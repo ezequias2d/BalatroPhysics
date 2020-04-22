@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using JitterDemo.Vehicle;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysicsDemo.Vehicle;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
     public abstract class Scene
     {

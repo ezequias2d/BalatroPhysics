@@ -1,8 +1,8 @@
 using System;
-using Jitter.Collision.Shapes;
-using Jitter.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.LinearMath;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
     static class Program
     {

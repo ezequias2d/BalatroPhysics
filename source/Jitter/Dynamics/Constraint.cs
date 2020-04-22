@@ -22,12 +22,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
 #endregion
 
-namespace Jitter.Dynamics.Constraints
+namespace BalatroPhysics.Dynamics.Constraints
 {
 
     public interface IConstraint

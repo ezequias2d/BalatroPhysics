@@ -6,23 +6,23 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using Jitter;
-using Jitter.Dynamics;
-using Jitter.Collision;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics.Constraints;
-using Jitter.Dynamics.Joints;
+using BalatroPhysics;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.Dynamics.Joints;
 using System.Reflection;
-using Jitter.Forces;
+using BalatroPhysics.Forces;
 using System.Diagnostics;
 
-using SingleBodyConstraints = Jitter.Dynamics.Constraints.SingleBody;
+using SingleBodyConstraints = BalatroPhysics.Dynamics.Constraints.SingleBody;
 using System.IO;
-using Jitter.DataStructures;
+using BalatroPhysics.DataStructures;
 #endregion
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
 
     public enum BodyTag { DrawMe, DontDrawMe }
@@ -83,7 +83,7 @@ namespace JitterDemo
 
 #if(WINDOWS)
             this.Window.Title = "Jitter Physics Demo - Jitter "
-                + Assembly.GetAssembly(typeof(Jitter.World)).GetName().Version.ToString();
+                + Assembly.GetAssembly(typeof(BalatroPhysics.World)).GetName().Version.ToString();
 #else
             this.Window.Title = "Jitter Physics Demo - Jitter";
 #endif
@@ -137,7 +137,8 @@ namespace JitterDemo
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                if (type.Namespace == "JitterDemo.Scenes" && !type.IsAbstract && type.DeclaringType == null)
+                
+                if (type.Namespace == "BalatroPhysicsDemo.Scenes" && !type.IsAbstract && type.DeclaringType == null)
                 {
                     if (type.Name == "SoftBodyJenga") currentScene = PhysicScenes.Count;
                     Scenes.Scene scene = (Scenes.Scene)Activator.CreateInstance(type, this);
@@ -429,7 +430,7 @@ namespace JitterDemo
             Display.DisplayText[4] = "Bodycount: " + World.RigidBodies.Count + " (" + activeBodies.ToString() + ")";
             Display.DisplayText[5] = (multithread) ? "Multithreaded" : "Single Threaded";
 
-            int entries = (int)Jitter.World.DebugType.Num;
+            int entries = (int)BalatroPhysics.World.DebugType.Num;
             double total = 0;
 
             for (int i = 0; i < entries; i++)
@@ -442,9 +443,11 @@ namespace JitterDemo
                 total += World.DebugTimes[i];
             }
 
+            double framerate = 1000.0 / total;
+
             Display.DisplayText[8+entries] = "------------------------------";
             Display.DisplayText[9 + entries] = "Total Physics Time: " + total.ToString("0.00");
-            Display.DisplayText[10 + entries] = "Physics Framerate: " + (1000.0d / total).ToString("0") + " fps";
+            Display.DisplayText[10 + entries] = "Physics Framerate: " + (double.IsInfinity(framerate) ? "infinity" : framerate.ToString("0")) + " fps";
 
 #if(WINDOWS)
             Display.DisplayText[6] = "gen0: " + GC.CollectionCount(0).ToString() +

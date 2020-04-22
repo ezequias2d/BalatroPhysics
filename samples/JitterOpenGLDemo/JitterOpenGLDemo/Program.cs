@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter.LinearMath;
-using Jitter.Collision;
-using Jitter;
-using Jitter.Dynamics;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision;
+using BalatroPhysics;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision.Shapes;
 #endregion
 
-namespace JitterOpenGLDemo
+namespace BalatroPhysicsOpenGLDemo
 {
     public class Program : DrawStuffOtk, IDisposable
     {
@@ -29,7 +29,7 @@ namespace JitterOpenGLDemo
             this.VSync = OpenTK.VSyncMode.Off;
             this.Title = title;
 
-            Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
+            KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
 
             BuildScene();
         }

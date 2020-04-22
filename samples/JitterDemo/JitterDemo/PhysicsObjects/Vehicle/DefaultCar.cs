@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter.Dynamics;
-using Jitter.Collision.Shapes;
-using Jitter.LinearMath;
-using Jitter;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
 
     /// <summary>

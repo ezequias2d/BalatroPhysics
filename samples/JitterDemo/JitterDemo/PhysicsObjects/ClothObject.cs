@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Jitter.Dynamics;
-using Jitter.LinearMath;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
 
-namespace JitterDemo.PhysicsObjects
+namespace BalatroPhysicsDemo.PhysicsObjects
 {
     class ClothObject : DrawableGameComponent
     {

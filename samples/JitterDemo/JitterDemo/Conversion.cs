@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Jitter.LinearMath;
+using BalatroPhysics.LinearMath;
 using Microsoft.Xna.Framework;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
     public sealed class Conversion
     {

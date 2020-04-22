@@ -22,15 +22,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Collision;
-using Jitter.Dynamics.Constraints;
-using Jitter.DataStructures;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Collision;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.DataStructures;
 #endregion
 
-namespace Jitter.Dynamics
+namespace BalatroPhysics.Dynamics
 {
 
 

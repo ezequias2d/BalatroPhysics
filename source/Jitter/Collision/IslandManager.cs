@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Jitter.Dynamics;
-using Jitter.Dynamics.Constraints;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Dynamics.Constraints;
 using System.Collections.ObjectModel;
 
-namespace Jitter.Collision
+namespace BalatroPhysics.Collision
 {
 
 

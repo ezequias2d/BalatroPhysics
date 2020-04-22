@@ -38,9 +38,9 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using Jitter.LinearMath;
+using BalatroPhysics.LinearMath;
 
-namespace JitterOpenGLDemo
+namespace BalatroPhysicsOpenGLDemo
 {
     public sealed class Conversion
     {
@@ -227,8 +227,8 @@ namespace JitterOpenGLDemo
             s_params_SSDM = new float[] { ground_scale, 0, 0, ground_ofsx };
             t_params_SSDM = new float[] { 0, ground_scale, 0, ground_ofsy };
 
-            Mouse.ButtonDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
-            Mouse.ButtonUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
+            MouseDown += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonDown);
+            MouseUp += new EventHandler<OpenTK.Input.MouseButtonEventArgs>(Mouse_ButtonUp);
         }
         #endregion Constructores
 
@@ -289,11 +289,11 @@ namespace JitterOpenGLDemo
                 Assembly a = Assembly.GetExecutingAssembly();
                 // Para ver los nombres de los recursos incrustados
                 String[] nombres = a.GetManifestResourceNames(); 
-                stmChecker = a.GetManifestResourceStream("JitterOpenGLDemo.Resources.checkered.png");
-                stmGround = a.GetManifestResourceStream("JitterOpenGLDemo.Resources.ground.png");
-                stmSky = a.GetManifestResourceStream("JitterOpenGLDemo.Resources.sky.png");
-                stmWood = a.GetManifestResourceStream("JitterOpenGLDemo.Resources.wood.png");
-                stmGrass = a.GetManifestResourceStream("JitterOpenGLDemo.Resources.grass.jpeg");
+                stmChecker = a.GetManifestResourceStream("BalatroPhysicsOpenGLDemo.Resources.checkered.png");
+                stmGround = a.GetManifestResourceStream("BalatroPhysicsOpenGLDemo.Resources.ground.png");
+                stmSky = a.GetManifestResourceStream("BalatroPhysicsOpenGLDemo.Resources.sky.png");
+                stmWood = a.GetManifestResourceStream("BalatroPhysicsOpenGLDemo.Resources.wood.png");
+                stmGrass = a.GetManifestResourceStream("BalatroPhysicsOpenGLDemo.Resources.grass.jpeg");
             }
             catch
             {
@@ -1567,7 +1567,7 @@ namespace JitterOpenGLDemo
             if (color[3] < 1.0f)
             {
                 GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             }
             else
             {

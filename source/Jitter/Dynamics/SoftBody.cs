@@ -22,15 +22,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Jitter.Dynamics.Constraints;
-using Jitter.Dynamics;
-using Jitter.Collision.Shapes;
-using Jitter.LinearMath;
-using Jitter.Collision;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision;
 using System.Collections.ObjectModel;
 #endregion
 
-namespace Jitter.Dynamics
+namespace BalatroPhysics.Dynamics
 {
     public partial class SoftBody : IBroadphaseEntity
     {

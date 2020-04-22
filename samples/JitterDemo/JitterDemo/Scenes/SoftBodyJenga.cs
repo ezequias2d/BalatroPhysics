@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter;
+using BalatroPhysics;
 using Microsoft.Xna.Framework;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics;
-using Jitter.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
 using Microsoft.Xna.Framework.Graphics;
-using Jitter.Collision;
-using JitterDemo.PhysicsObjects;
+using BalatroPhysics.Collision;
+using BalatroPhysicsDemo.PhysicsObjects;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
     class SoftBodyJenga : Scene
     {

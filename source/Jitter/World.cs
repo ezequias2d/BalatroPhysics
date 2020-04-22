@@ -23,15 +23,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Collision;
-using Jitter.Dynamics.Constraints;
-using Jitter.DataStructures;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Collision;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.DataStructures;
 #endregion
 
-namespace Jitter
+namespace BalatroPhysics
 {
 
     /// <summary>
@@ -150,7 +150,7 @@ namespace Jitter
         private int smallIterations = 4;
         private float timestep = 0.0f;
 
-        private Jitter.Collision.IslandManager islands = new IslandManager();
+        private BalatroPhysics.Collision.IslandManager islands = new IslandManager();
 
         private HashSet<RigidBody> rigidBodies = new HashSet<RigidBody>();
         private HashSet<Constraint> constraints = new HashSet<Constraint>();
@@ -180,7 +180,7 @@ namespace Jitter
         public ContactSettings ContactSettings { get { return contactSettings; } }
 
         /// <summary>
-        /// Gets a read only collection of the <see cref="Jitter.Collision.CollisionIsland"/> objects managed by
+        /// Gets a read only collection of the <see cref="BalatroPhysics.Collision.CollisionIsland"/> objects managed by
         /// this class.
         /// </summary>
         public ReadOnlyCollection<CollisionIsland> Islands { get { return islands; } }

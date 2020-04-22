@@ -21,9 +21,9 @@
 using System;
 using System.Collections.Generic;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
 using System.Threading;
 #if PORTABLE
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ using Thread = System.Threading.Tasks.Task;
 #endif
 #endregion
 
-namespace Jitter
+namespace BalatroPhysics
 {
 
     /// <summary>

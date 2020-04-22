@@ -21,14 +21,14 @@
 using System;
 using System.Collections.Generic;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
 using System.Collections;
-using Jitter.Collision;
+using BalatroPhysics.Collision;
 #endregion
 
-namespace Jitter.Dynamics
+namespace BalatroPhysics.Dynamics
 {
     /// <summary>
     /// For easy access, Arbiters are stored in a Hashtable(ArbiterMap). 

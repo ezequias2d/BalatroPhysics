@@ -31,10 +31,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Jitter.LinearMath;
+using BalatroPhysics.LinearMath;
 
 
-namespace Jitter.Collision
+namespace BalatroPhysics.Collision
 {
 
     /// <summary>

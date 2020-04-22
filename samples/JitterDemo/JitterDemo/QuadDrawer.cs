@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
 
     public class QuadDrawer : DrawableGameComponent

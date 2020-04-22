@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
     /// <summary>
     /// First person camera component for the demos, rotated by mouse.

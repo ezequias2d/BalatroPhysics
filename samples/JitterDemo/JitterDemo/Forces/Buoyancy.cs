@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Jitter.Dynamics;
-using Jitter.Collision.Shapes;
-using Jitter.LinearMath;
-using Jitter.Collision;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision;
 
-namespace Jitter.Forces
+namespace BalatroPhysics.Forces
 {
 
     /// <summary>

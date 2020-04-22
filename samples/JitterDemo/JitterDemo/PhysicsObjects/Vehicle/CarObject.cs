@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Jitter.Collision.Shapes;
-using Jitter;
-using Jitter.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics;
+using BalatroPhysics.LinearMath;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
 
-namespace JitterDemo.Vehicle
+namespace BalatroPhysicsDemo.Vehicle
 {
     public class CarObject : DrawableGameComponent
     {

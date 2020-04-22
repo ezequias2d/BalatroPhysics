@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter;
+using BalatroPhysics;
 using Microsoft.Xna.Framework;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Dynamics.Constraints;
-using Jitter.Dynamics.Joints;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.Dynamics.Joints;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
     class Ragdoll : Scene
     {

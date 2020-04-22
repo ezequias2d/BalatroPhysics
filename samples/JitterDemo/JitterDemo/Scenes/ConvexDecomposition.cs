@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Jitter.LinearMath;
+using BalatroPhysics.LinearMath;
 #if WINDOWS
 
-using Jitter.Collision;
+using BalatroPhysics.Collision;
 using System.Globalization;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
 
     class ConvexDecomposition : Scene

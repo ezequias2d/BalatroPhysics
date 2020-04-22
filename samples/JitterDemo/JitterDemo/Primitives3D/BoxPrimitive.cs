@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
 
-namespace JitterDemo.Primitives3D
+namespace BalatroPhysicsDemo.Primitives3D
 {
     /// <summary>
     /// Geometric primitive class for drawing cubes.

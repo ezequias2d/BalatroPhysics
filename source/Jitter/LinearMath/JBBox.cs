@@ -21,12 +21,12 @@
 using System;
 using System.Collections.Generic;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
 #endregion
 
-namespace Jitter.LinearMath
+namespace BalatroPhysics.LinearMath
 {
     /// <summary>
     /// Bounding Box defined through min and max vectors. Member

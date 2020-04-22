@@ -21,11 +21,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Jitter.Dynamics;
+using BalatroPhysics.Dynamics;
 using System.Collections;
 #endregion
 
-namespace Jitter.DataStructures
+namespace BalatroPhysics.DataStructures
 {
 
     public class ReadOnlyHashset<T> : IEnumerable, IEnumerable<T>

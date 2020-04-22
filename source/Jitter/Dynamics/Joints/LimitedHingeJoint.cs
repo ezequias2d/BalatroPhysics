@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter.LinearMath;
-using Jitter.Dynamics.Joints;
-using Jitter.Dynamics.Constraints;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Dynamics.Joints;
+using BalatroPhysics.Dynamics.Constraints;
 
-namespace Jitter.Dynamics.Joints
+namespace BalatroPhysics.Dynamics.Joints
 {
 
     /// <summary>

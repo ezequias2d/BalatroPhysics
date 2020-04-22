@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Jitter.Dynamics
+namespace BalatroPhysics.Dynamics
 {
 
     // TODO: Check values, Documenation

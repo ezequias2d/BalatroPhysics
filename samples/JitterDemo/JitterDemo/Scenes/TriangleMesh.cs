@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics;
-using JitterDemo.Vehicle;
-using Jitter.Collision;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysicsDemo.Vehicle;
+using BalatroPhysics.Collision;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
     public class TriangleMesh : Scene
     {

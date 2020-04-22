@@ -22,15 +22,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics.Constraints;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics.Constraints;
 using System.Collections.ObjectModel;
-using Jitter.DataStructures;
+using BalatroPhysics.DataStructures;
 #endregion
 
-namespace Jitter.Collision
+namespace BalatroPhysics.Collision
 {
     /// <summary>
     /// Holds a list of bodies which are in contact with each other.

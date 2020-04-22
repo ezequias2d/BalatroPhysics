@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Jitter.LinearMath;
-namespace JitterDemo
+using BalatroPhysics.LinearMath;
+namespace BalatroPhysicsDemo
 {
 
     /// <summary>
     /// Draw axis aligned bounding boxes, points and lines.
     /// </summary>
-    public class DebugDrawer : DrawableGameComponent, Jitter.IDebugDrawer
+    public class DebugDrawer : DrawableGameComponent, BalatroPhysics.IDebugDrawer
     {
         BasicEffect basicEffect;
 

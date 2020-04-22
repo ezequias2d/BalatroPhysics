@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter.Collision.Shapes;
-using Jitter.LinearMath;
-using Jitter.Dynamics;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Dynamics;
 using Microsoft.Xna.Framework;
-using Jitter;
-using Jitter.Dynamics.Constraints;
-using Jitter.Dynamics.Joints;
+using BalatroPhysics;
+using BalatroPhysics.Dynamics.Constraints;
+using BalatroPhysics.Dynamics.Joints;
 
-namespace JitterDemo.Scenes
+namespace BalatroPhysicsDemo.Scenes
 {
 
     public class EmptyScene : Scene

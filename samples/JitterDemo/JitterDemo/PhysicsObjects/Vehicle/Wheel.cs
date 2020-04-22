@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision;
-using Jitter;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision;
+using BalatroPhysics;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
 
     #region Copyright Notice - Wheel based on Jiglib

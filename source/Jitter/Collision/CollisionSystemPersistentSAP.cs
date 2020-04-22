@@ -21,13 +21,13 @@
 using System;
 using System.Collections.Generic;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
 using System.Collections;
 #endregion
 
-namespace Jitter.Collision
+namespace BalatroPhysics.Collision
 {
     /// <summary>
     /// Full 3-Axis SweepAndPrune using persistent updates.

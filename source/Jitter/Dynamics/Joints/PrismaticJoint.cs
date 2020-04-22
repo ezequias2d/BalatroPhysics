@@ -21,13 +21,13 @@
 using System;
 using System.Collections.Generic;
 
-using Jitter.Dynamics;
-using Jitter.LinearMath;
-using Jitter.Collision.Shapes;
-using Jitter.Dynamics.Constraints;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Collision.Shapes;
+using BalatroPhysics.Dynamics.Constraints;
 #endregion
 
-namespace Jitter.Dynamics.Joints
+namespace BalatroPhysics.Dynamics.Joints
 {
     public class PrismaticJoint : Joint
     {

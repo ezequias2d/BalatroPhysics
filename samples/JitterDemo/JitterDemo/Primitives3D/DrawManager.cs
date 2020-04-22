@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace JitterDemo.Primitives3D
+namespace BalatroPhysicsDemo.Primitives3D
 {
     //public class DrawManager : DrawableGameComponent
     //{

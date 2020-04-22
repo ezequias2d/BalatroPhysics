@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Jitter.LinearMath;
-using Jitter.Dynamics;
-using Jitter.Collision.Shapes;
+using BalatroPhysics.LinearMath;
+using BalatroPhysics.Dynamics;
+using BalatroPhysics.Collision.Shapes;
 using Microsoft.Xna.Framework.Graphics;
-using Jitter.Collision;
+using BalatroPhysics.Collision;
 
-namespace JitterDemo
+namespace BalatroPhysicsDemo
 {
     public class ConvexHullObject : DrawableGameComponent
     {
