@@ -30,7 +30,7 @@ namespace BalatroPhysics.LinearMath
 {
 
     /// <summary>
-    /// Contains some math operations used within Jitter.
+    /// Contains some math operations used within BalatroPhysics.
     /// </summary>
     public sealed class JMath
     {
@@ -47,6 +47,7 @@ namespace BalatroPhysics.LinearMath
         /// results are zero.
         /// </summary>
         public const float Epsilon = 1.192092896e-012f;
+        
 
         /// <summary>
         /// Gets the square root.

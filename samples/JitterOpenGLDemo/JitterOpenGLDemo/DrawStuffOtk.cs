@@ -579,7 +579,7 @@ namespace BalatroPhysicsOpenGLDemo
                     else
                         setColor(1.0f, 1.0f, 0, 1.0f);
                     float k = 0.03f;
-                    GL.Begin(BeginMode.TriangleFan);
+                    GL.Begin(PrimitiveType.TriangleFan);
                     GL.Normal3(0, -1.0f, 1.0f); // GL.Normal3(0, -1, 1) esto no funciona
                     GL.Vertex3(0, 0, k);
                     GL.Vertex3(-k, -k, 0);
@@ -1044,7 +1044,7 @@ namespace BalatroPhysicsOpenGLDemo
             float ky = 0.25881904510252f;
             float x = radius, y = 0;
 
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             for (int i = 0; i < 24; i++)
             {
                 // for all points on circle, scale to elongated rotated shadow and draw
@@ -1387,7 +1387,7 @@ namespace BalatroPhysicsOpenGLDemo
             // draw top cap
             GL.ShadeModel(ShadingModel.Flat);
             ny = 1; nz = 0;		  // normal vector = (0,ny,nz)
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             GL.Normal3(0, 0, 1.0f);
             GL.Vertex3(0, 0, l + zoffset);
             for (i = 0; i <= n; i++)
@@ -1408,7 +1408,7 @@ namespace BalatroPhysicsOpenGLDemo
 
             // draw bottom cap
             ny = 1; nz = 0;		  // normal vector = (0,ny,nz)
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             GL.Normal3(0, 0, -1.0f);
             GL.Vertex3(0, 0, -l + zoffset);
             for (i = 0; i <= n; i++)
@@ -1452,7 +1452,7 @@ namespace BalatroPhysicsOpenGLDemo
             GL.End();
 
             // top face
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             GL.Normal3(0, 0, 1.0f); // GL.Normal3(0, 0, 1) no funciona
             GL.Vertex3(-lx, -ly, lz);
             GL.Vertex3(lx, -ly, lz);
@@ -1461,7 +1461,7 @@ namespace BalatroPhysicsOpenGLDemo
             GL.End();
 
             // bottom face
-            GL.Begin(BeginMode.TriangleFan);
+            GL.Begin(PrimitiveType.TriangleFan);
             GL.Normal3(0, 0, -1.0f); // GL.Normal3(0, 0, -1) no funciona
             GL.Vertex3(-lx, -ly, -lz);
             GL.Vertex3(-lx, ly, -lz);

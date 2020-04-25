@@ -14,7 +14,7 @@ namespace BalatroPhysicsDemo
         {
             using (JitterDemo game = new JitterDemo())
             {
-                //Jitter.DynamicTree dt = new Jitter.DynamicTree();
+                //BalatroPhysics.DynamicTree dt = new BalatroPhysics.DynamicTree();
 
                 //JBBox jb;
                 //jb.Min = JVector.Zero;

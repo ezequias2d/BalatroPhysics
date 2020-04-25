@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <ProjectGuid>{6D78166B-77BC-4BAF-97CC-A946D013145B}</ProjectGuid>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JitterDemo</RootNamespace>
     <AssemblyName>JitterDemo</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <ApplicationIcon>Game.ico</ApplicationIcon>
@@ -158,7 +158,7 @@
     <None Include="Content\wheel.fbx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Jitter\BalatroPhysics.csproj">
+    <ProjectReference Include="..\..\..\source\BalatroPhysics\BalatroPhysics.csproj">
       <Project>{aa03ef1a-94f7-4d30-ab14-2092863ff923}</Project>
       <Name>BalatroPhysics</Name>
     </ProjectReference>

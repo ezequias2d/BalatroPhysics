@@ -19,7 +19,7 @@ namespace BalatroPhysicsDemo.Scenes
 
         public override void Build()
         {
-            //this.Demo.World.Solver = Jitter.World.SolverType.Sequential;
+            //this.Demo.World.Solver = BalatroPhysics.World.SolverType.Sequential;
 
 
             AddGround();

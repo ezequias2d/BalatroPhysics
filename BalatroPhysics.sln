@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5FC265FF-3CD8-4120-905C-B0548A8E1EF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysics", "source\Jitter\BalatroPhysics.csproj", "{AA03EF1A-94F7-4D30-AB14-2092863FF923}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysics", "source\BalatroPhysics\BalatroPhysics.csproj", "{AA03EF1A-94F7-4D30-AB14-2092863FF923}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysicsDemo", "samples\JitterDemo\JitterDemo\BalatroPhysicsDemo.csproj", "{6D78166B-77BC-4BAF-97CC-A946D013145B}"
 EndProject

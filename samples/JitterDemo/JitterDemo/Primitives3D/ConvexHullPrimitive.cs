@@ -4,7 +4,7 @@
 //using System.Text;
 //using Microsoft.Xna.Framework.Graphics;
 //using Microsoft.Xna.Framework;
-//using Jitter.LinearMath;
+//using BalatroPhysics.LinearMath;
 //using JitterDemo;
 
 //namespace JitterDemo.Primitives3D
