@@ -818,7 +818,7 @@ namespace BalatroPhysics
 
             if (!(body.isParticle))
             {
-
+                
                 //exponential map
                 Vector3 axis;
                 float angle = body.angularVelocity.Length();
@@ -835,12 +835,12 @@ namespace BalatroPhysics
                     axis = body.angularVelocity * ((float)Math.Sin(0.5f * angle * timestep) / angle);
                 }
 
-                JQuaternion dorn = new JQuaternion(axis.X, axis.Y, axis.Z, (float)Math.Cos(angle * timestep * 0.5f));
-                JQuaternion ornA; JQuaternion.CreateFromMatrix(body.orientation, out ornA);
+                Quaternion dorn = new Quaternion(axis.X, axis.Y, axis.Z, (float)Math.Cos(angle * timestep * 0.5f));
+                Quaternion ornA = JMath.CreateFromMatrix(body.orientation);
 
-                JQuaternion.Multiply(dorn, ornA, out dorn);
+                dorn = Quaternion.Normalize(Quaternion.Multiply(dorn, ornA));
 
-                dorn.Normalize(); JMatrix.CreateFromQuaternion(dorn, out body.orientation);
+                JMatrix.CreateFromQuaternion(dorn, out body.orientation);
             }
 
             if ((body.Damping & RigidBody.DampingType.Linear) != 0)

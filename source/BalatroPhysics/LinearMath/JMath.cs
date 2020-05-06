@@ -275,5 +275,53 @@ namespace BalatroPhysics.LinearMath
             vector1.Z = vector2.Z;
             vector2.Z = temp;
         }
+
+        /// <summary>
+        /// Creates a quaternion from a matrix.
+        /// </summary>
+        /// <param name="matrix">A matrix representing an orientation.</param>
+        /// <returns>JQuaternion representing an orientation.</returns>
+        public static Quaternion CreateFromMatrix(JMatrix matrix)
+        {
+            Quaternion result;
+            float num8 = (matrix.M11 + matrix.M22) + matrix.M33;
+            if (num8 > 0f)
+            {
+                float num = (float)Math.Sqrt((double)(num8 + 1f));
+                result.W = num * 0.5f;
+                num = 0.5f / num;
+                result.X = (matrix.M23 - matrix.M32) * num;
+                result.Y = (matrix.M31 - matrix.M13) * num;
+                result.Z = (matrix.M12 - matrix.M21) * num;
+            }
+            else if ((matrix.M11 >= matrix.M22) && (matrix.M11 >= matrix.M33))
+            {
+                float num7 = (float)Math.Sqrt((double)(((1f + matrix.M11) - matrix.M22) - matrix.M33));
+                float num4 = 0.5f / num7;
+                result.X = 0.5f * num7;
+                result.Y = (matrix.M12 + matrix.M21) * num4;
+                result.Z = (matrix.M13 + matrix.M31) * num4;
+                result.W = (matrix.M23 - matrix.M32) * num4;
+            }
+            else if (matrix.M22 > matrix.M33)
+            {
+                float num6 = (float)Math.Sqrt((double)(((1f + matrix.M22) - matrix.M11) - matrix.M33));
+                float num3 = 0.5f / num6;
+                result.X = (matrix.M21 + matrix.M12) * num3;
+                result.Y = 0.5f * num6;
+                result.Z = (matrix.M32 + matrix.M23) * num3;
+                result.W = (matrix.M31 - matrix.M13) * num3;
+            }
+            else
+            {
+                float num5 = (float)Math.Sqrt((double)(((1f + matrix.M33) - matrix.M11) - matrix.M22));
+                float num2 = 0.5f / num5;
+                result.X = (matrix.M31 + matrix.M13) * num2;
+                result.Y = (matrix.M32 + matrix.M23) * num2;
+                result.Z = 0.5f * num5;
+                result.W = (matrix.M12 - matrix.M21) * num2;
+            }
+            return result;
+        }
     }
 }

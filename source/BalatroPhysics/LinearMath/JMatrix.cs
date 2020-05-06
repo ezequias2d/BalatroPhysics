@@ -97,8 +97,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
         {
             JMatrix matrix;
-            JQuaternion quaternion;
-            JQuaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
+            Quaternion quaternion = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);
             CreateFromQuaternion(quaternion, out matrix);
             return matrix;
         }
@@ -455,9 +454,9 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="quaternion">The quaternion the matrix should be created from.</param>
         /// <returns>JMatrix representing an orientation.</returns>
-        #region public static JMatrix CreateFromQuaternion(JQuaternion quaternion)
+        #region public static JMatrix CreateFromQuaternion(Quaternion quaternion)
 
-        public static JMatrix CreateFromQuaternion(JQuaternion quaternion)
+        public static JMatrix CreateFromQuaternion(Quaternion quaternion)
         {
             JMatrix result;
             JMatrix.CreateFromQuaternion(quaternion,out result);
@@ -469,7 +468,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="quaternion">The quaternion the matrix should be created from.</param>
         /// <param name="result">JMatrix representing an orientation.</param>
-        public static void CreateFromQuaternion(JQuaternion quaternion, out JMatrix result)
+        public static void CreateFromQuaternion(Quaternion quaternion, out JMatrix result)
         {
             float num9 = quaternion.X * quaternion.X;
             float num8 = quaternion.Y * quaternion.Y;
