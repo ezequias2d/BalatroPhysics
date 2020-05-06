@@ -22,7 +22,7 @@ namespace BalatroPhysicsOpenGLDemo
         public Program() : base(800,600)
         {
             world = new World(new CollisionSystemSAP());
-            world.Gravity = new JVector(0, 0, -10);
+            world.Gravity = new System.Numerics.Vector3(0, 0, -10);
 
             dsSetSphereQuality(2);
 
@@ -44,8 +44,8 @@ namespace BalatroPhysicsOpenGLDemo
         {
             world.Clear();
 
-            RigidBody body = AddBox(new JVector(0, 0, -0.5f), JVector.Zero,
-                new JVector(300, 300, 1));
+            RigidBody body = AddBox(new System.Numerics.Vector3(0, 0, -0.5f), System.Numerics.Vector3.Zero,
+                new System.Numerics.Vector3(300, 300, 1));
 
             body.IsStatic = true;
             body.Tag = false;
@@ -54,21 +54,21 @@ namespace BalatroPhysicsOpenGLDemo
             {
                 for (int e = i; e < 20; e++)
                 {
-                    AddBox(new JVector(0.0f, (e - i * 0.5f) * 1.01f, 0.5f + i * 1.0f),
-                        JVector.Zero, JVector.One);
+                    AddBox(new System.Numerics.Vector3(0.0f, (e - i * 0.5f) * 1.01f, 0.5f + i * 1.0f),
+                        System.Numerics.Vector3.Zero, System.Numerics.Vector3.One);
                 }
             }
         }
 
         private void ShootSphere()
         {
-            JVector pos, ang;
+            System.Numerics.Vector3 pos, ang;
             dsGetViewPoint(out pos, out ang);
 
             RigidBody body = new RigidBody(new SphereShape(1.0f));
             body.Position = pos;
 
-            JVector unit;
+            System.Numerics.Vector3 unit;
             unit.X = (float)Math.Cos(ang.X / 180.0f * JMath.Pi);
             unit.Y = (float)Math.Sin(ang.X / 180.0f * JMath.Pi);
             unit.Z = (float)Math.Sin(ang.Y / 180.0f * JMath.Pi);
@@ -78,7 +78,7 @@ namespace BalatroPhysicsOpenGLDemo
             world.AddBody(body);
         }
 
-        private RigidBody AddBox(JVector position, JVector velocity, JVector size)
+        private RigidBody AddBox(System.Numerics.Vector3 position, System.Numerics.Vector3 velocity, System.Numerics.Vector3 size)
         {
             BoxShape shape = new BoxShape(size);
             RigidBody body = new RigidBody(shape);

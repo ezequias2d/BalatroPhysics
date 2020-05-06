@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -58,12 +59,9 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref JVector direction, out JVector result)
+        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
         {
-            result = direction;
-            result.Normalize();
-
-            JVector.Multiply(ref result, radius, out result);
+            result = Vector3.Normalize(direction) * radius;
         }
 
         /// <summary>

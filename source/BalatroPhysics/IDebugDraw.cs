@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics
@@ -41,9 +42,9 @@ namespace BalatroPhysics
     public interface IDebugDrawer
     {
 
-        void DrawLine(JVector start, JVector end);
-        void DrawPoint(JVector pos);
-        void DrawTriangle(JVector pos1,JVector pos2,JVector pos3);
+        void DrawLine(Vector3 start, Vector3 end);
+        void DrawPoint(Vector3 pos);
+        void DrawTriangle(Vector3 pos1,Vector3 pos2,Vector3 pos3);
 
         
     }

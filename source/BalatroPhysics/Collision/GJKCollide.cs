@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision
@@ -38,13 +39,13 @@ namespace BalatroPhysics.Collision
 
         private static ResourcePool<VoronoiSimplexSolver> simplexSolverPool = new ResourcePool<VoronoiSimplexSolver>();
 
-        #region private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref JVector position, ref JVector direction, out JVector result)
-        private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref JVector position, ref JVector direction, out JVector result)
+        #region private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref Vector3 position, ref Vector3 direction, out Vector3 result)
+        private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref Vector3 position, ref Vector3 direction, out Vector3 result)
         {
-            //JVector.Transform(ref direction, ref invOrientation, out result);
+            //JMath.Transform(ref direction, ref invOrientation, out result);
             //support.SupportMapping(ref result, out result);
-            //JVector.Transform(ref result, ref orientation, out result);
-            //JVector.Add(ref result, ref position, out result);
+            //JMath.Transform(ref result, ref orientation, out result);
+            //Vector3.Add(ref result, ref position, out result);
 
             result.X = ((direction.X * orientation.M11) + (direction.Y * orientation.M12)) + (direction.Z * orientation.M13);
             result.Y = ((direction.X * orientation.M21) + (direction.Y * orientation.M22)) + (direction.Z * orientation.M23);
@@ -71,23 +72,23 @@ namespace BalatroPhysics.Collision
         /// <param name="position">The position of the shape.</param>
         /// <param name="point">The point to check.</param>
         /// <returns>Returns true if the point is within the shape, otherwise false.</returns>
-        public static bool Pointcast(ISupportMappable support, ref JMatrix orientation,ref JVector position,ref JVector point)
+        public static bool Pointcast(ISupportMappable support, ref JMatrix orientation,ref Vector3 position,ref Vector3 point)
         {
-            JVector arbitraryPoint; 
+            Vector3 arbitraryPoint; 
 
             SupportMapTransformed(support, ref orientation, ref position, ref point, out arbitraryPoint);
-            JVector.Subtract(ref point, ref arbitraryPoint, out arbitraryPoint);
+            arbitraryPoint = point - arbitraryPoint;
 
-            JVector r; support.SupportCenter(out r);
-            JVector.Transform(ref r, ref orientation, out r);
-            JVector.Add(ref position, ref r, out r);
-            JVector.Subtract(ref point, ref r, out r);
+            Vector3 r; support.SupportCenter(out r);
+            JMath.Transform(ref r, ref orientation, out r);
+            r += position;
+            r = point - r;
 
-            JVector x = point;
-            JVector w, p;
+            Vector3 x = point;
+            Vector3 w, p;
             float VdotR;
 
-            JVector v; JVector.Subtract(ref x, ref arbitraryPoint, out v);
+            Vector3 v = x - arbitraryPoint;
             float dist = v.LengthSquared();
             float epsilon = 0.0001f;
 
@@ -100,13 +101,13 @@ namespace BalatroPhysics.Collision
             while ((dist > epsilon) && (maxIter-- != 0))
             {
                 SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
-                JVector.Subtract(ref x, ref p, out w);
+                w = x - p;
 
-                float VdotW = JVector.Dot(ref v, ref w);
+                float VdotW = Vector3.Dot(v, w);
 
                 if (VdotW > 0.0f)
                 {
-                    VdotR = JVector.Dot(ref v, ref r);
+                    VdotR = Vector3.Dot(v, r);
 
                     if (VdotR >= -(JMath.Epsilon * JMath.Epsilon)) { simplexSolverPool.GiveBack(simplexSolver); return false; }
                     else simplexSolver.Reset();
@@ -124,31 +125,31 @@ namespace BalatroPhysics.Collision
 
 
         public static bool ClosestPoints(ISupportMappable support1, ISupportMappable support2, ref JMatrix orientation1,
-            ref JMatrix orientation2, ref JVector position1, ref JVector position2,
-            out JVector p1, out JVector p2, out JVector normal)
+            ref JMatrix orientation2, ref Vector3 position1, ref Vector3 position2,
+            out Vector3 p1, out Vector3 p2, out Vector3 normal)
         {
 
             VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
             simplexSolver.Reset();
 
-            p1 = p2 = JVector.Zero;
+            p1 = p2 = Vector3.Zero;
 
-            JVector r = position1 - position2;
-            JVector w, v;
+            Vector3 r = position1 - position2;
+            Vector3 w, v;
 
-            JVector supVertexA;
-            JVector rn,vn;
+            Vector3 supVertexA;
+            Vector3 rn,vn;
 
-            rn = JVector.Negate(r);
+            rn = Vector3.Negate(r);
 
             SupportMapTransformed(support1, ref orientation1, ref position1, ref rn, out supVertexA);
 
-            JVector supVertexB;
+            Vector3 supVertexB;
             SupportMapTransformed(support2, ref orientation2, ref position2, ref r, out supVertexB);
 
             v = supVertexA - supVertexB;
 
-            normal = JVector.Zero;
+            normal = Vector3.Zero;
 
             int maxIter = 15;
 
@@ -157,7 +158,7 @@ namespace BalatroPhysics.Collision
 
             while ((distSq > epsilon) && (maxIter-- != 0))
             {
-                vn = JVector.Negate(v);
+                vn = Vector3.Negate(v);
                 SupportMapTransformed(support1, ref orientation1, ref position1, ref vn, out supVertexA);
                 SupportMapTransformed(support2, ref orientation2, ref position2, ref v, out supVertexB);
                 w = supVertexA - supVertexB;
@@ -175,7 +176,7 @@ namespace BalatroPhysics.Collision
             simplexSolver.ComputePoints(out p1, out p2);
 
             if (normal.LengthSquared() > JMath.Epsilon * JMath.Epsilon)
-                normal.Normalize();
+                normal = Vector3.Normalize(normal);
 
             simplexSolverPool.GiveBack(simplexSolver);
 
@@ -185,8 +186,8 @@ namespace BalatroPhysics.Collision
 
         #region TimeOfImpact Conservative Advancement - Depricated
     //    public static bool TimeOfImpact(ISupportMappable support1, ISupportMappable support2, ref JMatrix orientation1,
-    //ref JMatrix orientation2, ref JVector position1, ref JVector position2, ref JVector sweptA, ref JVector sweptB,
-    //out JVector p1, out JVector p2, out JVector normal)
+    //ref JMatrix orientation2, ref Vector3 position1, ref Vector3 position2, ref Vector3 sweptA, ref Vector3 sweptB,
+    //out Vector3 p1, out Vector3 p2, out Vector3 normal)
     //    {
 
     //        VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
@@ -194,26 +195,26 @@ namespace BalatroPhysics.Collision
 
     //        float lambda = 0.0f;
 
-    //        p1 = p2 = JVector.Zero;
+    //        p1 = p2 = Vector3.Zero;
 
-    //        JVector x1 = position1;
-    //        JVector x2 = position2;
+    //        Vector3 x1 = position1;
+    //        Vector3 x2 = position2;
 
-    //        JVector r = sweptA - sweptB;
-    //        JVector w, v;
+    //        Vector3 r = sweptA - sweptB;
+    //        Vector3 w, v;
 
-    //        JVector supVertexA;
-    //        JVector rn = JVector.Negate(r);
+    //        Vector3 supVertexA;
+    //        Vector3 rn = Vector3.Negate(r);
     //        SupportMapTransformed(support1, ref orientation1, ref x1, ref rn, out supVertexA);
 
-    //        JVector supVertexB;
+    //        Vector3 supVertexB;
     //        SupportMapTransformed(support2, ref orientation2, ref x2, ref r, out supVertexB);
 
     //        v = supVertexA - supVertexB;
 
     //        bool hasResult = false;
 
-    //        normal = JVector.Zero;
+    //        normal = Vector3.Zero;
 
 
     //        float lastLambda = lambda;
@@ -228,16 +229,16 @@ namespace BalatroPhysics.Collision
     //        while ((distSq > epsilon) && (maxIter-- != 0))
     //        {
 
-    //            JVector vn = JVector.Negate(v);
+    //            Vector3 vn = Vector3.Negate(v);
     //            SupportMapTransformed(support1, ref orientation1, ref x1, ref vn, out supVertexA);
     //            SupportMapTransformed(support2, ref orientation2, ref x2, ref v, out supVertexB);
     //            w = supVertexA - supVertexB;
 
-    //            float VdotW = JVector.Dot(ref v, ref w);
+    //            float VdotW = Vector3.Dot(ref v, ref w);
 
     //            if (VdotW > 0.0f)
     //            {
-    //                VdotR = JVector.Dot(ref v, ref r);
+    //                VdotR = Vector3.Dot(ref v, ref r);
 
     //                if (VdotR >= -JMath.Epsilon)
     //                {
@@ -302,23 +303,23 @@ namespace BalatroPhysics.Collision
         /// <param name="normal">The normal from the ray collision.</param>
         /// <returns>Returns true if the ray hit the shape, false otherwise.</returns>
         public static bool Raycast(ISupportMappable support, ref JMatrix orientation, ref JMatrix invOrientation,
-            ref JVector position,ref JVector origin,ref JVector direction, out float fraction, out JVector normal)
+            ref Vector3 position,ref Vector3 origin,ref Vector3 direction, out float fraction, out Vector3 normal)
         {
             VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
             simplexSolver.Reset();
 
-            normal = JVector.Zero;
+            normal = Vector3.Zero;
             fraction = float.MaxValue;
 
             float lambda = 0.0f;
 
-            JVector r = direction;
-            JVector x = origin;
-            JVector w, p, v;
+            Vector3 r = direction;
+            Vector3 x = origin;
+            Vector3 w, p, v;
 
-            JVector arbitraryPoint; 
+            Vector3 arbitraryPoint; 
             SupportMapTransformed(support, ref orientation, ref position, ref r, out arbitraryPoint);
-            JVector.Subtract(ref x, ref arbitraryPoint, out v);
+            v = x - arbitraryPoint;
 
             int maxIter = MaxIterations;
 
@@ -330,13 +331,13 @@ namespace BalatroPhysics.Collision
             while ((distSq > epsilon) && (maxIter-- != 0))
             {
                 SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
-                JVector.Subtract(ref x, ref p, out w);
+                w = x - p;
 
-                float VdotW = JVector.Dot(ref v, ref w);
+                float VdotW = Vector3.Dot(v, w);
 
                 if (VdotW > 0.0f)
                 {
-                    VdotR = JVector.Dot(ref v, ref r);
+                    VdotR = Vector3.Dot(v, r);
 
                     if (VdotR >= -JMath.Epsilon)
                     {
@@ -346,9 +347,9 @@ namespace BalatroPhysics.Collision
                     else
                     {
                         lambda = lambda - VdotW / VdotR;
-                        JVector.Multiply(ref r, lambda, out x);
-                        JVector.Add(ref origin, ref x, out x);
-                        JVector.Subtract(ref x, ref p, out w);
+                        x = r * lambda;
+                        x = origin + x;
+                        w = x - p;
                         normal = v;
                     }
                 }
@@ -363,7 +364,7 @@ namespace BalatroPhysics.Collision
             // but is inaccurate against large objects:
             // fraction = lambda;
 
-            JVector p1, p2;
+            Vector3 p1, p2;
             simplexSolver.ComputePoints(out p1, out p2);
 
             p2 = p2 - origin;
@@ -372,7 +373,7 @@ namespace BalatroPhysics.Collision
             #endregion
 
             if (normal.LengthSquared() > JMath.Epsilon * JMath.Epsilon)
-                normal.Normalize();
+                normal = Vector3.Normalize(normal);
 
             simplexSolverPool.GiveBack(simplexSolver);
 
@@ -423,7 +424,7 @@ namespace BalatroPhysics.Collision
 
         private class SubSimplexClosestResult
         {
-            private JVector _closestPointOnSimplex;
+            private Vector3 _closestPointOnSimplex;
 
             //MASK for m_usedVertices
             //stores the simplex vertex-usage, using the MASK, 
@@ -432,7 +433,7 @@ namespace BalatroPhysics.Collision
             private float[] _barycentricCoords = new float[4];
             private bool _degenerate;
 
-            public JVector ClosestPointOnSimplex { get { return _closestPointOnSimplex; } set { _closestPointOnSimplex = value; } }
+            public Vector3 ClosestPointOnSimplex { get { return _closestPointOnSimplex; } set { _closestPointOnSimplex = value; } }
             public UsageBitfield UsedVertices { get { return _usedVertices; } set { _usedVertices = value; } }
             public float[] BarycentricCoords { get { return _barycentricCoords; } set { _barycentricCoords = value; } }
             public bool Degenerate { get { return _degenerate; } set { _degenerate = value; } }
@@ -481,14 +482,14 @@ namespace BalatroPhysics.Collision
 
             private int _numVertices;
 
-            private JVector[] _simplexVectorW = new JVector[VoronoiSimplexMaxVerts];
-            private JVector[] _simplexPointsP = new JVector[VoronoiSimplexMaxVerts];
-            private JVector[] _simplexPointsQ = new JVector[VoronoiSimplexMaxVerts];
+            private Vector3[] _simplexVectorW = new Vector3[VoronoiSimplexMaxVerts];
+            private Vector3[] _simplexPointsP = new Vector3[VoronoiSimplexMaxVerts];
+            private Vector3[] _simplexPointsQ = new Vector3[VoronoiSimplexMaxVerts];
 
-            private JVector _cachedPA;
-            private JVector _cachedPB;
-            private JVector _cachedV;
-            private JVector _lastW;
+            private Vector3 _cachedPA;
+            private Vector3 _cachedPB;
+            private Vector3 _cachedV;
+            private Vector3 _lastW;
             private bool _cachedValidClosest;
 
             private SubSimplexClosestResult _cachedBC = new SubSimplexClosestResult();
@@ -523,11 +524,11 @@ namespace BalatroPhysics.Collision
                 _cachedValidClosest = false;
                 _numVertices = 0;
                 _needsUpdate = true;
-                _lastW = new JVector(1e30f, 1e30f, 1e30f);
+                _lastW = new Vector3(1e30f, 1e30f, 1e30f);
                 _cachedBC.Reset();
             }
 
-            public void AddVertex(JVector w, JVector p, JVector q)
+            public void AddVertex(Vector3 w, Vector3 p, Vector3 q)
             {
                 _lastW = w;
                 _needsUpdate = true;
@@ -540,7 +541,7 @@ namespace BalatroPhysics.Collision
             }
 
             //return/calculate the closest vertex
-            public bool Closest(out JVector v)
+            public bool Closest(out Vector3 v)
             {
                 bool succes = UpdateClosestVectorAndPoints();
                 v = _cachedV;
@@ -563,12 +564,12 @@ namespace BalatroPhysics.Collision
             }
 
             //return the current simplex
-            public int GetSimplex(out JVector[] pBuf, out JVector[] qBuf, out JVector[] yBuf)
+            public int GetSimplex(out Vector3[] pBuf, out Vector3[] qBuf, out Vector3[] yBuf)
             {
                 int numverts = NumVertices;
-                pBuf = new JVector[numverts];
-                qBuf = new JVector[numverts];
-                yBuf = new JVector[numverts];
+                pBuf = new Vector3[numverts];
+                qBuf = new Vector3[numverts];
+                yBuf = new Vector3[numverts];
                 for (int i = 0; i < numverts; i++)
                 {
                     yBuf[i] = _simplexVectorW[i];
@@ -578,7 +579,7 @@ namespace BalatroPhysics.Collision
                 return numverts;
             }
 
-            public bool InSimplex(JVector w)
+            public bool InSimplex(Vector3 w)
             {
                 //check in case lastW is already removed
                 if (w == _lastW) return true;
@@ -591,7 +592,7 @@ namespace BalatroPhysics.Collision
                 return false;
             }
 
-            public void BackupClosest(out JVector v)
+            public void BackupClosest(out Vector3 v)
             {
                 v = _cachedV;
             }
@@ -604,7 +605,7 @@ namespace BalatroPhysics.Collision
                 }
             }
 
-            public void ComputePoints(out JVector p1, out JVector p2)
+            public void ComputePoints(out Vector3 p1, out Vector3 p2)
             {
                 UpdateClosestVectorAndPoints();
                 p1 = _cachedPA;
@@ -636,7 +637,7 @@ namespace BalatroPhysics.Collision
                     _cachedBC.Reset();
                     _needsUpdate = false;
 
-                    JVector p, a, b, c, d;
+                    Vector3 p, a, b, c, d;
                     switch (NumVertices)
                     {
                         case 0:
@@ -652,13 +653,13 @@ namespace BalatroPhysics.Collision
                             break;
                         case 2:
                             //closest point origin from line segment
-                            JVector from = _simplexVectorW[0];
-                            JVector to = _simplexVectorW[1];
-                            JVector nearest;
+                            Vector3 from = _simplexVectorW[0];
+                            Vector3 to = _simplexVectorW[1];
+                            Vector3 nearest;
 
-                            JVector diff = from * (-1);
-                            JVector v = to - from;
-                            float t = JVector.Dot(v, diff);
+                            Vector3 diff = from * (-1);
+                            Vector3 v = to - from;
+                            float t = Vector3.Dot(v, diff);
 
                             if (t > 0)
                             {
@@ -698,7 +699,7 @@ namespace BalatroPhysics.Collision
                             break;
                         case 3:
                             //closest point origin from triangle
-                            p = new JVector();
+                            p = new Vector3();
                             a = _simplexVectorW[0];
                             b = _simplexVectorW[1];
                             c = _simplexVectorW[2];
@@ -720,7 +721,7 @@ namespace BalatroPhysics.Collision
                             _cachedValidClosest = _cachedBC.IsValid;
                             break;
                         case 4:
-                            p = new JVector();
+                            p = new Vector3();
                             a = _simplexVectorW[0];
                             b = _simplexVectorW[1];
                             c = _simplexVectorW[2];
@@ -771,7 +772,7 @@ namespace BalatroPhysics.Collision
                 return _cachedValidClosest;
             }
 
-            public bool ClosestPtPointTriangle(JVector p, JVector a, JVector b, JVector c,
+            public bool ClosestPtPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c,
                 ref SubSimplexClosestResult result)
             {
                 result.UsedVertices.Reset();
@@ -779,11 +780,11 @@ namespace BalatroPhysics.Collision
                 float v, w;
 
                 // Check if P in vertex region outside A
-                JVector ab = b - a;
-                JVector ac = c - a;
-                JVector ap = p - a;
-                float d1 = JVector.Dot(ab, ap);
-                float d2 = JVector.Dot(ac, ap);
+                Vector3 ab = b - a;
+                Vector3 ac = c - a;
+                Vector3 ap = p - a;
+                float d1 = Vector3.Dot(ab, ap);
+                float d2 = Vector3.Dot(ac, ap);
                 if (d1 <= 0f && d2 <= 0f)
                 {
                     result.ClosestPointOnSimplex = a;
@@ -793,9 +794,9 @@ namespace BalatroPhysics.Collision
                 }
 
                 // Check if P in vertex region outside B
-                JVector bp = p - b;
-                float d3 = JVector.Dot(ab, bp);
-                float d4 = JVector.Dot(ac, bp);
+                Vector3 bp = p - b;
+                float d3 = Vector3.Dot(ab, bp);
+                float d4 = Vector3.Dot(ac, bp);
                 if (d3 >= 0f && d4 <= d3)
                 {
                     result.ClosestPointOnSimplex = b;
@@ -818,9 +819,9 @@ namespace BalatroPhysics.Collision
                 }
 
                 // Check if P in vertex region outside C
-                JVector cp = p - c;
-                float d5 = JVector.Dot(ab, cp);
-                float d6 = JVector.Dot(ac, cp);
+                Vector3 cp = p - c;
+                float d5 = Vector3.Dot(ab, cp);
+                float d6 = Vector3.Dot(ac, cp);
                 if (d6 >= 0f && d5 <= d6)
                 {
                     result.ClosestPointOnSimplex = c;
@@ -871,12 +872,12 @@ namespace BalatroPhysics.Collision
             }
 
             /// Test if point p and d lie on opposite sides of plane through abc
-            public int PointOutsideOfPlane(JVector p, JVector a, JVector b, JVector c, JVector d)
+            public int PointOutsideOfPlane(Vector3 p, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
             {
-                JVector normal = JVector.Cross(b - a, c - a);
+                Vector3 normal = Vector3.Cross(b - a, c - a);
 
-                float signp = JVector.Dot(p - a, normal); // [AP AB AC]
-                float signd = JVector.Dot(d - a, normal); // [AD AB AC]
+                float signp = Vector3.Dot(p - a, normal); // [AP AB AC]
+                float signd = Vector3.Dot(d - a, normal); // [AD AB AC]
 
                 //if (CatchDegenerateTetrahedron)
                     if (signd * signd < (1e-4f * 1e-4f)) return -1;
@@ -885,7 +886,7 @@ namespace BalatroPhysics.Collision
                 return signp * signd < 0f ? 1 : 0;
             }
 
-            public bool ClosestPtPointTetrahedron(JVector p, JVector a, JVector b, JVector c, JVector d,
+            public bool ClosestPtPointTetrahedron(Vector3 p, Vector3 a, Vector3 b, Vector3 c, Vector3 d,
                 ref SubSimplexClosestResult finalResult)
             {
                 tempResult.Reset();
@@ -917,9 +918,9 @@ namespace BalatroPhysics.Collision
                 if (pointOutsideABC != 0)
                 {
                     ClosestPtPointTriangle(p, a, b, c, ref tempResult);
-                    JVector q = tempResult.ClosestPointOnSimplex;
+                    Vector3 q = tempResult.ClosestPointOnSimplex;
 
-                    float sqDist = ((JVector)(q - p)).LengthSquared();
+                    float sqDist = ((Vector3)(q - p)).LengthSquared();
                     // Update best closest point if (squared) distance is less than current best
                     if (sqDist < bestSqDist)
                     {
@@ -942,10 +943,10 @@ namespace BalatroPhysics.Collision
                 if (pointOutsideACD != 0)
                 {
                     ClosestPtPointTriangle(p, a, c, d, ref tempResult);
-                    JVector q = tempResult.ClosestPointOnSimplex;
+                    Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
 
-                    float sqDist = ((JVector)(q - p)).LengthSquared();
+                    float sqDist = ((Vector3)(q - p)).LengthSquared();
                     if (sqDist < bestSqDist)
                     {
                         bestSqDist = sqDist;
@@ -966,10 +967,10 @@ namespace BalatroPhysics.Collision
                 if (pointOutsideADB != 0)
                 {
                     ClosestPtPointTriangle(p, a, d, b, ref tempResult);
-                    JVector q = tempResult.ClosestPointOnSimplex;
+                    Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
 
-                    float sqDist = ((JVector)(q - p)).LengthSquared();
+                    float sqDist = ((Vector3)(q - p)).LengthSquared();
                     if (sqDist < bestSqDist)
                     {
                         bestSqDist = sqDist;
@@ -991,9 +992,9 @@ namespace BalatroPhysics.Collision
                 if (pointOutsideBDC != 0)
                 {
                     ClosestPtPointTriangle(p, b, d, c, ref tempResult);
-                    JVector q = tempResult.ClosestPointOnSimplex;
+                    Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
-                    float sqDist = ((JVector)(q - p)).LengthSquared();
+                    float sqDist = ((Vector3)(q - p)).LengthSquared();
                     if (sqDist < bestSqDist)
                     {
                         bestSqDist = sqDist;

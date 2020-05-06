@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.LinearMath
@@ -32,8 +33,52 @@ namespace BalatroPhysics.LinearMath
     /// <summary>
     /// Contains some math operations used within BalatroPhysics.
     /// </summary>
-    public sealed class JMath
+    public static class JMath
     {
+        #region Static readonly variables
+        /// <summary>
+        /// A vector with components (0,0,0);
+        /// </summary>
+        public static readonly Vector3 Zero;
+        /// <summary>
+        /// A vector with components (1,0,0);
+        /// </summary>
+        public static readonly Vector3 Left;
+        /// <summary>
+        /// A vector with components (-1,0,0);
+        /// </summary>
+        public static readonly Vector3 Right;
+        /// <summary>
+        /// A vector with components (0,1,0);
+        /// </summary>
+        public static readonly Vector3 Up;
+        /// <summary>
+        /// A vector with components (0,-1,0);
+        /// </summary>
+        public static readonly Vector3 Down;
+        /// <summary>
+        /// A vector with components (0,0,1);
+        /// </summary>
+        public static readonly Vector3 Backward;
+        /// <summary>
+        /// A vector with components (0,0,-1);
+        /// </summary>
+        public static readonly Vector3 Forward;
+        /// <summary>
+        /// A vector with components (1,1,1);
+        /// </summary>
+        public static readonly Vector3 One;
+        /// <summary>
+        /// A vector with components 
+        /// (float.MinValue,float.MinValue,float.MinValue);
+        /// </summary>
+        public static readonly Vector3 MinValue;
+        /// <summary>
+        /// A vector with components 
+        /// (float.MaxValue,float.MaxValue,float.MaxValue);
+        /// </summary>
+        public static readonly Vector3 MaxValue;
+        #endregion
 
         /// <summary>
         /// PI.
@@ -47,7 +92,22 @@ namespace BalatroPhysics.LinearMath
         /// results are zero.
         /// </summary>
         public const float Epsilon = 1.192092896e-012f;
-        
+
+        private const float ZeroEpsilonSq = JMath.Epsilon * JMath.Epsilon;
+
+        static JMath()
+        {
+            One = new Vector3(1, 1, 1);
+            Zero = new Vector3(0, 0, 0);
+            Left = new Vector3(1, 0, 0);
+            Right = new Vector3(-1, 0, 0);
+            Up = new Vector3(0, 1, 0);
+            Down = new Vector3(0, -1, 0);
+            Backward = new Vector3(0, 0, 1);
+            Forward = new Vector3(0, 0, -1);
+            MinValue = new Vector3(float.MinValue);
+            MaxValue = new Vector3(float.MaxValue);
+        }
 
         /// <summary>
         /// Gets the square root.
@@ -137,5 +197,83 @@ namespace BalatroPhysics.LinearMath
             result.M33 = Math.Abs(matrix.M33);
         }
         #endregion
+
+        /// <summary>
+        /// Transforms a vector by the given matrix.
+        /// </summary>
+        /// <param name="position">The vector to transform.</param>
+        /// <param name="matrix">The transform matrix.</param>
+        /// <param name="result">The transformed vector.</param>
+        public static void Transform(ref Vector3 position, ref JMatrix matrix, out Vector3 result)
+        {
+            float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M21)) + (position.Z * matrix.M31);
+            float num1 = ((position.X * matrix.M12) + (position.Y * matrix.M22)) + (position.Z * matrix.M32);
+            float num2 = ((position.X * matrix.M13) + (position.Y * matrix.M23)) + (position.Z * matrix.M33);
+
+            result.X = num0;
+            result.Y = num1;
+            result.Z = num2;
+        }
+
+        /// <summary>
+        /// Transforms a vector by the given matrix.
+        /// </summary>
+        /// <param name="position">The vector to transform.</param>
+        /// <param name="matrix">The transform matrix.</param>
+        /// <returns>The transformed vector.</returns>
+        public static Vector3 Transform(Vector3 position, JMatrix matrix)
+        {
+            Vector3 result;
+            JMath.Transform(ref position, ref matrix, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms a vector by the transposed of the given Matrix.
+        /// </summary>
+        /// <param name="position">The vector to transform.</param>
+        /// <param name="matrix">The transform matrix.</param>
+        /// <param name="result">The transformed vector.</param>
+        public static void TransposedTransform(ref Vector3 position, ref JMatrix matrix, out Vector3 result)
+        {
+            float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M12)) + (position.Z * matrix.M13);
+            float num1 = ((position.X * matrix.M21) + (position.Y * matrix.M22)) + (position.Z * matrix.M23);
+            float num2 = ((position.X * matrix.M31) + (position.Y * matrix.M32)) + (position.Z * matrix.M33);
+
+            result.X = num0;
+            result.Y = num1;
+            result.Z = num2;
+        }
+
+        /// <summary>
+        /// Checks if the length of the vector is nearly zero.
+        /// </summary>
+        /// <returns>Returns true if the vector is nearly zero, otherwise false.</returns>
+        public static bool IsNearlyZero(this Vector3 vector)
+        {
+            return (vector.LengthSquared() < ZeroEpsilonSq);
+        }
+
+        /// <summary>
+        /// Swaps the components of both vectors.
+        /// </summary>
+        /// <param name="vector1">The first vector to swap with the second.</param>
+        /// <param name="vector2">The second vector to swap with the first.</param>
+        public static void Swap(ref Vector3 vector1, ref Vector3 vector2)
+        {
+            float temp;
+
+            temp = vector1.X;
+            vector1.X = vector2.X;
+            vector2.X = temp;
+
+            temp = vector1.Y;
+            vector1.Y = vector2.Y;
+            vector2.Y = temp;
+
+            temp = vector1.Z;
+            vector1.Z = vector2.Z;
+            vector2.Z = temp;
+        }
     }
 }

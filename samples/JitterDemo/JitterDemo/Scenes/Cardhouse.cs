@@ -15,7 +15,7 @@ namespace BalatroPhysicsDemo.Scenes
     {
         public CardHouse(JitterDemo demo) : base(demo) { }
 
-        static JVector cardHouseStartingPosition = new JVector(0, 0, 0);
+        static System.Numerics.Vector3 cardHouseStartingPosition = new System.Numerics.Vector3(0, 0, 0);
         const int cardHouseLayers = 10; // starting from 1
 
 
@@ -46,34 +46,34 @@ namespace BalatroPhysicsDemo.Scenes
 
                 AddCardLayer(
                     cardHouseStartingPosition +
-                        new JVector(cardSpacing * layer, (layerHeight + (float)(2 * cardThickness)) * layer, 0),
+                        new System.Numerics.Vector3(cardSpacing * layer, (layerHeight + (float)(2 * cardThickness)) * layer, 0),
                     layerCards);
             }
         }
 
-        private void AddCardLayer(JVector startPosition, int angledCards)
+        private void AddCardLayer(System.Numerics.Vector3 startPosition, int angledCards)
         {
             Debug.Assert(angledCards % 2 == 0);
 
             foreach (int i in Enumerable.Range(0, angledCards))
             {
                 AddCard(
-                    startPosition + new JVector(cardSpacing * i, layerHeight / 2f, 0),
+                    startPosition + new System.Numerics.Vector3(cardSpacing * i, layerHeight / 2f, 0),
                     (i % 2 == 0) ? angle : oppositeAngle);
             }
 
             for (float distance = 1.5f; distance < angledCards - 0.5; distance += 4)
             {
-                AddCard(startPosition + new JVector(cardSpacing * distance, layerHeight, 0), 0);
+                AddCard(startPosition + new System.Numerics.Vector3(cardSpacing * distance, layerHeight, 0), 0);
             }
 
             for (float distance = 3.5f; distance < angledCards - 0.5; distance += 4)
             {
-                AddCard(startPosition + new JVector(cardSpacing * distance, layerHeight + (float)cardThickness, 0), 0);
+                AddCard(startPosition + new System.Numerics.Vector3(cardSpacing * distance, layerHeight + (float)cardThickness, 0), 0);
             }
         }
 
-        private void AddCard(JVector position, float rollOrientation)
+        private void AddCard(System.Numerics.Vector3 position, float rollOrientation)
         {
             RigidBody body = new RigidBody(new BoxShape((float)cardHeight, (float)cardThickness, (float)cardWidth));
             body.Mass = 0.5f;

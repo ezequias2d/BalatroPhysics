@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision
@@ -115,7 +116,7 @@ namespace BalatroPhysics.Collision
             public JBBox box;
         }
 
-        private JVector[] positions;
+        private Vector3[] positions;
         private JBBox[] triBoxes;
         private Node[] nodes;
         //private UInt16[] nodeStack;
@@ -146,11 +147,11 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="positions">Vertices.</param>
         /// <param name="tris">Indices.</param>
-        #region public void AddTriangles(List<JVector> positions, List<TriangleVertexIndices> tris)
-        public void SetTriangles(List<JVector> positions, List<TriangleVertexIndices> tris)
+        #region public void AddTriangles(List<Vector3> positions, List<TriangleVertexIndices> tris)
+        public void SetTriangles(List<Vector3> positions, List<TriangleVertexIndices> tris)
         {
             // copy the position data into a array
-            this.positions = new JVector[positions.Count];
+            this.positions = new Vector3[positions.Count];
             positions.CopyTo(this.positions);
 
             // copy the triangles
@@ -169,21 +170,21 @@ namespace BalatroPhysics.Collision
             triBoxes = new JBBox[tris.Length];
 
             // create an infinite size root box
-            rootNodeBox = new JBBox(new JVector(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity),
-                                           new JVector(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity));
+            rootNodeBox = new JBBox(new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity),
+                                           new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity));
 
 
             for (int i = 0; i < tris.Length; i++)
             {
-                JVector.Min(ref positions[tris[i].I1], ref positions[tris[i].I2], out triBoxes[i].Min);
-                JVector.Min(ref positions[tris[i].I0], ref triBoxes[i].Min, out triBoxes[i].Min);
+                triBoxes[i].Min = Vector3.Min(positions[tris[i].I1], positions[tris[i].I2]);
+                triBoxes[i].Min = Vector3.Min(positions[tris[i].I0], triBoxes[i].Min);
 
-                JVector.Max(ref positions[tris[i].I1], ref positions[tris[i].I2], out triBoxes[i].Max);
-                JVector.Max(ref positions[tris[i].I0], ref triBoxes[i].Max, out triBoxes[i].Max);
+                triBoxes[i].Max = Vector3.Max(positions[tris[i].I1], positions[tris[i].I2]);
+                triBoxes[i].Max = Vector3.Max(positions[tris[i].I0], triBoxes[i].Max);
 
                 // get size of the root box
-                JVector.Min(ref rootNodeBox.Min, ref triBoxes[i].Min, out rootNodeBox.Min);
-                JVector.Max(ref rootNodeBox.Max, ref triBoxes[i].Max, out rootNodeBox.Max);
+                rootNodeBox.Min = Vector3.Min(rootNodeBox.Min, triBoxes[i].Min);
+                rootNodeBox.Max = Vector3.Max(rootNodeBox.Max, triBoxes[i].Max);
             }
 
             List<BuildNode> buildNodes = new List<BuildNode>();
@@ -277,7 +278,7 @@ namespace BalatroPhysics.Collision
         /// <param name="positions">Vertices.</param>
         /// <param name="tris">Indices.</param>
         #region Constructor
-        public Octree(List<JVector> positions, List<TriangleVertexIndices> tris)
+        public Octree(List<Vector3> positions, List<TriangleVertexIndices> tris)
         {
             SetTriangles(positions, tris);
             BuildOctree();
@@ -293,22 +294,22 @@ namespace BalatroPhysics.Collision
         #region  private void CreateAABox(ref JBBox aabb, EChild child,out JBBox result)
         private void CreateAABox(ref JBBox aabb, EChild child,out JBBox result)
         {
-            JVector dims;
-            JVector.Subtract(ref aabb.Max, ref aabb.Min, out dims);
-            JVector.Multiply(ref dims, 0.5f, out dims);
+            Vector3 dims;
+            dims = aabb.Max - aabb.Min;
+            dims *= 0.5f;
 
-            JVector offset = JVector.Zero;
+            Vector3 offset = Vector3.Zero;
 
             switch (child)
             {
-                case EChild.PPP: offset = new JVector(1, 1, 1); break;
-                case EChild.PPM: offset = new JVector(1, 1, 0); break;
-                case EChild.PMP: offset = new JVector(1, 0, 1); break;
-                case EChild.PMM: offset = new JVector(1, 0, 0); break;
-                case EChild.MPP: offset = new JVector(0, 1, 1); break;
-                case EChild.MPM: offset = new JVector(0, 1, 0); break;
-                case EChild.MMP: offset = new JVector(0, 0, 1); break;
-                case EChild.MMM: offset = new JVector(0, 0, 0); break;
+                case EChild.PPP: offset = new Vector3(1, 1, 1); break;
+                case EChild.PPM: offset = new Vector3(1, 1, 0); break;
+                case EChild.PMP: offset = new Vector3(1, 0, 1); break;
+                case EChild.PMM: offset = new Vector3(1, 0, 0); break;
+                case EChild.MPP: offset = new Vector3(0, 1, 1); break;
+                case EChild.MPM: offset = new Vector3(0, 1, 0); break;
+                case EChild.MMP: offset = new Vector3(0, 0, 1); break;
+                case EChild.MMM: offset = new Vector3(0, 0, 0); break;
 
                 default:
                     System.Diagnostics.Debug.WriteLine("Octree.CreateAABox  got impossible child");
@@ -316,17 +317,17 @@ namespace BalatroPhysics.Collision
             }
 
             result = new JBBox();
-            result.Min = new JVector(offset.X * dims.X, offset.Y * dims.Y, offset.Z * dims.Z);
-            JVector.Add(ref result.Min, ref aabb.Min, out result.Min);
+            result.Min = new Vector3(offset.X * dims.X, offset.Y * dims.Y, offset.Z * dims.Z);
+            result.Min += aabb.Min;
 
-            JVector.Add(ref result.Min, ref dims, out result.Max);
+            result.Max = result.Min + dims;
 
             // expand it just a tiny bit just to be safe!
             float extra = 0.00001f;
 
-            JVector temp; JVector.Multiply(ref dims, extra, out temp);
-            JVector.Subtract(ref result.Min, ref temp, out result.Min);
-            JVector.Add(ref result.Max, ref temp, out result.Max);
+            Vector3 temp = dims * extra;
+            result.Min -= temp;
+            result.Max += temp;
         }
         #endregion
 
@@ -405,8 +406,8 @@ namespace BalatroPhysics.Collision
         /// <param name="rayDelta"></param>
         /// <param name="triangles"></param>
         /// <returns></returns>
-        #region public int GetTrianglesIntersectingtRay(JVector rayOrigin, JVector rayDelta)
-        public int GetTrianglesIntersectingRay(List<int> triangles, JVector rayOrigin, JVector rayDelta)
+        #region public int GetTrianglesIntersectingtRay(Vector3 rayOrigin, Vector3 rayDelta)
+        public int GetTrianglesIntersectingRay(List<int> triangles, Vector3 rayOrigin, Vector3 rayDelta)
         {
             if (nodes.Length == 0)
                 return 0;
@@ -463,8 +464,8 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="vertex">The index of the vertex</param>
         /// <returns></returns>
-        #region public JVector GetVertex(int vertex)
-        public JVector GetVertex(int vertex)
+        #region public Vector3 GetVertex(int vertex)
+        public Vector3 GetVertex(int vertex)
         {
             return positions[vertex];
         }
@@ -474,7 +475,7 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="vertex">The index of the vertex</param>
         /// <param name="result"></param>
-        public void GetVertex(int vertex, out JVector result)
+        public void GetVertex(int vertex, out Vector3 result)
         {
             result = positions[vertex];
         }

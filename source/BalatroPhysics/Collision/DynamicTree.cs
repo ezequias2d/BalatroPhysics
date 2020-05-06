@@ -31,6 +31,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using BalatroPhysics.LinearMath;
 
 
@@ -132,7 +133,7 @@ namespace BalatroPhysics.Collision
             _nodes[proxyId].MinorRandomExtension = (float)rnd.NextDouble() * settingsRndExtension;
 
             // Fatten the aabb.
-            JVector r = new JVector(_nodes[proxyId].MinorRandomExtension);
+            Vector3 r = new Vector3(_nodes[proxyId].MinorRandomExtension);
             _nodes[proxyId].AABB.Min = aabb.Min - r;
             _nodes[proxyId].AABB.Max = aabb.Max + r;
             _nodes[proxyId].UserData = userData;
@@ -165,7 +166,7 @@ namespace BalatroPhysics.Collision
         /// <param name="aabb">The aabb.</param>
         /// <param name="displacement">The displacement.</param>
         /// <returns>true if the proxy was re-inserted.</returns>
-        public bool MoveProxy(int proxyId, ref JBBox aabb, JVector displacement)
+        public bool MoveProxy(int proxyId, ref JBBox aabb, Vector3 displacement)
         {
             Debug.Assert(0 <= proxyId && proxyId < _nodeCapacity);
 
@@ -180,13 +181,13 @@ namespace BalatroPhysics.Collision
 
             // Extend AABB.
             JBBox b = aabb;
-            JVector r = new JVector(_nodes[proxyId].MinorRandomExtension);
+            Vector3 r = new Vector3(_nodes[proxyId].MinorRandomExtension);
             b.Min = b.Min - r;
             b.Max = b.Max + r;
 
             // Predict AABB displacement.
-            JVector d = SettingsAABBMultiplier * displacement;
-            //JVector randomExpansion = new JVector((float)rnd.Next(0, 10) * 0.1f, (float)rnd.Next(0, 10) * 0.1f, (float)rnd.Next(0, 10) * 0.1f);
+            Vector3 d = SettingsAABBMultiplier * displacement;
+            //Vector3 randomExpansion = new Vector3((float)rnd.Next(0, 10) * 0.1f, (float)rnd.Next(0, 10) * 0.1f, (float)rnd.Next(0, 10) * 0.1f);
 
             //d += randomExpansion;
 
@@ -256,7 +257,7 @@ namespace BalatroPhysics.Collision
             return ComputeHeight(_root);
         }
 
-        public void Query(JVector origin, JVector direction, List<int> collisions)
+        public void Query(Vector3 origin, Vector3 direction, List<int> collisions)
         {
             Stack<int> stack = stackPool.GetNew();
 

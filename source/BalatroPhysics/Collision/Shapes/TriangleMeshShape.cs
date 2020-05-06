@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -98,7 +99,7 @@ namespace BalatroPhysics.Collision.Shapes
             return potentialTriangles.Count;
         }
 
-        public override void MakeHull(ref List<JVector> triangleList, int generationThreshold)
+        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
         {
             JBBox large = JBBox.LargeBox;
 
@@ -120,13 +121,13 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayDelta"></param>
         /// <returns></returns>
-        public override int Prepare(ref JVector rayOrigin, ref JVector rayDelta)
+        public override int Prepare(ref Vector3 rayOrigin, ref Vector3 rayDelta)
         {
             potentialTriangles.Clear();
 
             #region Expand Spherical
-            JVector expDelta;
-            JVector.Normalize(ref rayDelta, out expDelta);
+            Vector3 expDelta;
+            expDelta = Vector3.Normalize(rayDelta);
             expDelta = rayDelta + expDelta * sphericalExpansion;
             #endregion
 
@@ -135,7 +136,7 @@ namespace BalatroPhysics.Collision.Shapes
             return potentialTriangles.Count;
         }
 
-        JVector[] vecs = new JVector[3];
+        Vector3[] vecs = new Vector3[3];
 
         /// <summary>
         /// SupportMapping. Finds the point in the shape furthest away from the given direction.
@@ -144,21 +145,21 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref JVector direction, out JVector result)
+        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
         {
-            JVector exp;
-            JVector.Normalize(ref direction, out exp);
+            Vector3 exp;
+            exp = Vector3.Normalize(direction);
             exp *= sphericalExpansion;
 
-            float min = JVector.Dot(ref vecs[0], ref direction);
+            float min = Vector3.Dot(vecs[0], direction);
             int minIndex = 0;
-            float dot = JVector.Dot(ref vecs[1], ref direction);
+            float dot = Vector3.Dot(vecs[1], direction);
             if (dot > min)
             {
                 min = dot;
                 minIndex = 1;
             }
-            dot = JVector.Dot(ref vecs[2], ref direction);
+            dot = Vector3.Dot(vecs[2], direction);
             if (dot > min)
             {
                 min = dot;
@@ -204,24 +205,24 @@ namespace BalatroPhysics.Collision.Shapes
             vecs[1] = octree.GetVertex(octree.tris[potentialTriangles[index]].I1);
             vecs[2] = octree.GetVertex(octree.tris[potentialTriangles[index]].I2);
 
-            JVector sum = vecs[0];
-            JVector.Add(ref sum, ref vecs[1], out sum);
-            JVector.Add(ref sum, ref vecs[2], out sum);
-            JVector.Multiply(ref sum, 1.0f / 3.0f, out sum);
+            Vector3 sum = vecs[0];
+            sum += vecs[1];
+            sum += vecs[2];
+            sum *= 1.0f / 3.0f;
 
       
             geomCen = sum;
 
-            JVector.Subtract(ref vecs[1], ref vecs[0], out sum);
-            JVector.Subtract(ref vecs[2], ref vecs[0], out normal);
-            JVector.Cross(ref sum, ref normal, out normal);
+            sum = vecs[1] - vecs[0];
+            normal = vecs[2] - vecs[0];
+            normal = Vector3.Cross(sum, normal);
 
-            if (flipNormal) normal.Negate();
+            if (flipNormal) normal = -normal;
         }
 
-        private JVector normal = JVector.Up;
+        private Vector3 normal = JMath.Up;
 
-        public void CollisionNormal(out JVector normal)
+        public void CollisionNormal(out Vector3 normal)
         {
             normal = this.normal;
         }

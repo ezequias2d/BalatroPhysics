@@ -26,8 +26,8 @@ namespace BalatroPhysicsDemo.Scenes
             RigidBody body1 = new RigidBody(new BoxShape(1, 1, 1));
             RigidBody body2 = new RigidBody(new BoxShape(1, 1, 1));
 
-            body1.Position = new JVector(0, 7, 0);
-            body2.Position = new JVector(0, 4, 0);
+            body1.Position = new System.Numerics.Vector3(0, 7, 0);
+            body2.Position = new System.Numerics.Vector3(0, 4, 0);
 
             // add a prismatic joint.
             // the minimum allowed distance is 3

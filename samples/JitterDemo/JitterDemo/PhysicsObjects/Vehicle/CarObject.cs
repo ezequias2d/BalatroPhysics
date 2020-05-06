@@ -32,10 +32,10 @@ namespace BalatroPhysicsDemo.Vehicle
             World world = demo.World;
 
             CompoundShape.TransformedShape lower = new CompoundShape.TransformedShape(
-                new BoxShape(2.5f, 1f, 6.0f), JMatrix.Identity, JVector.Zero);
+                new BoxShape(2.5f, 1f, 6.0f), JMatrix.Identity, System.Numerics.Vector3.Zero);
 
             CompoundShape.TransformedShape upper = new CompoundShape.TransformedShape(
-                new BoxShape(2.0f, 0.5f, 3.0f), JMatrix.Identity, JVector.Up * 0.75f + JVector.Backward * 1.0f);
+                new BoxShape(2.0f, 0.5f, 3.0f), JMatrix.Identity, JMath.Up * 0.75f + JMath.Backward * 1.0f);
 
             CompoundShape.TransformedShape[] subShapes = { lower, upper };
 
@@ -57,7 +57,7 @@ namespace BalatroPhysicsDemo.Vehicle
             carBody.AllowDeactivation = false;
 
             // place the car two units above the ground.
-            carBody.Position = new JVector(0, 5, 0);
+            carBody.Position = new System.Numerics.Vector3(0, 5, 0);
 
             world.AddBody(carBody);
         }

@@ -25,6 +25,7 @@ using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using System.Diagnostics;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics
@@ -162,11 +163,10 @@ namespace BalatroPhysics.Dynamics
         /// <param name="point2">Point on body2. In world space.</param>
         /// <param name="normal">The normal pointing to body2.</param>
         /// <param name="penetration">The estimated penetration depth.</param>
-        public Contact AddContact(JVector point1, JVector point2, JVector normal, float penetration, 
+        public Contact AddContact(Vector3 point1, Vector3 point2, Vector3 normal, float penetration, 
             ContactSettings contactSettings)
         {
-            JVector relPos1;
-            JVector.Subtract(ref point1, ref body1.position, out relPos1);
+            Vector3 relPos1 = point1 - body1.position;
 
             int index;
 
@@ -196,7 +196,7 @@ namespace BalatroPhysics.Dynamics
             }
         }
 
-        private void ReplaceContact(ref JVector point1, ref JVector point2, ref JVector n, float p, int index,
+        private void ReplaceContact(ref Vector3 point1, ref Vector3 point2, ref Vector3 n, float p, int index,
             ContactSettings contactSettings)
         {
             Contact contact = contactList[index];
@@ -207,14 +207,14 @@ namespace BalatroPhysics.Dynamics
 
         }
 
-        private int GetCacheEntry(ref JVector realRelPos1, float contactBreakThreshold)
+        private int GetCacheEntry(ref Vector3 realRelPos1, float contactBreakThreshold)
         {
             float shortestDist = contactBreakThreshold * contactBreakThreshold;
             int size = contactList.Count;
             int nearestPoint = -1;
             for (int i = 0; i < size; i++)
             {
-                JVector diffA; JVector.Subtract(ref contactList[i].relativePos1,ref realRelPos1,out diffA);
+                Vector3 diffA = contactList[i].relativePos1 - realRelPos1;
                 float distToManiPoint = diffA.LengthSquared();
                 if (distToManiPoint < shortestDist)
                 {
@@ -226,7 +226,7 @@ namespace BalatroPhysics.Dynamics
         }
 
         // sort cached points so most isolated points come first
-        private int SortCachedPoints(ref JVector realRelPos1, float pen)
+        private int SortCachedPoints(ref Vector3 realRelPos1, float pen)
         {
             //calculate 4 possible cases areas, and take biggest area
             //also need to keep 'deepest'
@@ -245,32 +245,32 @@ namespace BalatroPhysics.Dynamics
             float res0 = 0, res1 = 0, res2 = 0, res3 = 0;
             if (maxPenetrationIndex != 0)
             {
-                JVector a0; JVector.Subtract(ref realRelPos1,ref contactList[1].relativePos1,out a0);
-                JVector b0; JVector.Subtract(ref contactList[3].relativePos1, ref contactList[2].relativePos1, out b0);
-                JVector cross; JVector.Cross(ref a0, ref b0, out cross);
+                Vector3 a0 = realRelPos1 - contactList[1].relativePos1;
+                Vector3 b0 = contactList[3].relativePos1 - contactList[2].relativePos1;
+                Vector3 cross = Vector3.Cross(a0, b0);
                 res0 = cross.LengthSquared();
             }
             if (maxPenetrationIndex != 1)
             {
-                JVector a0; JVector.Subtract(ref realRelPos1, ref contactList[0].relativePos1, out a0);
-                JVector b0; JVector.Subtract(ref contactList[3].relativePos1, ref contactList[2].relativePos1, out b0);
-                JVector cross; JVector.Cross(ref a0, ref b0, out cross);
+                Vector3 a0 = realRelPos1 - contactList[0].relativePos1;
+                Vector3 b0 = contactList[3].relativePos1 - contactList[2].relativePos1;
+                Vector3 cross = Vector3.Cross(a0, b0);
                 res1 = cross.LengthSquared();
             }
 
             if (maxPenetrationIndex != 2)
             {
-                JVector a0; JVector.Subtract(ref realRelPos1, ref contactList[0].relativePos1, out a0);
-                JVector b0; JVector.Subtract(ref contactList[3].relativePos1, ref contactList[1].relativePos1, out b0);
-                JVector cross; JVector.Cross(ref a0, ref b0, out cross);
+                Vector3 a0 = realRelPos1 - contactList[0].relativePos1;
+                Vector3 b0 = contactList[3].relativePos1 - contactList[1].relativePos1;
+                Vector3 cross = Vector3.Cross(a0, b0);
                 res2 = cross.LengthSquared();
             }
 
             if (maxPenetrationIndex != 3)
             {
-                JVector a0; JVector.Subtract(ref realRelPos1, ref contactList[0].relativePos1, out a0);
-                JVector b0; JVector.Subtract(ref contactList[2].relativePos1, ref contactList[1].relativePos1, out b0);
-                JVector cross; JVector.Cross(ref a0, ref b0, out cross);
+                Vector3 a0 = realRelPos1 - contactList[0].relativePos1;
+                Vector3 b0 = contactList[2].relativePos1 - contactList[1].relativePos1;
+                Vector3 cross = Vector3.Cross(a0, b0);
                 res3 = cross.LengthSquared();
             }
 

@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics.Constraints.SingleBody
@@ -33,11 +34,11 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
     /// </summary>
     public class PointOnLine : Constraint
     {
-        private JVector localAnchor1;
-        private JVector r1;
+        private Vector3 localAnchor1;
+        private Vector3 r1;
 
-        private JVector lineNormal = JVector.Right;
-        private JVector anchor;
+        private Vector3 lineNormal = JMath.Right;
+        private Vector3 anchor;
 
         private float biasFactor = 0.5f;
         private float softness = 0.0f;
@@ -49,28 +50,28 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         /// <param name="localAnchor">The anchor point on the body in local (body)
         /// coordinates.</param>
         /// <param name="lineDirection">The axis defining the line in world space.</param>/param>
-        public PointOnLine(RigidBody body, JVector localAnchor, JVector lineDirection)
+        public PointOnLine(RigidBody body, Vector3 localAnchor, Vector3 lineDirection)
             : base(body, null)
         {
             if (lineDirection.LengthSquared() == 0.0f)
                 throw new ArgumentException("Line direction can't be zero", "lineDirection");
 
             localAnchor1 = localAnchor;
-            this.anchor = body.position + JVector.Transform(localAnchor, body.orientation);
+            this.anchor = body.position + JMath.Transform(localAnchor, body.orientation);
 
             this.lineNormal = lineDirection;
-            this.lineNormal.Normalize();
+            this.lineNormal = Vector3.Normalize(lineNormal);
         }
 
         /// <summary>
         /// The anchor point of the body in world space.
         /// </summary>
-        public JVector Anchor { get { return anchor; } set { anchor = value; } }
+        public Vector3 Anchor { get { return anchor; } set { anchor = value; } }
 
         /// <summary>
         /// The axis defining the line of the constraint.
         /// </summary>
-        public JVector Axis { get { return lineNormal; } set { lineNormal = value; lineNormal.Normalize(); } }
+        public Vector3 Axis { get { return lineNormal; } set { lineNormal = value; lineNormal = Vector3.Normalize(lineNormal); } }
 
         /// <summary>
         /// Defines how big the applied impulses can get.
@@ -87,7 +88,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         float bias;
         float softnessOverDt;
 
-        JVector[] jacobian = new JVector[2];
+        Vector3[] jacobian = new Vector3[2];
 
         /// <summary>
         /// Called once before iteration starts.
@@ -95,36 +96,36 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         /// <param name="timestep">The simulation timestep</param>
         public override void PrepareForIteration(float timestep)
         {
-            JVector.Transform(ref localAnchor1, ref body1.orientation, out r1);
+            JMath.Transform(ref localAnchor1, ref body1.orientation, out r1);
 
-            JVector p1, dp;
-            JVector.Add(ref body1.position, ref r1, out p1);
+            Vector3 p1, dp;
+            p1 = body1.position + r1;
 
-            JVector.Subtract(ref p1, ref anchor, out dp);
+            dp = p1 - anchor;
 
-            JVector l = lineNormal;
+            Vector3 l = lineNormal;
 
-            JVector t = (p1 - anchor) % l;
-            if (t.LengthSquared() != 0.0f) t.Normalize();
-            t = t % l;
+            Vector3 t = Vector3.Cross(p1 - anchor, l);
+            if (t.LengthSquared() != 0.0f) t = Vector3.Normalize(t);
+            t = Vector3.Cross(t, l);
 
             jacobian[0] = t;
-            jacobian[1] = r1 % t;
+            jacobian[1] = Vector3.Cross(r1, t);
 
             effectiveMass = body1.inverseMass
-                + JVector.Transform(jacobian[1], body1.invInertiaWorld) * jacobian[1];
+                + Vector3.Dot(JMath.Transform(jacobian[1], body1.invInertiaWorld), jacobian[1]);
 
             softnessOverDt = softness / timestep;
             effectiveMass += softnessOverDt;
 
             if (effectiveMass != 0) effectiveMass = 1.0f / effectiveMass;
 
-            bias = -(l % (p1 - anchor)).Length() * biasFactor * (1.0f / timestep);
+            bias = -Vector3.Cross(l, p1 - anchor).Length() * biasFactor * (1.0f / timestep);
 
             if (!body1.isStatic)
             {
                 body1.linearVelocity += body1.inverseMass * accumulatedImpulse * jacobian[0];
-                body1.angularVelocity += JVector.Transform(accumulatedImpulse * jacobian[1], body1.invInertiaWorld);
+                body1.angularVelocity += JMath.Transform(accumulatedImpulse * jacobian[1], body1.invInertiaWorld);
             }
 
         }
@@ -135,8 +136,8 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         public override void Iterate()
         {
             float jv =
-                body1.linearVelocity * jacobian[0] +
-                body1.angularVelocity * jacobian[1];
+                Vector3.Dot(body1.linearVelocity, jacobian[0]) +
+                Vector3.Dot(body1.angularVelocity, jacobian[1]);
 
             float softnessScalar = accumulatedImpulse * softnessOverDt;
 
@@ -147,7 +148,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
             if (!body1.isStatic)
             {
                 body1.linearVelocity += body1.inverseMass * lambda * jacobian[0];
-                body1.angularVelocity += JVector.Transform(lambda * jacobian[1], body1.invInertiaWorld);
+                body1.angularVelocity += JMath.Transform(lambda * jacobian[1], body1.invInertiaWorld);
             }
         }
 

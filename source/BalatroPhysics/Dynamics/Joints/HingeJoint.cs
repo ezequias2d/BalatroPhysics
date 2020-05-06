@@ -25,6 +25,7 @@ using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Dynamics.Constraints;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics.Joints
@@ -49,14 +50,14 @@ namespace BalatroPhysics.Dynamics.Joints
         /// <param name="body2">The second body connected to the first one.</param>
         /// <param name="position">The position in world space where both bodies get connected.</param>
         /// <param name="hingeAxis">The axis if the hinge.</param>
-        public HingeJoint(World world, RigidBody body1, RigidBody body2, JVector position, JVector hingeAxis) : base(world)
+        public HingeJoint(World world, RigidBody body1, RigidBody body2, Vector3 position, Vector3 hingeAxis) : base(world)
         {
             worldPointConstraint = new PointOnPoint[2];
 
             hingeAxis *= 0.5f;
 
-            JVector pos1 = position; JVector.Add(ref pos1,ref hingeAxis,out pos1);
-            JVector pos2 = position; JVector.Subtract(ref pos2,ref hingeAxis,out pos2);
+            Vector3 pos1 = position + hingeAxis;
+            Vector3 pos2 = position - hingeAxis;
 
             worldPointConstraint[0] = new PointOnPoint(body1,body2,pos1);
             worldPointConstraint[1] = new PointOnPoint(body1,body2,pos2);

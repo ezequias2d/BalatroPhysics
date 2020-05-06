@@ -17,19 +17,19 @@ namespace BalatroPhysicsDemo
                 //BalatroPhysics.DynamicTree dt = new BalatroPhysics.DynamicTree();
 
                 //JBBox jb;
-                //jb.Min = JVector.Zero;
-                //jb.Max = JVector.One;
+                //jb.Min = System.Numerics.Vector3.Zero;
+                //jb.Max = System.Numerics.Vector3.One;
 
                 //JBBox jb2;
-                //jb2.Min = JVector.Zero;
-                //jb.Max = JVector.One * 2.0f;
+                //jb2.Min = System.Numerics.Vector3.Zero;
+                //jb.Max = System.Numerics.Vector3.One * 2.0f;
 
                 //dt.CreateProxy(ref jb, 1);
                 //dt.CreateProxy(ref jb, 2);
 
                 //JBBox testBox;
-                //testBox.Min = JVector.Zero;
-                //testBox.Max = JVector.One *20.0f;
+                //testBox.Min = System.Numerics.Vector3.Zero;
+                //testBox.Max = System.Numerics.Vector3.One *20.0f;
 
                 //dt.Query(bla, ref testBox);
                 //dt.MoveProxy

@@ -48,7 +48,7 @@ namespace BalatroPhysicsDemo.Scenes
             {
                 RigidBody compoundBody = new RigidBody(cs);
                 compoundBody.EnableDebugDraw = true;
-                compoundBody.Position = new JVector(0, 5+ i*10, 0) - cs.Shift;
+                compoundBody.Position = new System.Numerics.Vector3(0, 5+ i*10, 0) - cs.Shift;
                 Demo.World.AddBody(compoundBody);
             }
 
@@ -57,7 +57,7 @@ namespace BalatroPhysicsDemo.Scenes
             for (int i = 0; i < shapes.Count; i++)
             {
                 RigidBody body = new RigidBody(shapes[i]);
-                body.Position = -1.0f * shapes[i].Shift + new JVector(-10, 5, 0);
+                body.Position = -1.0f * shapes[i].Shift + new System.Numerics.Vector3(-10, 5, 0);
                 body.EnableDebugDraw = true;
                 Demo.World.AddBody(body);
             }
@@ -65,7 +65,7 @@ namespace BalatroPhysicsDemo.Scenes
             for (int i = 0; i < shapes.Count; i++)
             {
                 RigidBody body = new RigidBody(shapes[i]);
-                body.Position = -1.0f * shapes[i].Shift + new JVector(-20, 5, 0);
+                body.Position = -1.0f * shapes[i].Shift + new System.Numerics.Vector3(-20, 5, 0);
                 body.EnableDebugDraw = true;
                 body.IsStatic = true;
                 Demo.World.AddBody(body);
@@ -83,7 +83,7 @@ namespace BalatroPhysicsDemo.Scenes
             string[] lines = File.ReadAllLines(path);
             Char[] splitter = new Char [] {' '};
 
-            List<JVector> convexPoints = new List<JVector>();
+            List<System.Numerics.Vector3> convexPoints = new List<System.Numerics.Vector3>();
             
             for (int i = 0; i < lines.Length; i++)
             {
@@ -93,7 +93,7 @@ namespace BalatroPhysicsDemo.Scenes
                 {
                     string[] values = line.Split(splitter);
 
-                    JVector vertex = new JVector(float.Parse(values[1], NumberFormatInfo.InvariantInfo),
+                    System.Numerics.Vector3 vertex = new System.Numerics.Vector3(float.Parse(values[1], NumberFormatInfo.InvariantInfo),
                         float.Parse(values[2], NumberFormatInfo.InvariantInfo),
                         float.Parse(values[3], NumberFormatInfo.InvariantInfo));
 
@@ -104,7 +104,7 @@ namespace BalatroPhysicsDemo.Scenes
                 {
                     if(convexPoints.Count > 0)
                     {
-                        List<JVector> copyVertex = new List<JVector>(convexPoints);
+                        List<System.Numerics.Vector3> copyVertex = new List<System.Numerics.Vector3>(convexPoints);
                         convexPoints.Clear();
 
                         ConvexHullShape cvhs = new ConvexHullShape(copyVertex);

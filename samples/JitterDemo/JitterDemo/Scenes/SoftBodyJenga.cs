@@ -22,9 +22,9 @@ namespace BalatroPhysicsDemo.Scenes
         }
 
         private void RemoveDuplicateVertices(List<TriangleVertexIndices> indices,
-                List<JVector> vertices)
+                List<System.Numerics.Vector3> vertices)
         {
-            Dictionary<JVector, int> unique = new Dictionary<JVector, int>(vertices.Count);
+            Dictionary<System.Numerics.Vector3, int> unique = new Dictionary<System.Numerics.Vector3, int>(vertices.Count);
             Stack<int> tbr = new Stack<int>(vertices.Count / 3);
 
             // get all unique vertices and their indices
@@ -63,9 +63,9 @@ namespace BalatroPhysicsDemo.Scenes
 
                 for (int e = 0; e < 3; e++)
                 {
-                    JVector size = (even) ? new JVector(1, 1, 3) : new JVector(3, 1, 1);
+                    System.Numerics.Vector3 size = (even) ? new System.Numerics.Vector3(1, 1, 3) : new System.Numerics.Vector3(3, 1, 1);
                     RigidBody body = new RigidBody(new BoxShape(size));
-                    body.Position = new JVector(3.0f + (even ? e : 1.0f), i + 0.5f, -5.0f + (even ? 1.0f : e));
+                    body.Position = new System.Numerics.Vector3(3.0f + (even ? e : 1.0f), i + 0.5f, -5.0f + (even ? 1.0f : e));
 
                     Demo.World.AddBody(body);
                 }
@@ -76,14 +76,14 @@ namespace BalatroPhysicsDemo.Scenes
             Model model = this.Demo.Content.Load<Model>("torus");
 
             List<TriangleVertexIndices> indices = new List<TriangleVertexIndices>();
-            List<JVector> vertices = new List<JVector>();
+            List<System.Numerics.Vector3> vertices = new List<System.Numerics.Vector3>();
 
             ConvexHullObject.ExtractData(vertices, indices, model);
             RemoveDuplicateVertices(indices, vertices);
 
             SoftBody softBody = new SoftBody(indices, vertices);
 
-            softBody.Translate(new JVector(10, 5, 0));
+            softBody.Translate(new System.Numerics.Vector3(10, 5, 0));
             softBody.Pressure = 1000.0f;
             softBody.SetSpringValues(0.2f, 0.005f);
             //softBody.SelfCollision = true; ;
@@ -97,7 +97,7 @@ namespace BalatroPhysicsDemo.Scenes
             //cloth.TriangleExpansion = 0.05f;
             //cloth.VertexExpansion = 0.05f;
 
-            cloth.Translate(new JVector(0, 10, 10));
+            cloth.Translate(new System.Numerics.Vector3(0, 10, 10));
 
             cloth.Material.KineticFriction = 0.9f;
             cloth.Material.StaticFriction = 0.95f;

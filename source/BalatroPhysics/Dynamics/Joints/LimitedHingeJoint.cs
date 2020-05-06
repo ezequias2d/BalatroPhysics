@@ -5,6 +5,7 @@ using System.Text;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Dynamics.Joints;
 using BalatroPhysics.Dynamics.Constraints;
+using System.Numerics;
 
 namespace BalatroPhysics.Dynamics.Joints
 {
@@ -33,7 +34,7 @@ namespace BalatroPhysics.Dynamics.Joints
         /// <param name="body2">The second body connected to the first one.</param>
         /// <param name="position">The position in world space where both bodies get connected.</param>
         /// <param name="hingeAxis">The axis if the hinge.</param>
-        public LimitedHingeJoint(World world, RigidBody body1, RigidBody body2, JVector position, JVector hingeAxis,
+        public LimitedHingeJoint(World world, RigidBody body1, RigidBody body2, Vector3 position, Vector3 hingeAxis,
             float hingeFwdAngle, float hingeBckAngle)
             : base(world)
         {
@@ -43,8 +44,8 @@ namespace BalatroPhysics.Dynamics.Joints
 
             hingeAxis *= 0.5f;
 
-            JVector pos1 = position; JVector.Add(ref pos1, ref hingeAxis, out pos1);
-            JVector pos2 = position; JVector.Subtract(ref pos2, ref hingeAxis, out pos2);
+            Vector3 pos1 = position + hingeAxis;
+            Vector3 pos2 = position - hingeAxis;
 
             worldPointConstraint[0] = new PointOnPoint(body1, body2, pos1);
             worldPointConstraint[1] = new PointOnPoint(body1, body2, pos2);
@@ -52,17 +53,17 @@ namespace BalatroPhysics.Dynamics.Joints
 
             // Now the limit, one max distance constraint
 
-            hingeAxis.Normalize();
+            hingeAxis = Vector3.Normalize(hingeAxis);
 
             // choose a direction that is perpendicular to the hinge
-            JVector perpDir = JVector.Up;
+            Vector3 perpDir = JMath.Up;
 
-            if (JVector.Dot(perpDir, hingeAxis) > 0.1f) perpDir = JVector.Right;
+            if (Vector3.Dot(perpDir, hingeAxis) > 0.1f) perpDir = JMath.Right;
 
             // now make it perpendicular to the hinge
-            JVector sideAxis = JVector.Cross(hingeAxis, perpDir);
-            perpDir = JVector.Cross(sideAxis, hingeAxis);
-            perpDir.Normalize();
+            Vector3 sideAxis = Vector3.Cross(hingeAxis, perpDir);
+            perpDir = Vector3.Cross(sideAxis, hingeAxis);
+            perpDir = Vector3.Normalize(perpDir);
 
             // the length of the "arm" TODO take this as a parameter? what's
             // the effect of changing it?
@@ -70,21 +71,21 @@ namespace BalatroPhysics.Dynamics.Joints
 
             // Choose a position using that dir. this will be the anchor point
             // for body 0. relative to hinge
-            JVector hingeRelAnchorPos0 = perpDir * len;
+            Vector3 hingeRelAnchorPos0 = perpDir * len;
 
 
             // anchor point for body 2 is chosen to be in the middle of the
             // angle range.  relative to hinge
             float angleToMiddle = 0.5f * (hingeFwdAngle - hingeBckAngle);
-            JVector hingeRelAnchorPos1 = JVector.Transform(hingeRelAnchorPos0, JMatrix.CreateFromAxisAngle(hingeAxis, -angleToMiddle / 360.0f * 2.0f * JMath.Pi));
+            Vector3 hingeRelAnchorPos1 = JMath.Transform(hingeRelAnchorPos0, JMatrix.CreateFromAxisAngle(hingeAxis, -angleToMiddle / 360.0f * 2.0f * JMath.Pi));
 
             // work out the "string" length
             float hingeHalfAngle = 0.5f * (hingeFwdAngle + hingeBckAngle);
             float allowedDistance = len * 2.0f * (float)System.Math.Sin(hingeHalfAngle * 0.5f / 360.0f * 2.0f * JMath.Pi);
 
-            JVector hingePos = body1.Position;
-            JVector relPos0c = hingePos + hingeRelAnchorPos0;
-            JVector relPos1c = hingePos + hingeRelAnchorPos1;
+            Vector3 hingePos = body1.Position;
+            Vector3 relPos0c = hingePos + hingeRelAnchorPos0;
+            Vector3 relPos1c = hingePos + hingeRelAnchorPos1;
 
             distance = new PointPointDistance(body1, body2, relPos0c, relPos1c);
             distance.Distance = allowedDistance;

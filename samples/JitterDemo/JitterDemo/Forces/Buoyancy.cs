@@ -22,9 +22,9 @@ namespace BalatroPhysics.Forces
         /// </summary>
         /// <param name="point">The point.</param>
         /// <returns>True if the given point is within the area.</returns>
-        public delegate bool DefineFluidArea(ref JVector point);
+        public delegate bool DefineFluidArea(ref System.Numerics.Vector3 point);
 
-        private Dictionary<Shape, JVector[]> samples = new Dictionary<Shape, JVector[]>();
+        private Dictionary<Shape, System.Numerics.Vector3[]> samples = new Dictionary<Shape, System.Numerics.Vector3[]>();
         private List<RigidBody> bodies = new List<RigidBody>();
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace BalatroPhysics.Forces
         /// <summary>
         /// Flow direction and magnitude.
         /// </summary>
-        public JVector Flow { get; set; }
+        public System.Numerics.Vector3 Flow { get; set; }
 
         private DefineFluidArea fluidArea = null;
 
@@ -59,7 +59,7 @@ namespace BalatroPhysics.Forces
         {
             Density = 2.0f;
             Damping = 0.1f;
-            Flow = JVector.Zero;
+            Flow = System.Numerics.Vector3.Zero;
         }
 
         /// <summary>
@@ -110,10 +110,10 @@ namespace BalatroPhysics.Forces
         /// the results. Note that the total number of subdivisions is subdivisions³.</param>
         public void Add(RigidBody body, int subdivisions)
         {
-            List<JVector> massPoints = new List<JVector>();
-            JVector testVector;
+            List<System.Numerics.Vector3> massPoints = new List<System.Numerics.Vector3>();
+            System.Numerics.Vector3 testVector;
 
-            JVector diff = body.Shape.BoundingBox.Max - body.Shape.BoundingBox.Min;
+            System.Numerics.Vector3 diff = body.Shape.BoundingBox.Max - body.Shape.BoundingBox.Min;
 
             if (diff.IsNearlyZero())
                 throw new InvalidOperationException("BoundingBox volume of the shape is zero.");
@@ -138,7 +138,7 @@ namespace BalatroPhysics.Forces
                         testVector.Z = body.Shape.BoundingBox.Min.Z + (diff.Z / (float)(subdivisions - 1)) * ((float)k);
 
                         JMatrix ident = JMatrix.Identity;
-                        JVector zero = JVector.Zero;
+                        System.Numerics.Vector3 zero = System.Numerics.Vector3.Zero;
 
                         if (ms != null)
                         {
@@ -184,15 +184,15 @@ namespace BalatroPhysics.Forces
 
                 if (FluidBox.Contains(body.BoundingBox) != JBBox.ContainmentType.Disjoint)
                 {
-                    JVector[] positions = samples[body.Shape];
+                    System.Numerics.Vector3[] positions = samples[body.Shape];
 
                     float frac = 0.0f;
 
-                    JVector currentCoord = JVector.Zero;
+                    System.Numerics.Vector3 currentCoord = System.Numerics.Vector3.Zero;
                     for (int i = 0; i < positions.Length; i++)
                     {
-                        currentCoord = JVector.Transform(positions[i], body.Orientation);
-                        currentCoord = JVector.Add(currentCoord, body.Position);
+                        currentCoord = JMath.Transform(positions[i], body.Orientation);
+                        currentCoord = System.Numerics.Vector3.Add(currentCoord, body.Position);
 
                         bool containsCoord = false;
 

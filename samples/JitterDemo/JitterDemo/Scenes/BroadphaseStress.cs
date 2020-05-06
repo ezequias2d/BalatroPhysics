@@ -20,7 +20,7 @@ namespace BalatroPhysicsDemo.Scenes
 
         public override void Build()
         {
-            BoxShape shape = new BoxShape(JVector.One);
+            BoxShape shape = new BoxShape(System.Numerics.Vector3.One);
 
             // CollisionSystemBrute        170 ms
             // CollisionSystemSAP          7   ms
@@ -34,7 +34,7 @@ namespace BalatroPhysicsDemo.Scenes
                     {
                         RigidBody b = new RigidBody(shape);
                         Demo.World.AddBody(b);
-                        b.Position = new JVector(i, e, k) * 2.0f;
+                        b.Position = new System.Numerics.Vector3(i, e, k) * 2.0f;
                         b.AffectedByGravity = false;
                     }
                 }

@@ -25,6 +25,7 @@ using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Dynamics.Constraints;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics
@@ -66,11 +67,11 @@ namespace BalatroPhysics.Dynamics
 
         internal RigidBody body1, body2;
 
-        internal JVector normal, tangent;
+        internal Vector3 normal, tangent;
 
-        internal JVector realRelPos1, realRelPos2;
-        internal JVector relativePos1, relativePos2;
-        internal JVector p1, p2;
+        internal Vector3 realRelPos1, realRelPos2;
+        internal Vector3 relativePos1, relativePos2;
+        internal Vector3 p1, p2;
 
         internal float accumulatedNormalImpulse = 0.0f;
         internal float accumulatedTangentImpulse = 0.0f;
@@ -140,29 +141,29 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The collision position in world space of body1.
         /// </summary>
-        public JVector Position1 { get { return p1; } }
+        public Vector3 Position1 { get { return p1; } }
 
         /// <summary>
         /// The collision position in world space of body2.
         /// </summary>
-        public JVector Position2 { get { return p2; } }
+        public Vector3 Position2 { get { return p2; } }
 
         /// <summary>
         /// The contact tangent.
         /// </summary>
-        public JVector Tangent { get { return tangent; } }
+        public Vector3 Tangent { get { return tangent; } }
 
         /// <summary>
         /// The contact normal.
         /// </summary>
-        public JVector Normal { get { return normal; } }
+        public Vector3 Normal { get { return normal; } }
         #endregion
 
         /// <summary>
         /// Calculates relative velocity of body contact points on the bodies.
         /// </summary>
         /// <param name="relVel">The relative velocity of body contact points on the bodies.</param>
-        public JVector CalculateRelativeVelocity()
+        public Vector3 CalculateRelativeVelocity()
         {
             float x, y, z;
 
@@ -170,7 +171,7 @@ namespace BalatroPhysics.Dynamics
             y = (body2.angularVelocity.Z * relativePos2.X) - (body2.angularVelocity.X * relativePos2.Z) + body2.linearVelocity.Y;
             z = (body2.angularVelocity.X * relativePos2.Y) - (body2.angularVelocity.Y * relativePos2.X) + body2.linearVelocity.Z;
 
-            JVector relVel;
+            Vector3 relVel;
             relVel.X = x - (body1.angularVelocity.Y * relativePos1.Z) + (body1.angularVelocity.Z * relativePos1.Y) - body1.linearVelocity.X;
             relVel.Y = y - (body1.angularVelocity.Z * relativePos1.X) + (body1.angularVelocity.X * relativePos1.Z) - body1.linearVelocity.Y;
             relVel.Z = z - (body1.angularVelocity.X * relativePos1.Y) + (body1.angularVelocity.Y * relativePos1.X) - body1.linearVelocity.Z;
@@ -183,8 +184,8 @@ namespace BalatroPhysics.Dynamics
         /// </summary>
         public void Iterate()
         {
-            //body1.linearVelocity = JVector.Zero;
-            //body2.linearVelocity = JVector.Zero;
+            //body1.linearVelocity = Vector3.Zero;
+            //body2.linearVelocity = Vector3.Zero;
             //return;
 
             if (treatBody1AsStatic && treatBody2AsStatic) return;
@@ -233,7 +234,7 @@ namespace BalatroPhysics.Dynamics
             tangentImpulse = accumulatedTangentImpulse - oldTangentImpulse;
 
             // Apply contact impulse
-            JVector impulse;
+            Vector3 impulse;
             impulse.X = normal.X * normalImpulse + tangent.X * tangentImpulse;
             impulse.Y = normal.Y * normalImpulse + tangent.Y * tangentImpulse;
             impulse.Z = normal.Z * normalImpulse + tangent.Z * tangentImpulse;
@@ -318,37 +319,37 @@ namespace BalatroPhysics.Dynamics
         {
             if (body1IsMassPoint)
             {
-                JVector.Add(ref realRelPos1, ref body1.position, out p1);
+                p1 = realRelPos1 + body1.position;
             }
             else
             {
-                JVector.Transform(ref realRelPos1, ref body1.orientation, out p1);
-                JVector.Add(ref p1, ref body1.position, out p1);
+                JMath.Transform(ref realRelPos1, ref body1.orientation, out p1);
+                p1 += body1.position;
             }
 
             if (body2IsMassPoint)
             {
-                JVector.Add(ref realRelPos2, ref body2.position, out p2);
+                p2 = realRelPos2 + body2.position;
             }
             else
             {
-                JVector.Transform(ref realRelPos2, ref body2.orientation, out p2);
-                JVector.Add(ref p2, ref body2.position, out p2);
+                JMath.Transform(ref realRelPos2, ref body2.orientation, out p2);
+                p2 += body2.position;
             }
 
 
-            JVector dist; JVector.Subtract(ref p1, ref p2, out dist);
-            penetration = JVector.Dot(ref dist, ref normal);
+            Vector3 dist = p1 - p2;
+            penetration = Vector3.Dot(dist, normal);
         }
 
         /// <summary>
         /// An impulse is applied an both contact points.
         /// </summary>
         /// <param name="impulse">The impulse to apply.</param>
-        public void ApplyImpulse(ref JVector impulse)
+        public void ApplyImpulse(ref Vector3 impulse)
         {
             #region INLINE - HighFrequency
-            //JVector temp;
+            //Vector3 temp;
 
             if (!treatBody1AsStatic)
             {
@@ -413,10 +414,10 @@ namespace BalatroPhysics.Dynamics
             #endregion
         }
 
-        public void ApplyImpulse(JVector impulse)
+        public void ApplyImpulse(Vector3 impulse)
         {
             #region INLINE - HighFrequency
-            //JVector temp;
+            //Vector3 temp;
 
             if (!treatBody1AsStatic)
             {
@@ -499,7 +500,7 @@ namespace BalatroPhysics.Dynamics
 
             float kNormal = 0.0f;
 
-            JVector rantra = JVector.Zero;
+            Vector3 rantra = Vector3.Zero;
             if (!treatBody1AsStatic)
             {
                 kNormal += body1.inverseMass;
@@ -507,19 +508,19 @@ namespace BalatroPhysics.Dynamics
                 if (!body1IsMassPoint)
                 {
 
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
                     rantra.X = (relativePos1.Y * normal.Z) - (relativePos1.Z * normal.Y);
                     rantra.Y = (relativePos1.Z * normal.X) - (relativePos1.X * normal.Z);
                     rantra.Z = (relativePos1.X * normal.Y) - (relativePos1.Y * normal.X);
 
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
                     float num0 = ((rantra.X * body1.invInertiaWorld.M11) + (rantra.Y * body1.invInertiaWorld.M21)) + (rantra.Z * body1.invInertiaWorld.M31);
                     float num1 = ((rantra.X * body1.invInertiaWorld.M12) + (rantra.Y * body1.invInertiaWorld.M22)) + (rantra.Z * body1.invInertiaWorld.M32);
                     float num2 = ((rantra.X * body1.invInertiaWorld.M13) + (rantra.Y * body1.invInertiaWorld.M23)) + (rantra.Z * body1.invInertiaWorld.M33);
 
                     rantra.X = num0; rantra.Y = num1; rantra.Z = num2;
 
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
                     num0 = (rantra.Y * relativePos1.Z) - (rantra.Z * relativePos1.Y);
                     num1 = (rantra.Z * relativePos1.X) - (rantra.X * relativePos1.Z);
                     num2 = (rantra.X * relativePos1.Y) - (rantra.Y * relativePos1.X);
@@ -528,7 +529,7 @@ namespace BalatroPhysics.Dynamics
                 }
             }
 
-            JVector rbntrb = JVector.Zero;
+            Vector3 rbntrb = Vector3.Zero;
             if (!treatBody2AsStatic)
             {
                 kNormal += body2.inverseMass;
@@ -536,19 +537,19 @@ namespace BalatroPhysics.Dynamics
                 if (!body2IsMassPoint)
                 {
 
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
                     rbntrb.X = (relativePos2.Y * normal.Z) - (relativePos2.Z * normal.Y);
                     rbntrb.Y = (relativePos2.Z * normal.X) - (relativePos2.X * normal.Z);
                     rbntrb.Z = (relativePos2.X * normal.Y) - (relativePos2.Y * normal.X);
 
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
                     float num0 = ((rbntrb.X * body2.invInertiaWorld.M11) + (rbntrb.Y * body2.invInertiaWorld.M21)) + (rbntrb.Z * body2.invInertiaWorld.M31);
                     float num1 = ((rbntrb.X * body2.invInertiaWorld.M12) + (rbntrb.Y * body2.invInertiaWorld.M22)) + (rbntrb.Z * body2.invInertiaWorld.M32);
                     float num2 = ((rbntrb.X * body2.invInertiaWorld.M13) + (rbntrb.Y * body2.invInertiaWorld.M23)) + (rbntrb.Z * body2.invInertiaWorld.M33);
 
                     rbntrb.X = num0; rbntrb.Y = num1; rbntrb.Z = num2;
 
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
                     num0 = (rbntrb.Y * relativePos2.Z) - (rbntrb.Z * relativePos2.Y);
                     num1 = (rbntrb.Z * relativePos2.X) - (rbntrb.X * relativePos2.Z);
                     num2 = (rbntrb.X * relativePos2.Y) - (rbntrb.Y * relativePos2.X);
@@ -580,26 +581,26 @@ namespace BalatroPhysics.Dynamics
 
             float kTangent = 0.0f;
 
-            if (treatBody1AsStatic) rantra.MakeZero();
+            if (treatBody1AsStatic) rantra = Vector3.Zero;
             else
             {
                 kTangent += body1.inverseMass;
   
                 if (!body1IsMassPoint)
                 {
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
                     rantra.X = (relativePos1.Y * tangent.Z) - (relativePos1.Z * tangent.Y);
                     rantra.Y = (relativePos1.Z * tangent.X) - (relativePos1.X * tangent.Z);
                     rantra.Z = (relativePos1.X * tangent.Y) - (relativePos1.Y * tangent.X);
 
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
                     float num0 = ((rantra.X * body1.invInertiaWorld.M11) + (rantra.Y * body1.invInertiaWorld.M21)) + (rantra.Z * body1.invInertiaWorld.M31);
                     float num1 = ((rantra.X * body1.invInertiaWorld.M12) + (rantra.Y * body1.invInertiaWorld.M22)) + (rantra.Z * body1.invInertiaWorld.M32);
                     float num2 = ((rantra.X * body1.invInertiaWorld.M13) + (rantra.Y * body1.invInertiaWorld.M23)) + (rantra.Z * body1.invInertiaWorld.M33);
 
                     rantra.X = num0; rantra.Y = num1; rantra.Z = num2;
 
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
                     num0 = (rantra.Y * relativePos1.Z) - (rantra.Z * relativePos1.Y);
                     num1 = (rantra.Z * relativePos1.X) - (rantra.X * relativePos1.Z);
                     num2 = (rantra.X * relativePos1.Y) - (rantra.Y * relativePos1.X);
@@ -609,26 +610,26 @@ namespace BalatroPhysics.Dynamics
 
             }
 
-            if (treatBody2AsStatic) rbntrb.MakeZero();
+            if (treatBody2AsStatic) rbntrb = Vector3.Zero;
             else
             {
                 kTangent += body2.inverseMass;
 
                 if (!body2IsMassPoint)
                 {
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
                     rbntrb.X = (relativePos2.Y * tangent.Z) - (relativePos2.Z * tangent.Y);
                     rbntrb.Y = (relativePos2.Z * tangent.X) - (relativePos2.X * tangent.Z);
                     rbntrb.Z = (relativePos2.X * tangent.Y) - (relativePos2.Y * tangent.X);
 
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
                     float num0 = ((rbntrb.X * body2.invInertiaWorld.M11) + (rbntrb.Y * body2.invInertiaWorld.M21)) + (rbntrb.Z * body2.invInertiaWorld.M31);
                     float num1 = ((rbntrb.X * body2.invInertiaWorld.M12) + (rbntrb.Y * body2.invInertiaWorld.M22)) + (rbntrb.Z * body2.invInertiaWorld.M32);
                     float num2 = ((rbntrb.X * body2.invInertiaWorld.M13) + (rbntrb.Y * body2.invInertiaWorld.M23)) + (rbntrb.Z * body2.invInertiaWorld.M33);
 
                     rbntrb.X = num0; rbntrb.Y = num1; rbntrb.Z = num2;
 
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
                     num0 = (rbntrb.Y * relativePos2.Z) - (rbntrb.Z * relativePos2.Y);
                     num1 = (rbntrb.Z * relativePos2.X) - (rbntrb.X * relativePos2.Z);
                     num2 = (rbntrb.X * relativePos2.Y) - (rbntrb.Y * relativePos2.X);
@@ -637,15 +638,15 @@ namespace BalatroPhysics.Dynamics
                 }
             }
 
-            if (!treatBody1AsStatic) kTangent += JVector.Dot(ref rantra, ref tangent);
-            if (!treatBody2AsStatic) kTangent += JVector.Dot(ref rbntrb, ref tangent);
+            if (!treatBody1AsStatic) kTangent += Vector3.Dot(rantra, tangent);
+            if (!treatBody2AsStatic) kTangent += Vector3.Dot(rbntrb, tangent);
             massTangent = 1.0f / kTangent;
 
             restitutionBias = lostSpeculativeBounce;
 
             speculativeVelocity = 0.0f;
 
-            float relNormalVel = normal.X * dvx + normal.Y * dvy + normal.Z * dvz; //JVector.Dot(ref normal, ref dv);
+            float relNormalVel = normal.X * dvx + normal.Y * dvy + normal.Z * dvz; //Vector3.Dot(ref normal, ref dv);
 
             if (Penetration > settings.allowedPenetration)
             {
@@ -669,7 +670,7 @@ namespace BalatroPhysics.Dynamics
                 else friction = staticFriction;
             }
 
-            JVector impulse;
+            Vector3 impulse;
 
             // Simultaneos solving and restitution is simply not possible
             // so fake it a bit by just applying restitution impulse when there
@@ -787,19 +788,19 @@ namespace BalatroPhysics.Dynamics
         /// <param name="point2">The collision point in worldspace</param>
         /// <param name="n">The normal pointing to body2.</param>
         /// <param name="penetration">The estimated penetration depth.</param>
-        public void Initialize(RigidBody body1, RigidBody body2, ref JVector point1, ref JVector point2, ref JVector n,
+        public void Initialize(RigidBody body1, RigidBody body2, ref Vector3 point1, ref Vector3 point2, ref Vector3 n,
             float penetration, bool newContact, ContactSettings settings)
         {
             this.body1 = body1;  this.body2 = body2;
-            this.normal = n; normal.Normalize();
+            this.normal = n; normal = Vector3.Normalize(normal);
             this.p1 = point1; this.p2 = point2;
 
             this.newContact = newContact;
 
-            JVector.Subtract(ref p1, ref body1.position, out relativePos1);
-            JVector.Subtract(ref p2, ref body2.position, out relativePos2);
-            JVector.Transform(ref relativePos1, ref body1.invOrientation, out realRelPos1);
-            JVector.Transform(ref relativePos2, ref body2.invOrientation, out realRelPos2);
+            relativePos1 = p1 - body1.position;
+            relativePos2 = p2 - body2.position;
+            JMath.Transform(ref relativePos1, ref body1.invOrientation, out realRelPos1);
+            JMath.Transform(ref relativePos2, ref body2.invOrientation, out realRelPos2);
 
             this.initialPen = penetration;
             this.penetration = penetration;

@@ -207,7 +207,7 @@ namespace BalatroPhysicsDemo
         MouseState mousePreviousState = new MouseState();
 
         // Store information for drag and drop
-        JVector hitPoint, hitNormal;
+        System.Numerics.Vector3 hitPoint, hitNormal;
         SingleBodyConstraints.PointOnPoint grabConstraint;
         RigidBody grabBody;
         float hitDistance = 0.0f;
@@ -243,10 +243,10 @@ namespace BalatroPhysicsDemo
                 padState.IsButtonDown(Buttons.RightThumbstickDown) &&
                 gamePadPreviousState.IsButtonUp(Buttons.RightThumbstickUp))
             {
-                JVector ray = Conversion.ToJitterVector(RayTo(mouseState.X, mouseState.Y));
-                JVector camp = Conversion.ToJitterVector(Camera.Position);
+                System.Numerics.Vector3 ray = Conversion.ToJitterVector(RayTo(mouseState.X, mouseState.Y));
+                System.Numerics.Vector3 camp = Conversion.ToJitterVector(Camera.Position);
 
-                ray = JVector.Normalize(ray) * 100;
+                ray = System.Numerics.Vector3.Normalize(ray) * 100;
 
                 float fraction;
 
@@ -258,8 +258,8 @@ namespace BalatroPhysicsDemo
 
                     if (grabConstraint != null) World.RemoveConstraint(grabConstraint);
 
-                    JVector lanchor = hitPoint - grabBody.Position;
-                    lanchor = JVector.Transform(lanchor, JMatrix.Transpose(grabBody.Orientation));
+                    System.Numerics.Vector3 lanchor = hitPoint - grabBody.Position;
+                    lanchor = JMath.Transform(lanchor, JMatrix.Transpose(grabBody.Orientation));
 
                     grabConstraint = new SingleBodyConstraints.PointOnPoint(grabBody, lanchor);
                     grabConstraint.Softness = 0.01f;
@@ -341,7 +341,7 @@ namespace BalatroPhysicsDemo
 
 
 
-        private bool RaycastCallback(RigidBody body, JVector normal, float fraction)
+        private bool RaycastCallback(RigidBody body, System.Numerics.Vector3 normal, float fraction)
         {
             if (body.IsStatic) return false;
             else return true;
@@ -350,7 +350,7 @@ namespace BalatroPhysicsDemo
         RigidBody lastBody = null;
 
         #region Spawn Random Primitive
-        private void SpawnRandomPrimitive(JVector position, JVector velocity)
+        private void SpawnRandomPrimitive(System.Numerics.Vector3 position, System.Numerics.Vector3 velocity)
         {
             RigidBody body = null;
             int rndn = rndn = random.Next(7);
@@ -376,13 +376,13 @@ namespace BalatroPhysicsDemo
                     body = new RigidBody(new CapsuleShape(1.0f, 0.5f));
                     break;
                 case 5:
-                    Shape b1 = new BoxShape(new JVector(3, 1, 1));
-                    Shape b2 = new BoxShape(new JVector(1, 1, 3));
+                    Shape b1 = new BoxShape(new System.Numerics.Vector3(3, 1, 1));
+                    Shape b2 = new BoxShape(new System.Numerics.Vector3(1, 1, 3));
                     Shape b3 = new CylinderShape(3.0f, 0.5f);
 
-                    CompoundShape.TransformedShape t1 = new CompoundShape.TransformedShape(b1, JMatrix.Identity, JVector.Zero);
-                    CompoundShape.TransformedShape t2 = new CompoundShape.TransformedShape(b2, JMatrix.Identity, JVector.Zero);
-                    CompoundShape.TransformedShape t3 = new CompoundShape.TransformedShape(b3, JMatrix.Identity, new JVector(0, 0, 0));
+                    CompoundShape.TransformedShape t1 = new CompoundShape.TransformedShape(b1, JMatrix.Identity, System.Numerics.Vector3.Zero);
+                    CompoundShape.TransformedShape t2 = new CompoundShape.TransformedShape(b2, JMatrix.Identity, System.Numerics.Vector3.Zero);
+                    CompoundShape.TransformedShape t3 = new CompoundShape.TransformedShape(b3, JMatrix.Identity, new System.Numerics.Vector3(0, 0, 0));
 
                     CompoundShape ms = new CompoundShape(new CompoundShape.TransformedShape[3] { t1, t2, t3 });
 
@@ -459,7 +459,7 @@ namespace BalatroPhysicsDemo
         #endregion
 
         #region add draw matrices to the different primitives
-        private void AddShapeToDrawList(Shape shape, JMatrix ori, JVector pos)
+        private void AddShapeToDrawList(Shape shape, JMatrix ori, System.Numerics.Vector3 pos)
         {
             Primitives3D.GeometricPrimitive primitive = null;
             Matrix scaleMatrix = Matrix.Identity;
@@ -513,15 +513,15 @@ namespace BalatroPhysicsDemo
             {
                 CompoundShape cShape = rb.Shape as CompoundShape;
                 JMatrix orientation = rb.Orientation;
-                JVector position = rb.Position;
+                System.Numerics.Vector3 position = rb.Position;
 
                 foreach (var ts in cShape.Shapes)
                 {
-                    JVector pos = ts.Position;
+                    System.Numerics.Vector3 pos = ts.Position;
                     JMatrix ori = ts.Orientation;
 
-                    JVector.Transform(ref pos,ref orientation,out pos);
-                    JVector.Add(ref pos, ref position, out pos);
+                    JMath.Transform(ref pos,ref orientation,out pos);
+                    pos += position;
 
                     JMatrix.Multiply(ref ori, ref orientation, out ori);
 
@@ -644,14 +644,14 @@ namespace BalatroPhysicsDemo
             //{
             //    foreach (Contact c in a.ContactList)
             //    {
-            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JVector.Left, c.Position1 + 0.5f * JVector.Right, Color.Green);
-            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JVector.Up, c.Position1 + 0.5f * JVector.Down, Color.Green);
-            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JVector.Forward, c.Position1 + 0.5f * JVector.Backward, Color.Green);
+            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JMath.Left, c.Position1 + 0.5f * JMath.Right, Color.Green);
+            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JMath.Up, c.Position1 + 0.5f * JMath.Down, Color.Green);
+            //        DebugDrawer.DrawLine(c.Position1 + 0.5f * JMath.Forward, c.Position1 + 0.5f * JMath.Backward, Color.Green);
 
 
-            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JVector.Left, c.Position2 + 0.5f * JVector.Right, Color.Red);
-            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JVector.Up, c.Position2 + 0.5f * JVector.Down, Color.Red);
-            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JVector.Forward, c.Position2 + 0.5f * JVector.Backward, Color.Red);
+            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JMath.Left, c.Position2 + 0.5f * JMath.Right, Color.Red);
+            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JMath.Up, c.Position2 + 0.5f * JMath.Down, Color.Red);
+            //        DebugDrawer.DrawLine(c.Position2 + 0.5f * JMath.Forward, c.Position2 + 0.5f * JMath.Backward, Color.Red);
             //    }
             //}
             #endregion

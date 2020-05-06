@@ -25,6 +25,7 @@ using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Dynamics.Constraints;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics.Joints
@@ -67,7 +68,7 @@ namespace BalatroPhysics.Dynamics.Joints
         }
 
 
-        public PrismaticJoint(World world, RigidBody body1, RigidBody body2, JVector pointOnBody1,JVector pointOnBody2)
+        public PrismaticJoint(World world, RigidBody body1, RigidBody body2, Vector3 pointOnBody1,Vector3 pointOnBody2)
             : base(world)
         {
             fixedAngle = new FixedAngle(body1, body2);
@@ -75,7 +76,7 @@ namespace BalatroPhysics.Dynamics.Joints
         }
 
 
-        public PrismaticJoint(World world, RigidBody body1, RigidBody body2, JVector pointOnBody1, JVector pointOnBody2, float maximumDistance, float minimumDistance)
+        public PrismaticJoint(World world, RigidBody body1, RigidBody body2, Vector3 pointOnBody1, Vector3 pointOnBody2, float maximumDistance, float minimumDistance)
             : base(world)
         {
             fixedAngle = new FixedAngle(body1, body2);

@@ -25,6 +25,7 @@ using System.Diagnostics;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -59,7 +60,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayDelta"></param>
         /// <returns></returns>
-        public abstract int Prepare(ref JVector rayOrigin, ref JVector rayDelta);
+        public abstract int Prepare(ref Vector3 rayOrigin, ref Vector3 rayDelta);
 
         protected abstract Multishape CreateWorkingClone();
 
@@ -123,7 +124,7 @@ namespace BalatroPhysics.Collision.Shapes
             }
         }
 
-        public override void MakeHull(ref List<JVector> triangleList, int generationThreshold)
+        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
         {
             //throw new NotImplementedException();
         }
@@ -134,12 +135,12 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            geomCen = JVector.Zero;
+            geomCen = Vector3.Zero;
 
             // TODO: calc this right
             inertia = JMatrix.Identity;
 
-            JVector size; JVector.Subtract(ref boundingBox.Max, ref boundingBox.Min, out size);
+            Vector3 size = boundingBox.Max - boundingBox.Min;
 
             mass = size.X * size.Y * size.Z;
 

@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.LinearMath
@@ -566,8 +567,8 @@ namespace BalatroPhysics.LinearMath
         /// <param name="axis">The axis.</param>
         /// <param name="angle">The angle.</param>
         /// <param name="result">The resulting rotation matrix</param>
-        #region public static void CreateFromAxisAngle(ref JVector axis, float angle, out JMatrix result)
-        public static void CreateFromAxisAngle(ref JVector axis, float angle, out JMatrix result)
+        #region public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out JMatrix result)
+        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out JMatrix result)
         {
             float x = axis.X;
             float y = axis.Y;
@@ -597,7 +598,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="axis">The axis.</param>
         /// <param name="angle">The angle.</param>
         /// <returns>The resulting rotation matrix</returns>
-        public static JMatrix CreateFromAxisAngle(JVector axis, float angle)
+        public static JMatrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
             JMatrix result; CreateFromAxisAngle(ref axis, angle, out result);
             return result;

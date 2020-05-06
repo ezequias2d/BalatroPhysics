@@ -24,13 +24,14 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
 {
     public class MinkowskiSumShape : Shape
     {
-        JVector shifted;
+        Vector3 shifted;
         List<Shape> shapes = new List<Shape>();
 
         public MinkowskiSumShape(IEnumerable<Shape> shapes)
@@ -65,7 +66,7 @@ namespace BalatroPhysics.Collision.Shapes
             return result;
         }
 
-        public JVector Shift()
+        public Vector3 Shift()
         {
             return -1 * this.shifted;
         }
@@ -75,17 +76,17 @@ namespace BalatroPhysics.Collision.Shapes
             this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);
         }
 
-        public override void SupportMapping(ref JVector direction, out JVector result)
+        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
         {
-            JVector temp1, temp2 = JVector.Zero;
+            Vector3 temp1, temp2 = Vector3.Zero;
 
             for (int i = 0; i < shapes.Count; i++)
             {
                 shapes[i].SupportMapping(ref direction, out temp1);
-                JVector.Add(ref temp1, ref temp2, out temp2);
+                temp2 += temp1;
             }
 
-            JVector.Subtract(ref temp2, ref shifted, out result);
+            result = temp2 - shifted;
         }
 
     }

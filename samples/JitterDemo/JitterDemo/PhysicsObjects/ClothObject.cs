@@ -86,7 +86,7 @@ namespace BalatroPhysicsDemo.PhysicsObjects
                 vertices[i].Position = Conversion.ToXNAVector(cloth.VertexBodies[i].Position);
             }
 
-            //JVector normal;
+            //System.Numerics.Vector3 normal;
 
             //for (int i = 0; i < cloth.Triangles.Count; i++)
             //{

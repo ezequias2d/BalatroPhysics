@@ -31,13 +31,13 @@ namespace BalatroPhysicsDemo.Scenes
             TerrainShape shape = new TerrainShape(terrain.heights, 1.0f, 1.0f);
             
             RigidBody body = new RigidBody(shape);
-            body.Position -= new JVector(50, 0, 50);
+            body.Position -= new System.Numerics.Vector3(50, 0, 50);
             body.IsStatic = true;
             body.Tag = BodyTag.DontDrawMe;
             //body.EnableDebugDraw = true;
             Demo.World.AddBody(body);
 
-            AddCar(new JVector(0, 4, 0));
+            AddCar(new System.Numerics.Vector3(0, 4, 0));
         }
 
         public override void Draw()

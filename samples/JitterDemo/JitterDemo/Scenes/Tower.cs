@@ -38,7 +38,7 @@ namespace BalatroPhysicsDemo.Scenes
             //        {
             //            RigidBody b = new RigidBody(shape);
             //            Demo.World.AddBody(b);
-            //            b.Position = new JVector(i, e, k) * 4.0f;
+            //            b.Position = new System.Numerics.Vector3(i, e, k) * 4.0f;
             //            b.AffectedByGravity = true;
             //        }
             //    }
@@ -74,7 +74,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             //        RigidBody body = new RigidBody(shape);
             //        body.Orientation = Conversion.ToJitterMatrix(orientation);
-            //        body.Position = Conversion.ToJitterVector(position) + new JVector(20,0,0);
+            //        body.Position = Conversion.ToJitterVector(position) + new System.Numerics.Vector3(20,0,0);
 
             //        world.AddBody(body);
 
@@ -93,7 +93,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             //        RigidBody body = new RigidBody(shape);
             //        body.Orientation = Conversion.ToJitterMatrix(orientation);
-            //        body.Position = Conversion.ToJitterVector(position) + new JVector(00, 0, -20); ;
+            //        body.Position = Conversion.ToJitterVector(position) + new System.Numerics.Vector3(00, 0, -20); ;
 
             //        world.AddBody(body);
 
@@ -112,7 +112,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             //        RigidBody body = new RigidBody(shape);
             //        body.Orientation = Conversion.ToJitterMatrix(orientation);
-            //        body.Position = Conversion.ToJitterVector(position) + new JVector(20, 0, -20);
+            //        body.Position = Conversion.ToJitterVector(position) + new System.Numerics.Vector3(20, 0, -20);
 
             //        world.AddBody(body);
 
@@ -134,7 +134,7 @@ namespace BalatroPhysicsDemo.Scenes
             //            RigidBody body = new RigidBody(new BoxShape(1, 1, 1));
             //            this.Demo.World.AddBody(body);
             //            body.AffectedByGravity = false;
-            //            body.Position = new JVector(i, k, l) * 2.0f;
+            //            body.Position = new System.Numerics.Vector3(i, k, l) * 2.0f;
             //            body.Restitution = 1.0f;
             //            body.Damping = RigidBody.DampingType.None;
             //            body.IsActive = false;

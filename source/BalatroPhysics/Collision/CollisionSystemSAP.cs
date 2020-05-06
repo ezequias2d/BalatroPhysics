@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision
@@ -223,12 +224,12 @@ namespace BalatroPhysics.Collision
         /// against rays (rays are of infinite length). They are checked against segments
         /// which start at rayOrigin and end in rayOrigin + rayDirection.
         /// </summary>
-        #region public override bool Raycast(JVector rayOrigin, JVector rayDirection, out JVector normal,out float fraction)
-        public override bool Raycast(JVector rayOrigin, JVector rayDirection, RaycastCallback raycast, out RigidBody body, out JVector normal, out float fraction)
+        #region public override bool Raycast(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 normal,out float fraction)
+        public override bool Raycast(Vector3 rayOrigin, Vector3 rayDirection, RaycastCallback raycast, out RigidBody body, out Vector3 normal, out float fraction)
         {
-            body = null; normal = JVector.Zero; fraction = float.MaxValue;
+            body = null; normal = Vector3.Zero; fraction = float.MaxValue;
 
-            JVector tempNormal; float tempFraction;
+            Vector3 tempNormal; float tempFraction;
             bool result = false;
 
             // TODO: This can be done better in CollisionSystemPersistenSAP
@@ -278,10 +279,10 @@ namespace BalatroPhysics.Collision
         /// against rays (rays are of infinite length). They are checked against segments
         /// which start at rayOrigin and end in rayOrigin + rayDirection.
         /// </summary>
-        #region public override bool Raycast(RigidBody body, JVector rayOrigin, JVector rayDirection, out JVector normal, out float fraction)
-        public override bool Raycast(RigidBody body, JVector rayOrigin, JVector rayDirection, out JVector normal, out float fraction)
+        #region public override bool Raycast(RigidBody body, Vector3 rayOrigin, Vector3 rayDirection, out Vector3 normal, out float fraction)
+        public override bool Raycast(RigidBody body, Vector3 rayOrigin, Vector3 rayDirection, out Vector3 normal, out float fraction)
         {
-            fraction = float.MaxValue; normal = JVector.Zero;
+            fraction = float.MaxValue; normal = Vector3.Zero;
 
             if (!body.BoundingBox.RayIntersect(ref rayOrigin, ref rayDirection)) return false;
 
@@ -289,12 +290,12 @@ namespace BalatroPhysics.Collision
             {
                 Multishape ms = (body.Shape as Multishape).RequestWorkingClone();
 
-                JVector tempNormal; float tempFraction;
+                Vector3 tempNormal; float tempFraction;
                 bool multiShapeCollides = false;
 
-                JVector transformedOrigin; JVector.Subtract(ref rayOrigin, ref body.position, out transformedOrigin);
-                JVector.Transform(ref transformedOrigin, ref body.invOrientation, out transformedOrigin);
-                JVector transformedDirection; JVector.Transform(ref rayDirection, ref body.invOrientation, out transformedDirection);
+                Vector3 transformedOrigin = rayOrigin - body.position;
+                JMath.Transform(ref transformedOrigin, ref body.invOrientation, out transformedOrigin);
+                Vector3 transformedDirection; JMath.Transform(ref rayDirection, ref body.invOrientation, out transformedDirection);
 
                 int msLength = ms.Prepare(ref transformedOrigin, ref transformedDirection);
 
@@ -310,14 +311,14 @@ namespace BalatroPhysics.Collision
                             if (useTerrainNormal && ms is TerrainShape)
                             {
                                 (ms as TerrainShape).CollisionNormal(out tempNormal);
-                                JVector.Transform(ref tempNormal, ref body.orientation, out tempNormal);
-                                tempNormal.Negate();
+                                JMath.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                tempNormal = -tempNormal;
                             }
                             else if (useTriangleMeshNormal && ms is TriangleMeshShape)
                             {
                                 (ms as TriangleMeshShape).CollisionNormal(out tempNormal);
-                                JVector.Transform(ref tempNormal, ref body.orientation, out tempNormal);
-                                tempNormal.Negate();
+                                JMath.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                tempNormal = -tempNormal;
                             }
 
                             normal = tempNormal;

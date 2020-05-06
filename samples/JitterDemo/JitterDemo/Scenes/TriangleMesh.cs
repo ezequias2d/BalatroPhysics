@@ -96,7 +96,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             ExtractData(vertices, indices, model);
 
-            List<JVector> jvertices = new List<JVector>(vertices.Count);
+            List<System.Numerics.Vector3> jvertices = new List<System.Numerics.Vector3>(vertices.Count);
             foreach(Vector3 vertex in vertices) jvertices.Add(Conversion.ToJitterVector(vertex));
 
             Octree octree = new Octree(jvertices, indices);
@@ -109,7 +109,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             Demo.World.AddBody(body);
 
-            AddCar(new JVector(-20, 20, 0));
+            AddCar(new System.Numerics.Vector3(-20, 20, 0));
         }
 
 

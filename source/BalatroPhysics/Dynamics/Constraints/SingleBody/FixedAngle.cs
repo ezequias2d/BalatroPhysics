@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics.Constraints.SingleBody
@@ -70,7 +71,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         private float softness = 0.0f;
 
         private JMatrix orientation;
-        private JVector accumulatedImpulse;
+        private Vector3 accumulatedImpulse;
 
         /// <summary>
         /// Constraints two bodies to always have the same relative
@@ -96,7 +97,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         public JMatrix InitialOrientation { get { return orientation; } set { orientation = value; } }
 
         JMatrix effectiveMass;
-        JVector bias;
+        Vector3 bias;
         float softnessOverDt;
 
         /// <summary>
@@ -116,7 +117,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
             JMatrix.Inverse(ref effectiveMass, out effectiveMass);
 
             JMatrix q = JMatrix.Transpose(orientation) * body1.orientation;
-            JVector axis;
+            Vector3 axis;
 
             float x = q.M32 - q.M23;
             float y = q.M13 - q.M31;
@@ -126,14 +127,14 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
             float t = q.M11 + q.M22 + q.M33;
 
             float angle = (float)Math.Atan2(r, t - 1);
-            axis = new JVector(x, y, z) * angle;
+            axis = new Vector3(x, y, z) * angle;
 
             if (r != 0.0f) axis = axis * (1.0f / r);
 
             bias = axis * biasFactor * (-1.0f / timestep);
 
             // Apply previous frame solution as initial guess for satisfying the constraint.
-            if (!body1.IsStatic) body1.angularVelocity += JVector.Transform(accumulatedImpulse, body1.invInertiaWorld);
+            if (!body1.IsStatic) body1.angularVelocity += JMath.Transform(accumulatedImpulse, body1.invInertiaWorld);
         }
 
         /// <summary>
@@ -141,15 +142,15 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         /// </summary>
         public override void Iterate()
         {
-            JVector jv = body1.angularVelocity;
+            Vector3 jv = body1.angularVelocity;
 
-            JVector softnessVector = accumulatedImpulse * softnessOverDt;
+            Vector3 softnessVector = accumulatedImpulse * softnessOverDt;
 
-            JVector lambda = -1.0f * JVector.Transform(jv + bias + softnessVector, effectiveMass);
+            Vector3 lambda = -1.0f * JMath.Transform(jv + bias + softnessVector, effectiveMass);
 
             accumulatedImpulse += lambda;
 
-            if (!body1.IsStatic) body1.angularVelocity += JVector.Transform(lambda, body1.invInertiaWorld);
+            if (!body1.IsStatic) body1.angularVelocity += JMath.Transform(lambda, body1.invInertiaWorld);
         }
 
     }

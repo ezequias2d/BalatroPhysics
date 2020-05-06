@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -50,7 +51,7 @@ namespace BalatroPhysics.Collision.Shapes
         internal float mass = 1.0f;
 
         internal JBBox boundingBox = JBBox.LargeBox;
-        internal JVector geomCen = JVector.Zero;
+        internal Vector3 geomCen = Vector3.Zero;
 
         /// <summary>
         /// Gets called when the shape changes one of the parameters.
@@ -95,9 +96,9 @@ namespace BalatroPhysics.Collision.Shapes
 
         private struct ClipTriangle
         {
-            public JVector n1;
-            public JVector n2;
-            public JVector n3;
+            public Vector3 n1;
+            public Vector3 n2;
+            public Vector3 n3;
             public int generation;
         };
 
@@ -109,7 +110,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </remarks>
         /// <param name="triangleList"></param>
         /// <param name="generationThreshold"></param>
-        public virtual void MakeHull(ref List<JVector> triangleList, int generationThreshold)
+        public virtual void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
         {
             float distanceThreshold = 0.0f;
 
@@ -117,16 +118,16 @@ namespace BalatroPhysics.Collision.Shapes
 
             Stack<ClipTriangle> activeTriList = new Stack<ClipTriangle>();
 
-            JVector[] v = new JVector[] // 6 Array
+            Vector3[] v = new Vector3[] // 6 Array
 		    {
-			new JVector( -1,  0,  0 ),
-			new JVector(  1,  0,  0 ),
+			new Vector3( -1,  0,  0 ),
+			new Vector3(  1,  0,  0 ),
 
-			new JVector(  0, -1,  0 ),
-			new JVector(  0,  1,  0 ),
+			new Vector3(  0, -1,  0 ),
+			new Vector3(  0,  1,  0 ),
 
-			new JVector(  0,  0, -1 ),
-			new JVector(  0,  0,  1 ),
+			new Vector3(  0,  0, -1 ),
+			new Vector3(  0,  0,  1 ),
 		    };
 
             int[,] kTriangleVerts = new int[8, 3] // 8 x 3 Array
@@ -152,16 +153,16 @@ namespace BalatroPhysics.Collision.Shapes
                 activeTriList.Push(tri);
             }
 
-            List<JVector> pointSet = new List<JVector>();
+            List<Vector3> pointSet = new List<Vector3>();
 
             // surfaceTriList
             while (activeTriList.Count > 0)
             {
                 ClipTriangle tri = activeTriList.Pop();
 
-                JVector p1; SupportMapping(ref tri.n1, out p1);
-                JVector p2; SupportMapping(ref tri.n2, out p2);
-                JVector p3; SupportMapping(ref tri.n3, out p3);
+                Vector3 p1; SupportMapping(ref tri.n1, out p1);
+                Vector3 p2; SupportMapping(ref tri.n2, out p2);
+                Vector3 p3; SupportMapping(ref tri.n3, out p3);
 
                 float d1 = (p2 - p1).LengthSquared();
                 float d2 = (p3 - p2).LengthSquared();
@@ -183,22 +184,22 @@ namespace BalatroPhysics.Collision.Shapes
                     tri2.n2 = tri.n2;
                     tri3.n3 = tri.n3;
 
-                    JVector n = 0.5f * (tri.n1 + tri.n2);
-                    n.Normalize();
+                    Vector3 n = 0.5f * (tri.n1 + tri.n2);
+                    n = Vector3.Normalize(n);
 
                     tri1.n2 = n;
                     tri2.n1 = n;
                     tri4.n3 = n;
 
                     n = 0.5f * (tri.n2 + tri.n3);
-                    n.Normalize();
+                    n = Vector3.Normalize(n);
 
                     tri2.n3 = n;
                     tri3.n2 = n;
                     tri4.n1 = n;
 
                     n = 0.5f * (tri.n3 + tri.n1);
-                    n.Normalize();
+                    n = Vector3.Normalize(n);
 
                     tri1.n3 = n;
                     tri3.n1 = n;
@@ -211,7 +212,7 @@ namespace BalatroPhysics.Collision.Shapes
                 }
                 else
                 {
-                    if (((p3 - p1) % (p2 - p1)).LengthSquared() > JMath.Epsilon)
+                    if (Vector3.Cross(p3 - p1, p2 - p1).LengthSquared() > JMath.Epsilon)
                     {
                         triangleList.Add(p1);
                         triangleList.Add(p2);
@@ -233,29 +234,29 @@ namespace BalatroPhysics.Collision.Shapes
             // I don't think that this can be done faster.
             // 6 is the minimum number of SupportMap calls.
 
-            JVector vec = JVector.Zero;
+            Vector3 vec = Vector3.Zero;
 
-            vec.Set(orientation.M11, orientation.M21, orientation.M31);
+            vec = new Vector3(orientation.M11, orientation.M21, orientation.M31);
             SupportMapping(ref vec, out vec);
             box.Max.X = orientation.M11 * vec.X + orientation.M21 * vec.Y + orientation.M31 * vec.Z;
 
-            vec.Set(orientation.M12, orientation.M22, orientation.M32);
+            vec = new Vector3(orientation.M12, orientation.M22, orientation.M32);
             SupportMapping(ref vec, out vec);
             box.Max.Y = orientation.M12 * vec.X + orientation.M22 * vec.Y + orientation.M32 * vec.Z;
 
-            vec.Set(orientation.M13, orientation.M23, orientation.M33);
+            vec = new Vector3(orientation.M13, orientation.M23, orientation.M33);
             SupportMapping(ref vec, out vec);
             box.Max.Z = orientation.M13 * vec.X + orientation.M23 * vec.Y + orientation.M33 * vec.Z;
 
-            vec.Set(-orientation.M11, -orientation.M21, -orientation.M31);
+            vec = new Vector3(-orientation.M11, -orientation.M21, -orientation.M31);
             SupportMapping(ref vec, out vec);
             box.Min.X = orientation.M11 * vec.X + orientation.M21 * vec.Y + orientation.M31 * vec.Z;
 
-            vec.Set(-orientation.M12, -orientation.M22, -orientation.M32);
+            vec = new Vector3(-orientation.M12, -orientation.M22, -orientation.M32);
             SupportMapping(ref vec, out vec);
             box.Min.Y = orientation.M12 * vec.X + orientation.M22 * vec.Y + orientation.M32 * vec.Z;
 
-            vec.Set(-orientation.M13, -orientation.M23, -orientation.M33);
+            vec = new Vector3(-orientation.M13, -orientation.M23, -orientation.M33);
             SupportMapping(ref vec, out vec);
             box.Min.Z = orientation.M13 * vec.X + orientation.M23 * vec.Y + orientation.M33 * vec.Z;
         }
@@ -281,17 +282,17 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="centerOfMass"></param>
         /// <param name="inertia">Returns the inertia relative to the center of mass, not to the origin</param>
         /// <returns></returns>
-        #region  public static float CalculateMassInertia(Shape shape, out JVector centerOfMass, out JMatrix inertia)
-        public static float CalculateMassInertia(Shape shape, out JVector centerOfMass,
+        #region  public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass, out JMatrix inertia)
+        public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass,
             out JMatrix inertia)
         {
             float mass = 0.0f;
-            centerOfMass = JVector.Zero; inertia = JMatrix.Zero;
+            centerOfMass = Vector3.Zero; inertia = JMatrix.Zero;
 
             if (shape is Multishape) throw new ArgumentException("Can't calculate inertia of multishapes.", "shape");
 
             // build a triangle hull around the shape
-            List<JVector> hullTriangles = new List<JVector>();
+            List<Vector3> hullTriangles = new List<Vector3>();
             shape.MakeHull(ref hullTriangles, 3);
 
             // create inertia of tetrahedron with vertices at
@@ -301,9 +302,9 @@ namespace BalatroPhysics.Collision.Shapes
 
             for (int i = 0; i < hullTriangles.Count; i += 3)
             {
-                JVector column0 = hullTriangles[i + 0];
-                JVector column1 = hullTriangles[i + 1];
-                JVector column2 = hullTriangles[i + 2];
+                Vector3 column0 = hullTriangles[i + 0];
+                Vector3 column1 = hullTriangles[i + 1];
+                Vector3 column2 = hullTriangles[i + 2];
 
                 JMatrix A = new JMatrix(column0.X, column1.X, column2.X,
                     column0.Y, column1.Y, column2.Y,
@@ -315,7 +316,7 @@ namespace BalatroPhysics.Collision.Shapes
                 // inertia by a linear transformation A
                 JMatrix tetrahedronInertia = JMatrix.Multiply(A * C * JMatrix.Transpose(A), detA);
 
-                JVector tetrahedronCOM = (1.0f / 4.0f) * (hullTriangles[i + 0] + hullTriangles[i + 1] + hullTriangles[i + 2]);
+                Vector3 tetrahedronCOM = (1.0f / 4.0f) * (hullTriangles[i + 0] + hullTriangles[i + 1] + hullTriangles[i + 2]);
                 float tetrahedronMass = (1.0f / 6.0f) * detA;
 
                 inertia += tetrahedronInertia;
@@ -359,13 +360,13 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public abstract void SupportMapping(ref JVector direction, out JVector result);
+        public abstract void SupportMapping(ref Vector3 direction, out Vector3 result);
 
         /// <summary>
         /// The center of the SupportMap.
         /// </summary>
         /// <param name="geomCenter">The center of the SupportMap.</param>
-        public void SupportCenter(out JVector geomCenter)
+        public void SupportCenter(out Vector3 geomCenter)
         {
             geomCenter = this.geomCen;
         }

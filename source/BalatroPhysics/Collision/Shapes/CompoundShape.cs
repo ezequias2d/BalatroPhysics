@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -44,7 +45,7 @@ namespace BalatroPhysics.Collision.Shapes
         public struct TransformedShape
         {
             private Shape shape;
-            internal JVector position;
+            internal Vector3 position;
             internal JMatrix orientation;
             internal JMatrix invOrientation;
             internal JBBox boundingBox;
@@ -57,7 +58,7 @@ namespace BalatroPhysics.Collision.Shapes
             /// <summary>
             /// The position of a 'sub' shape
             /// </summary>
-            public JVector Position { get { return position; } set { position = value; UpdateBoundingBox(); } }
+            public Vector3 Position { get { return position; } set { position = value; UpdateBoundingBox(); } }
 
             public JBBox BoundingBox { get { return boundingBox; } }
 
@@ -92,7 +93,7 @@ namespace BalatroPhysics.Collision.Shapes
             /// <param name="shape">The shape.</param>
             /// <param name="orientation">The orientation this shape should have.</param>
             /// <param name="position">The position this shape should have.</param>
-            public TransformedShape(Shape shape, JMatrix orientation, JVector position)
+            public TransformedShape(Shape shape, JMatrix orientation, Vector3 position)
             {
                 this.position = position;
                 this.orientation = orientation;
@@ -111,8 +112,8 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public TransformedShape[] Shapes { get { return this.shapes; } }
 
-        JVector shifted;
-        public JVector Shift { get { return -1.0f * this.shifted; } }
+        Vector3 shifted;
+        public Vector3 Shift { get { return -1.0f * this.shifted; } }
 
         private JBBox mInternalBBox;
 
@@ -153,18 +154,18 @@ namespace BalatroPhysics.Collision.Shapes
             return true;
         }
 
-        public override void MakeHull(ref List<JVector> triangleList, int generationThreshold)
+        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
         {
-            List<JVector> triangles = new List<JVector>();
+            List<Vector3> triangles = new List<Vector3>();
 
             for (int i = 0; i < shapes.Length; i++)
             {
                 shapes[i].Shape.MakeHull(ref triangles, 4);
                 for (int e = 0; e < triangles.Count; e++)
                 {
-                    JVector pos = triangles[e];
-                    JVector.Transform(ref pos,ref shapes[i].orientation,out pos);
-                    JVector.Add(ref pos, ref shapes[i].position,out pos);
+                    Vector3 pos = triangles[e];
+                    JMath.Transform(ref pos,ref shapes[i].orientation,out pos);
+                    pos += shapes[i].position;
                     triangleList.Add(pos);
                 }
                 triangles.Clear();
@@ -191,7 +192,7 @@ namespace BalatroPhysics.Collision.Shapes
             for (int i = 0; i < Shapes.Length; i++)
             {
                 JMatrix currentInertia = Shapes[i].InverseOrientation * Shapes[i].Shape.Inertia * Shapes[i].Orientation;
-                JVector p = Shapes[i].Position * -1.0f;
+                Vector3 p = Shapes[i].Position * -1.0f;
                 float m = Shapes[i].Shape.Mass;
 
                 currentInertia.M11 += m * (p.Y * p.Y + p.Z * p.Z);
@@ -232,12 +233,12 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref JVector direction, out JVector result)
+        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
         {
-            JVector.Transform(ref direction, ref shapes[currentShape].invOrientation, out result);
+            JMath.Transform(ref direction, ref shapes[currentShape].invOrientation, out result);
             shapes[currentShape].Shape.SupportMapping(ref direction, out result);
-            JVector.Transform(ref result, ref shapes[currentShape].orientation, out result);
-            JVector.Add(ref result, ref shapes[currentShape].position, out result);
+            JMath.Transform(ref result, ref shapes[currentShape].orientation, out result);
+            result += shapes[currentShape].position;
         }
 
         /// <summary>
@@ -251,15 +252,15 @@ namespace BalatroPhysics.Collision.Shapes
             box.Min = mInternalBBox.Min;
             box.Max = mInternalBBox.Max;
 
-            JVector localHalfExtents = 0.5f * (box.Max - box.Min);
-            JVector localCenter = 0.5f * (box.Max + box.Min);
+            Vector3 localHalfExtents = 0.5f * (box.Max - box.Min);
+            Vector3 localCenter = 0.5f * (box.Max + box.Min);
 
-            JVector center;
-            JVector.Transform(ref localCenter, ref orientation, out center);
+            Vector3 center;
+            JMath.Transform(ref localCenter, ref orientation, out center);
 
             JMatrix abs; JMath.Absolute(ref orientation, out abs);
-            JVector temp;
-            JVector.Transform(ref localHalfExtents, ref abs, out temp);
+            Vector3 temp;
+            JMath.Transform(ref localHalfExtents, ref abs, out temp);
 
             box.Max = center + temp;
             box.Min = center - temp;
@@ -306,7 +307,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayEnd"></param>
         /// <returns></returns>
-        public override int Prepare(ref JVector rayOrigin, ref JVector rayEnd)
+        public override int Prepare(ref Vector3 rayOrigin, ref Vector3 rayEnd)
         {
             JBBox box = JBBox.SmallBox;
 
@@ -326,8 +327,8 @@ namespace BalatroPhysics.Collision.Shapes
 
         protected void UpdateInternalBoundingBox()
         {
-            mInternalBBox.Min = new JVector(float.MaxValue);
-            mInternalBBox.Max = new JVector(float.MinValue);
+            mInternalBBox.Min = new Vector3(float.MaxValue);
+            mInternalBBox.Max = new Vector3(float.MinValue);
 
             for (int i = 0; i < shapes.Length; i++)
             {

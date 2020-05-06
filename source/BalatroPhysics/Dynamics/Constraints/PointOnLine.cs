@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics.Constraints
@@ -42,10 +43,10 @@ namespace BalatroPhysics.Dynamics.Constraints
     /// </summary>
     public class PointOnLine : Constraint
     {
-        private JVector lineNormal;
+        private Vector3 lineNormal;
 
-        private JVector localAnchor1, localAnchor2;
-        private JVector r1, r2;
+        private Vector3 localAnchor1, localAnchor2;
+        private Vector3 r1, r2;
 
         private float biasFactor = 0.5f;
         private float softness = 0.0f;
@@ -60,16 +61,16 @@ namespace BalatroPhysics.Dynamics.Constraints
         /// <param name="lineDirection"></param>
         /// <param name="pointBody2"></param>
         public PointOnLine(RigidBody body1, RigidBody body2,
-            JVector lineStartPointBody1, JVector pointBody2) : base(body1,body2)
+            Vector3 lineStartPointBody1, Vector3 pointBody2) : base(body1,body2)
         {
 
-            JVector.Subtract(ref lineStartPointBody1, ref body1.position, out localAnchor1);
-            JVector.Subtract(ref pointBody2, ref body2.position, out localAnchor2);
+            localAnchor1 = lineStartPointBody1 - body1.position;
+            localAnchor2 = pointBody2 - body2.position;
 
-            JVector.Transform(ref localAnchor1, ref body1.invOrientation, out localAnchor1);
-            JVector.Transform(ref localAnchor2, ref body2.invOrientation, out localAnchor2);
+            JMath.Transform(ref localAnchor1, ref body1.invOrientation, out localAnchor1);
+            JMath.Transform(ref localAnchor2, ref body2.invOrientation, out localAnchor2);
 
-            lineNormal = JVector.Normalize(lineStartPointBody1 - pointBody2);
+            lineNormal = Vector3.Normalize(lineStartPointBody1 - pointBody2);
         }
 
         public float AppliedImpulse { get { return accumulatedImpulse; } }
@@ -89,7 +90,7 @@ namespace BalatroPhysics.Dynamics.Constraints
         float bias;
         float softnessOverDt;
 
-        JVector[] jacobian = new JVector[4];
+        Vector3[] jacobian = new Vector3[4];
 
         /// <summary>
         /// Called once before iteration starts.
@@ -97,48 +98,48 @@ namespace BalatroPhysics.Dynamics.Constraints
         /// <param name="timestep">The simulation timestep</param>
         public override void PrepareForIteration(float timestep)
         {
-            JVector.Transform(ref localAnchor1, ref body1.orientation, out r1);
-            JVector.Transform(ref localAnchor2, ref body2.orientation, out r2);
+            JMath.Transform(ref localAnchor1, ref body1.orientation, out r1);
+            JMath.Transform(ref localAnchor2, ref body2.orientation, out r2);
 
-            JVector p1, p2, dp;
-            JVector.Add(ref body1.position, ref r1, out p1);
-            JVector.Add(ref body2.position, ref r2, out p2);
+            Vector3 p1, p2, dp;
+            p1 = body1.position + r1;
+            p2 = body2.position + r2;
 
-            JVector.Subtract(ref p2, ref p1, out dp);
+            dp = p2 - p1;
 
-            JVector l = JVector.Transform(lineNormal, body1.orientation);
-            l.Normalize();
+            Vector3 l = JMath.Transform(lineNormal, body1.orientation);
+            l = Vector3.Normalize(l);
 
-            JVector t = (p1 - p2) % l;
-            if(t.LengthSquared() != 0.0f) t.Normalize();
-            t = t % l;
+            Vector3 t = Vector3.Cross(p1 - p2, l);
+            if(t.LengthSquared() != 0.0f) t = Vector3.Normalize(t);
+            t = Vector3.Cross(t, l);
 
             jacobian[0] = t;                      // linearVel Body1
-            jacobian[1] = (r1 + p2 - p1) % t;     // angularVel Body1
+            jacobian[1] = Vector3.Cross(r1 + p2 - p1, t);     // angularVel Body1
             jacobian[2] = -1.0f * t;              // linearVel Body2
-            jacobian[3] = -1.0f * r2 % t;         // angularVel Body2
+            jacobian[3] = -1.0f * Vector3.Cross(r2, t);         // angularVel Body2
 
             effectiveMass = body1.inverseMass + body2.inverseMass
-                + JVector.Transform(jacobian[1], body1.invInertiaWorld) * jacobian[1]
-                + JVector.Transform(jacobian[3], body2.invInertiaWorld) * jacobian[3];
+                + Vector3.Dot(JMath.Transform(jacobian[1], body1.invInertiaWorld), jacobian[10])
+                + Vector3.Dot(JMath.Transform(jacobian[3], body2.invInertiaWorld), jacobian[3]);
 
             softnessOverDt = softness / timestep;
             effectiveMass += softnessOverDt;
 
             if(effectiveMass != 0) effectiveMass = 1.0f / effectiveMass;
 
-            bias = - (l % (p2-p1)).Length() * biasFactor * (1.0f / timestep);
+            bias = - Vector3.Cross(l, p2 - p1).Length() * biasFactor * (1.0f / timestep);
 
             if (!body1.isStatic)
             {
                 body1.linearVelocity += body1.inverseMass * accumulatedImpulse * jacobian[0];
-                body1.angularVelocity += JVector.Transform(accumulatedImpulse * jacobian[1], body1.invInertiaWorld);
+                body1.angularVelocity += JMath.Transform(accumulatedImpulse * jacobian[1], body1.invInertiaWorld);
             }
 
             if (!body2.isStatic)
             {
                 body2.linearVelocity += body2.inverseMass * accumulatedImpulse * jacobian[2];
-                body2.angularVelocity += JVector.Transform(accumulatedImpulse * jacobian[3], body2.invInertiaWorld);
+                body2.angularVelocity += JMath.Transform(accumulatedImpulse * jacobian[3], body2.invInertiaWorld);
             }
         }
 
@@ -148,10 +149,10 @@ namespace BalatroPhysics.Dynamics.Constraints
         public override void Iterate()
         {
             float jv =
-                body1.linearVelocity * jacobian[0] +
-                body1.angularVelocity * jacobian[1] +
-                body2.linearVelocity * jacobian[2] +
-                body2.angularVelocity * jacobian[3];
+                Vector3.Dot(body1.linearVelocity, jacobian[0]) +
+                Vector3.Dot(body1.angularVelocity, jacobian[1]) +
+                Vector3.Dot(body2.linearVelocity, jacobian[2]) +
+                Vector3.Dot(body2.angularVelocity, jacobian[3]);
 
             float softnessScalar = accumulatedImpulse * softnessOverDt;
 
@@ -162,20 +163,20 @@ namespace BalatroPhysics.Dynamics.Constraints
             if (!body1.isStatic)
             {
                 body1.linearVelocity += body1.inverseMass * lambda * jacobian[0];
-                body1.angularVelocity += JVector.Transform(lambda * jacobian[1], body1.invInertiaWorld);
+                body1.angularVelocity += JMath.Transform(lambda * jacobian[1], body1.invInertiaWorld);
             }
 
             if (!body2.isStatic)
             {
                 body2.linearVelocity += body2.inverseMass * lambda * jacobian[2];
-                body2.angularVelocity += JVector.Transform(lambda * jacobian[3], body2.invInertiaWorld);
+                body2.angularVelocity += JMath.Transform(lambda * jacobian[3], body2.invInertiaWorld);
             }
         }
 
         public override void DebugDraw(IDebugDrawer drawer)
         {
             drawer.DrawLine(body1.position + r1,
-                body1.position + r1 + JVector.Transform(lineNormal, body1.orientation) * 100.0f);
+                body1.position + r1 + JMath.Transform(lineNormal, body1.orientation) * 100.0f);
         }
 
     }

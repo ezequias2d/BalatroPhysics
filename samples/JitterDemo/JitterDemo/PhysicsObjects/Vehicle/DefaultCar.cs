@@ -88,10 +88,10 @@ namespace BalatroPhysicsDemo
             this.SteerRate = 5.0f;
 
             // create default wheels
-            wheels[(int)WheelPosition.FrontLeft] = new Wheel(world, this, JVector.Left + 1.8f * JVector.Forward + 0.8f * JVector.Down,0.4f);
-            wheels[(int)WheelPosition.FrontRight] = new Wheel(world, this, JVector.Right + 1.8f * JVector.Forward + 0.8f * JVector.Down, 0.4f);
-            wheels[(int)WheelPosition.BackLeft] = new Wheel(world, this, JVector.Left + 1.8f * JVector.Backward + 0.8f * JVector.Down, 0.4f);
-            wheels[(int)WheelPosition.BackRight] = new Wheel(world, this, JVector.Right + 1.8f * JVector.Backward + 0.8f * JVector.Down, 0.4f);
+            wheels[(int)WheelPosition.FrontLeft] = new Wheel(world, this, JMath.Left + 1.8f * JMath.Forward + 0.8f * JMath.Down,0.4f);
+            wheels[(int)WheelPosition.FrontRight] = new Wheel(world, this, JMath.Right + 1.8f * JMath.Forward + 0.8f * JMath.Down, 0.4f);
+            wheels[(int)WheelPosition.BackLeft] = new Wheel(world, this, JMath.Left + 1.8f * JMath.Backward + 0.8f * JMath.Down, 0.4f);
+            wheels[(int)WheelPosition.BackRight] = new Wheel(world, this, JMath.Right + 1.8f * JMath.Backward + 0.8f * JMath.Down, 0.4f);
 
             AdjustWheelValues();
         }

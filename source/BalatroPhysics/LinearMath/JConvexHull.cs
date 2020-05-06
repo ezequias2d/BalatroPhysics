@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.LinearMath
@@ -53,7 +54,7 @@ namespace BalatroPhysics.LinearMath
         }
         #endregion
 
-        public static int[] Build(List<JVector> pointCloud, Approximation factor)
+        public static int[] Build(List<Vector3> pointCloud, Approximation factor)
         {
             List<int> allIndices = new List<int>();
 
@@ -73,7 +74,7 @@ namespace BalatroPhysics.LinearMath
                     float sinPhi = (float)Math.Sin(phi);
                     float cosPhi = (float)Math.Cos(phi);
 
-                    JVector dir = new JVector(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi);
+                    Vector3 dir = new Vector3(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi);
 
                     int index = FindExtremePoint(pointCloud, ref dir);
                     allIndices.Add(index);
@@ -94,18 +95,18 @@ namespace BalatroPhysics.LinearMath
             // return allIndices.Distinct().ToArray();
         }
 
-        private static int FindExtremePoint(List<JVector> points,ref JVector dir)
+        private static int FindExtremePoint(List<Vector3> points,ref Vector3 dir)
         {
             int index = 0;
             float current = float.MinValue;
 
-            JVector point; float value;
+            Vector3 point; float value;
 
             for (int i = 1; i < points.Count; i++)
             {
                 point = points[i];
 
-                value = JVector.Dot(ref point, ref dir);
+                value = Vector3.Dot(point, dir);
                 if (value > current) { current = value; index= i; }
             }
 

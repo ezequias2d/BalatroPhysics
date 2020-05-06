@@ -28,6 +28,7 @@ using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Collision;
 using BalatroPhysics.Dynamics.Constraints;
 using BalatroPhysics.DataStructures;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Dynamics
@@ -53,9 +54,9 @@ namespace BalatroPhysics.Dynamics
         internal JMatrix invInertiaWorld;
         internal JMatrix orientation;
         internal JMatrix invOrientation;
-        internal JVector position;
-        internal JVector linearVelocity;
-        internal JVector angularVelocity;
+        internal Vector3 position;
+        internal Vector3 linearVelocity;
+        internal Vector3 angularVelocity;
 
         internal Material material;
 
@@ -70,7 +71,7 @@ namespace BalatroPhysics.Dynamics
         internal CollisionIsland island;
         internal float inverseMass;
 
-        internal JVector force, torque;
+        internal Vector3 force, torque;
 
         private int hashCode;
 
@@ -243,8 +244,8 @@ namespace BalatroPhysics.Dynamics
                 {
                     // if active and should be inactive
                     inactiveTime = float.PositiveInfinity;
-                    this.angularVelocity.MakeZero();
-                    this.linearVelocity.MakeZero();
+                    this.angularVelocity = Vector3.Zero;
+                    this.linearVelocity = Vector3.Zero;
                 }
 
                 isActive = value;
@@ -256,14 +257,14 @@ namespace BalatroPhysics.Dynamics
         /// linear velocity.
         /// </summary>
         /// <param name="impulse">Impulse direction and magnitude.</param>
-        public void ApplyImpulse(JVector impulse)
+        public void ApplyImpulse(Vector3 impulse)
         {
             if (this.isStatic)
                 throw new InvalidOperationException("Can't apply an impulse to a static body.");
 
-            JVector temp;
-            JVector.Multiply(ref impulse, inverseMass, out temp);
-            JVector.Add(ref linearVelocity, ref temp, out linearVelocity);
+            Vector3 temp;
+            temp = impulse * inverseMass;
+            linearVelocity += temp;
         }
 
         /// <summary>
@@ -273,18 +274,18 @@ namespace BalatroPhysics.Dynamics
         /// <param name="impulse">Impulse direction and magnitude.</param>
         /// <param name="relativePosition">The position where the impulse gets applied
         /// in Body coordinate frame.</param>
-        public void ApplyImpulse(JVector impulse, JVector relativePosition)
+        public void ApplyImpulse(Vector3 impulse, Vector3 relativePosition)
         {
             if (this.isStatic)
                 throw new InvalidOperationException("Can't apply an impulse to a static body.");
 
-            JVector temp;
-            JVector.Multiply(ref impulse, inverseMass, out temp);
-            JVector.Add(ref linearVelocity, ref temp, out linearVelocity);
+            Vector3 temp;
+            temp = impulse * inverseMass;
+            linearVelocity += temp;
 
-            JVector.Cross(ref relativePosition, ref impulse, out temp);
-            JVector.Transform(ref temp, ref invInertiaWorld, out temp);
-            JVector.Add(ref angularVelocity, ref temp, out angularVelocity);
+            temp = Vector3.Cross(relativePosition, impulse);
+            JMath.Transform(ref temp, ref invInertiaWorld, out temp);
+            angularVelocity += temp;
         }
 
         /// <summary>
@@ -294,9 +295,9 @@ namespace BalatroPhysics.Dynamics
         /// the timestep influences the energy added to the body.
         /// </summary>
         /// <param name="force">The force to add next <see cref="World.Step"/>.</param>
-        public void AddForce(JVector force)
+        public void AddForce(Vector3 force)
         {
-            JVector.Add(ref force, ref this.force, out this.force);
+            this.force += force;
         }
 
         /// <summary>
@@ -307,23 +308,23 @@ namespace BalatroPhysics.Dynamics
         /// </summary>
         /// <param name="force">The force to add next <see cref="World.Step"/>.</param>
         /// <param name="pos">The position where the force is applied.</param>
-        public void AddForce(JVector force, JVector pos)
+        public void AddForce(Vector3 force, Vector3 pos)
         {
-            JVector.Add(ref this.force, ref force, out this.force);
-            JVector.Subtract(ref pos, ref this.position, out pos);
-            JVector.Cross(ref pos, ref force, out pos);
-            JVector.Add(ref pos, ref this.torque, out this.torque);
+            this.force += force;
+            pos -= position;
+            pos = Vector3.Cross(pos, force);
+            torque += pos;
         }
 
         /// <summary>
         /// Returns the torque which acts this timestep on the body.
         /// </summary>
-        public JVector Torque { get { return torque; } }
+        public Vector3 Torque { get { return torque; } }
 
         /// <summary>
         /// Returns the force which acts this timestep on the body.
         /// </summary>
-        public JVector Force { get { return force; } set { force = value; } }
+        public Vector3 Force { get { return force; } set { force = value; } }
 
         /// <summary>
         /// Adds torque to the body. The torque gets applied
@@ -332,9 +333,9 @@ namespace BalatroPhysics.Dynamics
         /// the timestep influences the energy added to the body.
         /// </summary>
         /// <param name="torque">The torque to add next <see cref="World.Step"/>.</param>
-        public void AddTorque(JVector torque)
+        public void AddTorque(Vector3 torque)
         {
-            JVector.Add(ref torque, ref this.torque, out this.torque);
+            this.torque += torque;
         }
 
         protected bool useShapeMassProperties = true;
@@ -435,7 +436,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The velocity of the body.
         /// </summary>
-        public JVector LinearVelocity
+        public Vector3 LinearVelocity
         {
             get { return linearVelocity; }
             set 
@@ -450,7 +451,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The angular velocity of the body.
         /// </summary>
-        public JVector AngularVelocity
+        public Vector3 AngularVelocity
         {
             get { return angularVelocity; }
             set
@@ -464,7 +465,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The current position of the body.
         /// </summary>
-        public JVector Position
+        public Vector3 Position
         {
             get { return position; }
             set { position = value ; Update(); }
@@ -495,8 +496,8 @@ namespace BalatroPhysics.Dynamics
                     if(island != null)
                     island.islandManager.MakeBodyStatic(this);
 
-                    this.angularVelocity.MakeZero();
-                    this.linearVelocity.MakeZero();
+                    this.angularVelocity = Vector3.Zero;
+                    this.linearVelocity = Vector3.Zero;
                 }
                 isStatic = value;
             }
@@ -540,7 +541,7 @@ namespace BalatroPhysics.Dynamics
         #endregion
 
 
-        internal JVector sweptDirection = JVector.Zero;
+        internal Vector3 sweptDirection = Vector3.Zero;
 
         public void SweptExpandBoundingBox(float timestep)
         {
@@ -586,18 +587,18 @@ namespace BalatroPhysics.Dynamics
                 this.invInertia = this.invInertiaWorld = JMatrix.Zero;
                 this.invOrientation = this.orientation = JMatrix.Identity;
                 this.boundingBox = shape.boundingBox;
-                JVector.Add(ref boundingBox.Min, ref this.position, out boundingBox.Min);
-                JVector.Add(ref boundingBox.Max, ref this.position, out boundingBox.Max);
+                boundingBox.Min += position;
+                boundingBox.Max += position;
 
-                angularVelocity.MakeZero();
+                angularVelocity = Vector3.Zero;
             }
             else
             {
                 // Given: Orientation, Inertia
                 JMatrix.Transpose(ref orientation, out invOrientation);
                 this.Shape.GetBoundingBox(ref orientation, out boundingBox);
-                JVector.Add(ref boundingBox.Min, ref this.position, out boundingBox.Min);
-                JVector.Add(ref boundingBox.Max, ref this.position, out boundingBox.Max);
+                boundingBox.Min += position;
+                boundingBox.Max += position;
 
 
                 if (!isStatic)
@@ -650,7 +651,7 @@ namespace BalatroPhysics.Dynamics
             }
         }
 
-        private List<JVector> hullPoints = new List<JVector>();
+        private List<Vector3> hullPoints = new List<Vector3>();
 
         private void UpdateHullData()
         {
@@ -662,7 +663,7 @@ namespace BalatroPhysics.Dynamics
 
         public void DebugDraw(IDebugDrawer drawer)
         {
-            JVector pos1,pos2,pos3;
+            Vector3 pos1,pos2,pos3;
 
             for(int i = 0;i<hullPoints.Count;i+=3)
             {
@@ -670,14 +671,14 @@ namespace BalatroPhysics.Dynamics
                 pos2 = hullPoints[i + 1];
                 pos3 = hullPoints[i + 2];
 
-                JVector.Transform(ref pos1, ref orientation, out pos1);
-                JVector.Add(ref pos1, ref position, out pos1);
+                JMath.Transform(ref pos1, ref orientation, out pos1);
+                pos1 += position;
 
-                JVector.Transform(ref pos2, ref orientation, out pos2);
-                JVector.Add(ref pos2, ref position, out pos2);
+                JMath.Transform(ref pos2, ref orientation, out pos2);
+                pos2 += position;
 
-                JVector.Transform(ref pos3, ref orientation, out pos3);
-                JVector.Add(ref pos3, ref position, out pos3);
+                JMath.Transform(ref pos3, ref orientation, out pos3);
+                pos3 += position;
 
                 drawer.DrawTriangle(pos1, pos2, pos3);
             }

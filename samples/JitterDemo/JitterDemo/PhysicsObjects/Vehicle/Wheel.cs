@@ -124,7 +124,7 @@ namespace BalatroPhysicsDemo
         /// <summary>
         /// The position of the wheel in body space.
         /// </summary>
-        public JVector Position { get; set; }
+        public System.Numerics.Vector3 Position { get; set; }
 
         /// <summary>
         /// Creates a new instance of the Wheel class.
@@ -133,7 +133,7 @@ namespace BalatroPhysicsDemo
         /// <param name="car">The RigidBody on which to apply the wheel forces.</param>
         /// <param name="position">The position of the wheel on the body (in body space).</param>
         /// <param name="radius">The wheel radius.</param>
-        public Wheel(World world,RigidBody car,JVector position,float radius)
+        public Wheel(World world,RigidBody car,System.Numerics.Vector3 position,float radius)
         {
             this.world = world;
             this.car = car;
@@ -155,10 +155,10 @@ namespace BalatroPhysicsDemo
         /// Gets the position of the wheel in world space.
         /// </summary>
         /// <returns>The position of the wheel in world space.</returns>
-        public JVector GetWorldPosition()
+        public System.Numerics.Vector3 GetWorldPosition()
         {
             return car.Position +
-                JVector.Transform(Position + JVector.Up * displacement, car.Orientation);
+                JMath.Transform(Position + JMath.Up * displacement, car.Orientation);
         }
 
         /// <summary>
@@ -212,22 +212,22 @@ namespace BalatroPhysicsDemo
             SideFriction = 2.5f - JMath.Clamp(vel / 20.0f, 0.0f, 1.4f);
             ForwardFriction = 5.5f - JMath.Clamp(vel / 20.0f, 0.0f, 5.4f);
 
-            JVector force = JVector.Zero;
+            System.Numerics.Vector3 force = System.Numerics.Vector3.Zero;
 
-            JVector worldAxis = JVector.Transform(JVector.Up, car.Orientation);
-            JVector worldPos = car.Position + JVector.Transform(Position, car.Orientation);
+            System.Numerics.Vector3 worldAxis = JMath.Transform(JMath.Up, car.Orientation);
+            System.Numerics.Vector3 worldPos = car.Position + JMath.Transform(Position, car.Orientation);
 
-            JVector forward = new JVector(-car.Orientation.M31, -car.Orientation.M32, -car.Orientation.M33);
+            System.Numerics.Vector3 forward = new System.Numerics.Vector3(-car.Orientation.M31, -car.Orientation.M32, -car.Orientation.M33);
 
-            JVector wheelFwd = JVector.Transform(forward, JMatrix.CreateFromAxisAngle(JVector.Up, SteerAngle / 360 * 2 * JMath.Pi));
-            JVector wheelLeft = JVector.Cross(JVector.Up, wheelFwd); wheelLeft.Normalize();
-            JVector wheelUp = JVector.Cross(wheelFwd, wheelLeft);
+            System.Numerics.Vector3 wheelFwd = JMath.Transform(forward, JMatrix.CreateFromAxisAngle(JMath.Up, SteerAngle / 360 * 2 * JMath.Pi));
+            System.Numerics.Vector3 wheelLeft = System.Numerics.Vector3.Cross(JMath.Up, wheelFwd); wheelLeft = System.Numerics.Vector3.Normalize(wheelLeft);
+            System.Numerics.Vector3 wheelUp = System.Numerics.Vector3.Cross(wheelFwd, wheelLeft);
 
             float rayLen = 2.0f * Radius + WheelTravel;
             
-            JVector wheelRayStart = worldPos;
-            JVector wheelDelta = -Radius * worldAxis;
-            JVector wheelRayEnd = worldPos + wheelDelta;
+            System.Numerics.Vector3 wheelRayStart = worldPos;
+            System.Numerics.Vector3 wheelDelta = -Radius * worldAxis;
+            System.Numerics.Vector3 wheelRayEnd = worldPos + wheelDelta;
 
             float deltaFwd = (2.0f * Radius) / (NumberOfRays + 1);
             float deltaFwdStart = deltaFwd;
@@ -237,10 +237,10 @@ namespace BalatroPhysicsDemo
 
             lastOnFloor = false;
 
-            JVector rayOrigin = car.Position + JVector.Transform(Position, car.Orientation);
+            System.Numerics.Vector3 rayOrigin = car.Position + JMath.Transform(Position, car.Orientation);
 
-            JVector groundNormal = JVector.Zero;
-            JVector groundPos = JVector.Zero;
+            System.Numerics.Vector3 groundNormal = System.Numerics.Vector3.Zero;
+            System.Numerics.Vector3 groundPos = System.Numerics.Vector3.Zero;
             float deepestFrac = float.MaxValue;
             RigidBody worldBody = null;
 
@@ -249,9 +249,9 @@ namespace BalatroPhysicsDemo
                 float distFwd = (deltaFwdStart + i * deltaFwd) - Radius;
                 float zOffset = Radius * (1.0f - (float)Math.Cos(Math.PI / 4 * (distFwd / Radius)));
 
-                JVector newOrigin = wheelRayStart + distFwd * wheelFwd + zOffset * wheelUp;
+                System.Numerics.Vector3 newOrigin = wheelRayStart + distFwd * wheelFwd + zOffset * wheelUp;
 
-                RigidBody body; JVector normal; float frac;
+                RigidBody body; System.Numerics.Vector3 normal; float frac;
                 bool result = world.CollisionSystem.Raycast(newOrigin, wheelDelta,
                     raycast, out body, out normal, out frac);
 
@@ -273,7 +273,7 @@ namespace BalatroPhysicsDemo
 
             if (!lastOnFloor) return;
 
-            if (groundNormal.LengthSquared() > 0.0f) groundNormal.Normalize();
+            if (groundNormal.LengthSquared() > 0.0f) groundNormal = System.Numerics.Vector3.Normalize(groundNormal);
 
            // System.Diagnostics.Debug.WriteLine(groundPos.ToString());
             
@@ -284,7 +284,7 @@ namespace BalatroPhysicsDemo
             float displacementForceMag = displacement * Spring;
 
             // reduce force when suspension is par to ground
-            displacementForceMag *= Math.Abs(JVector.Dot(groundNormal, worldAxis));
+            displacementForceMag *= Math.Abs(System.Numerics.Vector3.Dot(groundNormal, worldAxis));
 
             // apply damping
             float dampingForceMag = upSpeed * Damping;
@@ -293,25 +293,25 @@ namespace BalatroPhysicsDemo
 
             if (totalForceMag < 0.0f) totalForceMag = 0.0f;
 
-            JVector extraForce = totalForceMag * worldAxis;
+            System.Numerics.Vector3 extraForce = totalForceMag * worldAxis;
 
             force += extraForce;
 
-            JVector groundUp = groundNormal;
-            JVector groundLeft = JVector.Cross(groundNormal, wheelFwd);
-            if (groundLeft.LengthSquared() > 0.0f) groundLeft.Normalize();
+            System.Numerics.Vector3 groundUp = groundNormal;
+            System.Numerics.Vector3 groundLeft = System.Numerics.Vector3.Cross(groundNormal, wheelFwd);
+            if (groundLeft.LengthSquared() > 0.0f) groundLeft = System.Numerics.Vector3.Normalize(groundLeft);
 
-            JVector groundFwd = JVector.Cross(groundLeft, groundUp);
+            System.Numerics.Vector3 groundFwd = System.Numerics.Vector3.Cross(groundLeft, groundUp);
 
-            JVector wheelPointVel = car.LinearVelocity +
-                    JVector.Cross(car.AngularVelocity, JVector.Transform(Position, car.Orientation));
+            System.Numerics.Vector3 wheelPointVel = car.LinearVelocity +
+                    System.Numerics.Vector3.Cross(car.AngularVelocity, JMath.Transform(Position, car.Orientation));
 
             // rimVel=(wxr)*v
-            JVector rimVel = angVel * JVector.Cross(wheelLeft, groundPos - worldPos);
+            System.Numerics.Vector3 rimVel = angVel * System.Numerics.Vector3.Cross(wheelLeft, groundPos - worldPos);
             wheelPointVel += rimVel;
 
-            JVector worldVel = worldBody.LinearVelocity +
-             JVector.Cross(worldBody.AngularVelocity, groundPos - worldBody.Position);
+            System.Numerics.Vector3 worldVel = worldBody.LinearVelocity +
+             System.Numerics.Vector3.Cross(worldBody.AngularVelocity, groundPos - worldBody.Position);
 
             wheelPointVel -= worldVel;
 
@@ -323,7 +323,7 @@ namespace BalatroPhysicsDemo
             float smallVel = 3;
             float friction = SideFriction;
 
-            float sideVel = JVector.Dot(wheelPointVel, groundLeft);
+            float sideVel = System.Numerics.Vector3.Dot(wheelPointVel, groundLeft);
 
             if ((sideVel > slipVel) || (sideVel < -slipVel))
                 friction *= slipFactor;
@@ -344,7 +344,7 @@ namespace BalatroPhysicsDemo
 
             // fwd/back forces
             friction = ForwardFriction;
-            float fwdVel = JVector.Dot(wheelPointVel, groundFwd);
+            float fwdVel = System.Numerics.Vector3.Dot(wheelPointVel, groundFwd);
 
             if ((fwdVel > slipVel) || (fwdVel < -slipVel))
                 friction *= slipFactor;
@@ -364,14 +364,14 @@ namespace BalatroPhysicsDemo
             force += extraForce;
 
             // fwd force also spins the wheel
-            JVector wheelCentreVel = car.LinearVelocity +
-             JVector.Cross(car.AngularVelocity, JVector.Transform(Position, car.Orientation));
+            System.Numerics.Vector3 wheelCentreVel = car.LinearVelocity +
+             System.Numerics.Vector3.Cross(car.AngularVelocity, JMath.Transform(Position, car.Orientation));
 
-            angVelForGrip = JVector.Dot(wheelCentreVel, groundFwd) / Radius;
+            angVelForGrip = System.Numerics.Vector3.Dot(wheelCentreVel, groundFwd) / Radius;
             torque += -fwdForce * Radius;
 
             // add force to car
-            car.AddForce(force, groundPos + 0.5f * JVector.Up);
+            car.AddForce(force, groundPos + 0.5f * JMath.Up);
 
             // add force to the world
             if (!worldBody.IsStatic)
@@ -381,7 +381,7 @@ namespace BalatroPhysicsDemo
 
         }
 
-        private bool RaycastCallback(RigidBody body, JVector normal, float frac)
+        private bool RaycastCallback(RigidBody body, System.Numerics.Vector3 normal, float frac)
         {
             return (body != car);
         }

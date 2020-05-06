@@ -30,7 +30,7 @@ namespace BalatroPhysicsDemo.Scenes
             for (int i = 0; i < 10; i++)
             {
                 RigidBody body = new RigidBody(bShape);
-                body.Position = new JVector(i * 2.0f, 2, 0);
+                body.Position = new System.Numerics.Vector3(i * 2.0f, 2, 0);
                 this.Demo.World.AddBody(body);
             }
 

@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using BalatroPhysics.Dynamics;
 using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
+using System.Numerics;
 #endregion
 
 namespace BalatroPhysics.Collision.Shapes
@@ -113,8 +114,8 @@ namespace BalatroPhysics.Collision.Shapes
         }
 
 
-        private JVector[] points = new JVector[3];
-        private JVector normal = JVector.Up;
+        private Vector3[] points = new Vector3[3];
+        private Vector3 normal = JMath.Up;
 
         /// <summary>
         /// Sets the current shape. First <see cref="Prepare"/> has to be called.
@@ -137,29 +138,29 @@ namespace BalatroPhysics.Collision.Shapes
             // each quad has two triangles, called 'leftTriangle' and !'leftTriangle'
             if (leftTriangle)
             {
-                points[0].Set((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
-                points[1].Set((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
-                points[2].Set((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
+                points[0] = new Vector3((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
+                points[1] = new Vector3((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
+                points[2] = new Vector3((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
             }
             else
             {
-                points[0].Set((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
-                points[1].Set((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
-                points[2].Set((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
+                points[0] = new Vector3((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 0], (minZ + quadIndexZ + 0) * scaleZ);
+                points[1] = new Vector3((minX + quadIndexX + 1) * scaleX, heights[minX + quadIndexX + 1, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
+                points[2] = new Vector3((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
             }
 
-            JVector sum = points[0];
-            JVector.Add(ref sum, ref points[1], out sum);
-            JVector.Add(ref sum, ref points[2], out sum);
-            JVector.Multiply(ref sum, 1.0f / 3.0f, out sum);
+            Vector3 sum = points[0];
+            sum += points[1];
+            sum += points[2];
+            sum *= 1.0f / 3.0f;
             geomCen = sum;
 
-            JVector.Subtract(ref points[1], ref points[0], out sum);
-            JVector.Subtract(ref points[2], ref points[0], out normal);
-            JVector.Cross(ref sum, ref normal, out normal);
+            sum = points[1] - points[0];
+            normal = points[2] - points[0];
+            normal = Vector3.Cross(sum, normal);
         }
 
-        public void CollisionNormal(out JVector normal)
+        public void CollisionNormal(out Vector3 normal)
         {
             normal = this.normal;
         }
@@ -246,20 +247,20 @@ namespace BalatroPhysics.Collision.Shapes
             box.Transform(ref orientation);
         }
 
-        public override void MakeHull(ref List<JVector> triangleList, int generationThreshold)
+        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
         {
             for (int index = 0; index < (heightsLength0 - 1) * (heightsLength1 - 1); index++)
             {
                 int quadIndexX = index % (heightsLength0 - 1);
                 int quadIndexZ = index / (heightsLength0 - 1);
 
-                triangleList.Add(new JVector((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new JVector((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new JVector((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
 
-                triangleList.Add(new JVector((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new JVector((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
-                triangleList.Add(new JVector((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
             }
         }
 
@@ -270,28 +271,28 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref JVector direction, out JVector result)
+        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
         {
-            JVector expandVector;
-            JVector.Normalize(ref direction, out expandVector);
-            JVector.Multiply(ref expandVector, sphericalExpansion, out expandVector);
+            Vector3 expandVector;
+            expandVector = Vector3.Normalize(direction);
+            expandVector *= sphericalExpansion;
 
             int minIndex = 0;
-            float min = JVector.Dot(ref points[0], ref direction);
-            float dot = JVector.Dot(ref points[1], ref direction);
+            float min = Vector3.Dot(points[0], direction);
+            float dot = Vector3.Dot(points[1], direction);
             if (dot > min)
             {
                 min = dot;
                 minIndex = 1;
             }
-            dot = JVector.Dot(ref points[2], ref direction);
+            dot = Vector3.Dot(points[2], direction);
             if (dot > min)
             {
                 min = dot;
                 minIndex = 2;
             }
 
-            JVector.Add(ref points[minIndex], ref expandVector, out result);
+            result = points[minIndex] + expandVector;
         }
 
         /// <summary>
@@ -300,13 +301,13 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayDelta"></param>
         /// <returns></returns>
-        public override int Prepare(ref JVector rayOrigin, ref JVector rayDelta)
+        public override int Prepare(ref Vector3 rayOrigin, ref Vector3 rayDelta)
         {
             JBBox box = JBBox.SmallBox;
 
             #region RayEnd + Expand Spherical
-            JVector rayEnd;
-            JVector.Normalize(ref rayDelta, out rayEnd);
+            Vector3 rayEnd;
+            rayEnd = Vector3.Normalize(rayDelta);
             rayEnd = rayOrigin + rayDelta + rayEnd * sphericalExpansion;
             #endregion
 

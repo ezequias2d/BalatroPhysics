@@ -26,8 +26,8 @@ namespace BalatroPhysicsDemo.Scenes
             {
                 for (int e = i; e < 30; e++)
                 {
-                    RigidBody body = new RigidBody(new BoxShape(new JVector(1.0f, 1.0f, 1.0f)));
-                    body.Position = new JVector((e - i * 0.5f) * 1.01f + 7, 0.5f + i * 1.0f, 3.0f);
+                    RigidBody body = new RigidBody(new BoxShape(new System.Numerics.Vector3(1.0f, 1.0f, 1.0f)));
+                    body.Position = new System.Numerics.Vector3((e - i * 0.5f) * 1.01f + 7, 0.5f + i * 1.0f, 3.0f);
                     Demo.World.AddBody(body);
                     //body.IsParticle = true;
                     //body.AffectedByGravity = false;
@@ -35,7 +35,7 @@ namespace BalatroPhysicsDemo.Scenes
                 }
             }
 
-            //BoxShape shape = new BoxShape(JVector.One);
+            //BoxShape shape = new BoxShape(System.Numerics.Vector3.One);
 
             //for (int i = 0; i < 20; i++)
             //{
@@ -45,7 +45,7 @@ namespace BalatroPhysicsDemo.Scenes
             //        {
             //            RigidBody b = new RigidBody(shape);
             //            Demo.World.AddBody(b);
-            //            b.Position = new JVector(i, e, k) * 2.0f;
+            //            b.Position = new System.Numerics.Vector3(i, e, k) * 2.0f;
             //            b.AffectedByGravity = false;
             //        }
             //    }
