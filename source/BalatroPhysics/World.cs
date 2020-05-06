@@ -840,7 +840,7 @@ namespace BalatroPhysics
 
                 dorn = Quaternion.Normalize(Quaternion.Multiply(dorn, ornA));
 
-                JMatrix.CreateFromQuaternion(dorn, out body.orientation);
+                body.orientation = Matrix4x4.CreateFromQuaternion(dorn);
             }
 
             if ((body.Damping & RigidBody.DampingType.Linear) != 0)

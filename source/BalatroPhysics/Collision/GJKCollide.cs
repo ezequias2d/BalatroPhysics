@@ -39,8 +39,8 @@ namespace BalatroPhysics.Collision
 
         private static IObjectPool<VoronoiSimplexSolver> simplexSolverPool = new ObjectPool<VoronoiSimplexSolver>(() => new VoronoiSimplexSolver());
 
-        #region private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
-        private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
+        #region private static void SupportMapTransformed(ISupportMappable support, Matrix4x4 orientation, Vector3 position, Vector3 direction, out Vector3 result)
+        private static void SupportMapTransformed(ISupportMappable support, Matrix4x4 orientation, Vector3 position, Vector3 direction, out Vector3 result)
         {
             //JMath.Transform(direction, invOrientation, out result);
             //support.SupportMapping(result, out result);
@@ -72,7 +72,7 @@ namespace BalatroPhysics.Collision
         /// <param name="position">The position of the shape.</param>
         /// <param name="point">The point to check.</param>
         /// <returns>Returns true if the point is within the shape, otherwise false.</returns>
-        public static bool Pointcast(ISupportMappable support, JMatrix orientation,Vector3 position,Vector3 point)
+        public static bool Pointcast(ISupportMappable support, Matrix4x4 orientation,Vector3 position,Vector3 point)
         {
             Vector3 arbitraryPoint; 
 
@@ -124,8 +124,8 @@ namespace BalatroPhysics.Collision
         }
 
 
-        public static bool ClosestPoints(ISupportMappable support1, ISupportMappable support2, JMatrix orientation1,
-            JMatrix orientation2, Vector3 position1, Vector3 position2,
+        public static bool ClosestPoints(ISupportMappable support1, ISupportMappable support2, Matrix4x4 orientation1,
+            Matrix4x4 orientation2, Vector3 position1, Vector3 position2,
             out Vector3 p1, out Vector3 p2, out Vector3 normal)
         {
 
@@ -185,8 +185,8 @@ namespace BalatroPhysics.Collision
         }
 
         #region TimeOfImpact Conservative Advancement - Depricated
-    //    public static bool TimeOfImpact(ISupportMappable support1, ISupportMappable support2, JMatrix orientation1,
-    //JMatrix orientation2, Vector3 position1, Vector3 position2, Vector3 sweptA, Vector3 sweptB,
+    //    public static bool TimeOfImpact(ISupportMappable support1, ISupportMappable support2, Matrix4x4 orientation1,
+    //Matrix4x4 orientation2, Vector3 position1, Vector3 position2, Vector3 sweptA, Vector3 sweptB,
     //out Vector3 p1, out Vector3 p2, out Vector3 normal)
     //    {
 
@@ -302,7 +302,7 @@ namespace BalatroPhysics.Collision
         /// ray the collision occured. The hitPoint is calculated by: origin+friction*direction.</param>
         /// <param name="normal">The normal from the ray collision.</param>
         /// <returns>Returns true if the ray hit the shape, false otherwise.</returns>
-        public static bool Raycast(ISupportMappable support, JMatrix orientation, JMatrix invOrientation,
+        public static bool Raycast(ISupportMappable support, Matrix4x4 orientation, Matrix4x4 invOrientation,
             Vector3 position,Vector3 origin,Vector3 direction, out float fraction, out Vector3 normal)
         {
             VoronoiSimplexSolver simplexSolver = simplexSolverPool.Get();

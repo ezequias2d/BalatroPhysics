@@ -78,6 +78,8 @@ namespace BalatroPhysics.LinearMath
         /// (float.MaxValue,float.MaxValue,float.MaxValue);
         /// </summary>
         public static readonly Vector3 MaxValue;
+
+        public static readonly Matrix4x4 ZeroMatrix;
         #endregion
 
         /// <summary>
@@ -107,6 +109,7 @@ namespace BalatroPhysics.LinearMath
             Forward = new Vector3(0, 0, -1);
             MinValue = new Vector3(float.MinValue);
             MaxValue = new Vector3(float.MaxValue);
+            ZeroMatrix = new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1f);
         }
 
         /// <summary>
@@ -183,9 +186,10 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">The matrix.</param>
         /// <param name="result">The absolute matrix.</param>
-        #region public static void Absolute(JMatrix matrix,out JMatrix result)
-        public static void Absolute(JMatrix matrix,out JMatrix result)
+        #region public static void Absolute(Matrix4x4 matrix,out Matrix4x4 result)
+        public static void Absolute(Matrix4x4 matrix,out Matrix4x4 result)
         {
+            result = Matrix4x4.Identity;
             result.M11 = Math.Abs(matrix.M11);
             result.M12 = Math.Abs(matrix.M12);
             result.M13 = Math.Abs(matrix.M13);
@@ -204,7 +208,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <param name="result">The transformed vector.</param>
-        public static void Transform(Vector3 position, JMatrix matrix, out Vector3 result)
+        public static void Transform(Vector3 position, Matrix4x4 matrix, out Vector3 result)
         {
             float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M21)) + (position.Z * matrix.M31);
             float num1 = ((position.X * matrix.M12) + (position.Y * matrix.M22)) + (position.Z * matrix.M32);
@@ -221,7 +225,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <returns>The transformed vector.</returns>
-        public static Vector3 Transform(Vector3 position, JMatrix matrix)
+        public static Vector3 Transform(Vector3 position, Matrix4x4 matrix)
         {
             Vector3 result;
             JMath.Transform(position, matrix, out result);
@@ -234,7 +238,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <param name="result">The transformed vector.</param>
-        public static void TransposedTransform(Vector3 position, JMatrix matrix, out Vector3 result)
+        public static void TransposedTransform(Vector3 position, Matrix4x4 matrix, out Vector3 result)
         {
             float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M12)) + (position.Z * matrix.M13);
             float num1 = ((position.X * matrix.M21) + (position.Y * matrix.M22)) + (position.Z * matrix.M23);
@@ -281,7 +285,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">A matrix representing an orientation.</param>
         /// <returns>JQuaternion representing an orientation.</returns>
-        public static Quaternion CreateFromMatrix(JMatrix matrix)
+        public static Quaternion CreateFromMatrix(Matrix4x4 matrix)
         {
             Quaternion result;
             float num8 = (matrix.M11 + matrix.M22) + matrix.M33;
@@ -322,6 +326,19 @@ namespace BalatroPhysics.LinearMath
                 result.W = (matrix.M12 - matrix.M21) * num2;
             }
             return result;
+        }
+
+        public static Matrix4x4 MatrixFromM11M22M33(float m11, float m22, float m33)
+        {
+            return new Matrix4x4(m11,  0f,  0f,  0f,
+                                  0f, m22,  0f,  0f,
+                                  0f,  0f, m33,  0f,
+                                  0f,  0f,  0f,  1f);
+        }
+
+        public static float Trace(this Matrix4x4 matrix)
+        {
+            return matrix.M11 + matrix.M22 + matrix.M33;
         }
     }
 }

@@ -513,7 +513,7 @@ namespace BalatroPhysics.Dynamics
             throw new NotImplementedException();
         }
 
-        public void Rotate(JMatrix orientation, Vector3 center)
+        public void Rotate(Matrix4x4 orientation, Vector3 center)
         {
             for (int i = 0; i < points.Count; i++)
             {
@@ -569,7 +569,7 @@ namespace BalatroPhysics.Dynamics
                     if (!(t.VertexBody1 == points[i] || t.VertexBody2 == points[i] || t.VertexBody3 == points[i]))
                     {
                         if (XenoCollide.Detect(points[i].Shape, t, points[i].orientation,
-                            JMatrix.InternalIdentity, points[i].position, Vector3.Zero,
+                            Matrix4x4.Identity, points[i].position, Vector3.Zero,
                             out point, out normal, out penetration))
                         {
                             int nearest = CollisionSystem.FindNearestTrianglePoint(this, queryList[e], point);

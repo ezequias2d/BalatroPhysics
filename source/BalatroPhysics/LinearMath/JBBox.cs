@@ -100,7 +100,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position"></param>
         /// <param name="orientation"></param>
         /// <param name="result"></param>
-        internal void InverseTransform(Vector3 position, JMatrix orientation)
+        internal void InverseTransform(Vector3 position, Matrix4x4 orientation)
         {
             Max -= position;
             Min -= position;
@@ -111,21 +111,21 @@ namespace BalatroPhysics.LinearMath
 
             JMath.TransposedTransform(center, orientation, out center);
 
-            JMatrix abs; JMath.Absolute(orientation, out abs);
+            Matrix4x4 abs; JMath.Absolute(orientation, out abs);
             JMath.TransposedTransform(halfExtents, abs, out halfExtents);
 
             Max = center + halfExtents;
             Min = center - halfExtents;
         }
 
-        public void Transform(JMatrix orientation)
+        public void Transform(Matrix4x4 orientation)
         {
             Vector3 halfExtents = 0.5f * (Max - Min);
             Vector3 center = 0.5f * (Max + Min);
 
             JMath.Transform(center, orientation, out center);
 
-            JMatrix abs; JMath.Absolute(orientation, out abs);
+            Matrix4x4 abs; JMath.Absolute(orientation, out abs);
             JMath.Transform(halfExtents, abs, out halfExtents);
 
             Max = center + halfExtents;

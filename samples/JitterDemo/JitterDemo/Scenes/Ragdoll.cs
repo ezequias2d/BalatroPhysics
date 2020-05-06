@@ -26,7 +26,7 @@ namespace BalatroPhysicsDemo.Scenes
 
             //RigidBody body = new RigidBody(new BoxShape(System.Numerics.Vector3.One * 3));
             //body.Position = new System.Numerics.Vector3(0, 5, 0);
-            //body.UseUserMassProperties(JMatrix.Zero, 1f, true);
+            //body.UseUserMassProperties(System.Numerics.Matrix4x4.Zero, 1f, true);
             //Demo.World.AddBody(body);
 
             for (int i = 3; i < 8; i++)

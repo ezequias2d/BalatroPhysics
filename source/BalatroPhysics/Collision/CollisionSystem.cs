@@ -233,7 +233,7 @@ namespace BalatroPhysics.Collision
                 float penetration;
                 bool result;
 
-                result = XenoCollide.Detect(myTriangle, otherTriangle, JMatrix.InternalIdentity, JMatrix.InternalIdentity,
+                result = XenoCollide.Detect(myTriangle, otherTriangle, Matrix4x4.Identity, Matrix4x4.Identity,
                     Vector3.Zero, Vector3.Zero, out point, out normal, out penetration);
 
                 if (result)
@@ -465,7 +465,7 @@ namespace BalatroPhysics.Collision
                     {
                         ms.SetCurrentShape(e);
 
-                        result = XenoCollide.Detect(ms, t, rigidBody.orientation, JMatrix.InternalIdentity,
+                        result = XenoCollide.Detect(ms, t, rigidBody.orientation, Matrix4x4.Identity,
                             rigidBody.position, Vector3.Zero, out point, out normal, out penetration);
 
                         if (result)
@@ -495,7 +495,7 @@ namespace BalatroPhysics.Collision
                     float penetration;
                     bool result;
 
-                    result = XenoCollide.Detect(rigidBody.Shape, t, rigidBody.orientation, JMatrix.InternalIdentity,
+                    result = XenoCollide.Detect(rigidBody.Shape, t, rigidBody.orientation, Matrix4x4.Identity,
                         rigidBody.position, Vector3.Zero, out point, out normal, out penetration);
 
                     if (result)

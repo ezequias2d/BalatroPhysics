@@ -137,7 +137,7 @@ namespace BalatroPhysics.Forces
                         testVector.Y = body.Shape.BoundingBox.Min.Y + (diff.Y / (float)(subdivisions - 1)) * ((float)e);
                         testVector.Z = body.Shape.BoundingBox.Min.Z + (diff.Z / (float)(subdivisions - 1)) * ((float)k);
 
-                        JMatrix ident = JMatrix.Identity;
+                        System.Numerics.Matrix4x4 ident = System.Numerics.Matrix4x4.Identity;
                         System.Numerics.Vector3 zero = System.Numerics.Vector3.Zero;
 
                         if (ms != null)

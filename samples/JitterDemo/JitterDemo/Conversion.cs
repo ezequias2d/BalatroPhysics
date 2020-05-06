@@ -13,7 +13,7 @@ namespace BalatroPhysicsDemo
             return new System.Numerics.Vector3(vector.X, vector.Y, vector.Z);
         }
 
-        public static Matrix ToXNAMatrix(JMatrix matrix)
+        public static Matrix ToXNAMatrix(System.Numerics.Matrix4x4 matrix)
         {
             return new Matrix(matrix.M11,
                             matrix.M12,
@@ -29,9 +29,9 @@ namespace BalatroPhysicsDemo
                             0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
         }
 
-        public static JMatrix ToJitterMatrix(Matrix matrix)
+        public static System.Numerics.Matrix4x4 ToJitterMatrix(Matrix matrix)
         {
-            JMatrix result;
+            System.Numerics.Matrix4x4 result = System.Numerics.Matrix4x4.Identity;
             result.M11 = matrix.M11;
             result.M12 = matrix.M12;
             result.M13 = matrix.M13;
@@ -42,7 +42,6 @@ namespace BalatroPhysicsDemo
             result.M32 = matrix.M32;
             result.M33 = matrix.M33;
             return result;
-
         }
 
 

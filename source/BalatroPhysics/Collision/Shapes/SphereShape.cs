@@ -69,7 +69,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The resulting axis aligned bounding box.</param>
-        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(Matrix4x4 orientation, out JBBox box)
         {
             box.Min.X = -radius;
             box.Min.Y = -radius;
@@ -89,7 +89,7 @@ namespace BalatroPhysics.Collision.Shapes
             // (0,0,0) is the center of mass, so only
             // the main matrix elements are != 0
             float value = 0.4f * Mass * radius * radius;
-            Inertia = new JMatrix(value, value, value);
+            Inertia = JMath.MatrixFromM11M22M33(value, value, value);
         }
 
 

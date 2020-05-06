@@ -81,7 +81,7 @@ namespace BalatroPhysicsDemo.Scenes
             body.Position = position;
             if (rollOrientation != 0)
             {
-                body.Orientation = JMatrix.CreateFromYawPitchRoll(0, 0, rollOrientation);
+                body.Orientation = System.Numerics.Matrix4x4.CreateFromYawPitchRoll(0, 0, rollOrientation);
             }
 
             Demo.World.AddBody(body);

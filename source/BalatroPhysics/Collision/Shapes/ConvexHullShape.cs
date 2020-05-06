@@ -54,7 +54,7 @@ namespace BalatroPhysics.Collision.Shapes
 
         public override void CalculateMassInertia()
         {
-            (float Mass, Vector3 Center, JMatrix Inertia) temp = Shape.CalculateMassInertia(this);
+            (float Mass, Vector3 Center, Matrix4x4 Inertia) temp = Shape.CalculateMassInertia(this);
             Mass = temp.Mass;
             shifted = -temp.Center;
             Inertia = temp.Inertia;

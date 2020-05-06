@@ -126,12 +126,12 @@ namespace BalatroPhysics.Collision.Shapes
 
         public override void CalculateMassInertia()
         {
-            Inertia = JMatrix.Zero;
+            Inertia = JMath.ZeroMatrix;
             Mass = 0.0f;
 
             for (int i = 0; i < Shapes.Length; i++)
             {
-                JMatrix currentInertia = Shapes[i].InverseOrientation * Shapes[i].Shape.Inertia * Shapes[i].Orientation;
+                Matrix4x4 currentInertia = Shapes[i].InverseOrientation * Shapes[i].Shape.Inertia * Shapes[i].Orientation;
                 Vector3 p = Shapes[i].Position * -1.0f;
                 float m = Shapes[i].Shape.Mass;
 
@@ -184,7 +184,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(Matrix4x4 orientation, out JBBox box)
         {
             box.Min = mInternalBBox.Min;
             box.Max = mInternalBBox.Max;
@@ -195,7 +195,7 @@ namespace BalatroPhysics.Collision.Shapes
             Vector3 center;
             JMath.Transform(localCenter, orientation, out center);
 
-            JMatrix abs; JMath.Absolute(orientation, out abs);
+            Matrix4x4 abs; JMath.Absolute(orientation, out abs);
             Vector3 temp;
             JMath.Transform(localHalfExtents, abs, out temp);
 

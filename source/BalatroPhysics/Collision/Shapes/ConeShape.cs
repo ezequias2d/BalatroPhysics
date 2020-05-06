@@ -99,7 +99,7 @@ namespace BalatroPhysics.Collision.Shapes
             Mass = (1.0f / 3.0f) * JMath.Pi * radius * radius * height;
 
             // inertia through center of mass axis.
-            Inertia = new JMatrix(
+            Inertia = JMath.MatrixFromM11M22M33(
                 (3.0f / 80.0f) * Mass * (radius * radius + 4 * height * height),
                 (3.0f / 10.0f) * Mass * radius * radius,
                 (3.0f / 80.0f) * Mass * (radius * radius + 4 * height * height));

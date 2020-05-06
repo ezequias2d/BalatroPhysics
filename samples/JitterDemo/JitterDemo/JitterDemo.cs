@@ -258,7 +258,7 @@ namespace BalatroPhysicsDemo
                     if (grabConstraint != null) World.RemoveConstraint(grabConstraint);
 
                     System.Numerics.Vector3 lanchor = hitPoint - grabBody.Position;
-                    lanchor = JMath.Transform(lanchor, JMatrix.Transpose(grabBody.Orientation));
+                    lanchor = JMath.Transform(lanchor, System.Numerics.Matrix4x4.Transpose(grabBody.Orientation));
 
                     grabConstraint = new SingleBodyConstraints.PointOnPoint(grabBody, lanchor);
                     grabConstraint.Softness = 0.01f;
@@ -379,9 +379,9 @@ namespace BalatroPhysicsDemo
                     Shape b2 = new BoxShape(new System.Numerics.Vector3(1, 1, 3));
                     Shape b3 = new CylinderShape(3.0f, 0.5f);
 
-                    TransformedShape t1 = new TransformedShape(b1, JMatrix.Identity, System.Numerics.Vector3.Zero);
-                    TransformedShape t2 = new TransformedShape(b2, JMatrix.Identity, System.Numerics.Vector3.Zero);
-                    TransformedShape t3 = new TransformedShape(b3, JMatrix.Identity, new System.Numerics.Vector3(0, 0, 0));
+                    TransformedShape t1 = new TransformedShape(b1, System.Numerics.Matrix4x4.Identity, System.Numerics.Vector3.Zero);
+                    TransformedShape t2 = new TransformedShape(b2, System.Numerics.Matrix4x4.Identity, System.Numerics.Vector3.Zero);
+                    TransformedShape t3 = new TransformedShape(b3, System.Numerics.Matrix4x4.Identity, new System.Numerics.Vector3(0, 0, 0));
 
                     CompoundShape ms = new CompoundShape(new TransformedShape[3] { t1, t2, t3 });
 
@@ -458,7 +458,7 @@ namespace BalatroPhysicsDemo
         #endregion
 
         #region add draw matrices to the different primitives
-        private void AddShapeToDrawList(Shape shape, JMatrix ori, System.Numerics.Vector3 pos)
+        private void AddShapeToDrawList(Shape shape, System.Numerics.Matrix4x4 ori, System.Numerics.Vector3 pos)
         {
             Primitives3D.GeometricPrimitive primitive = null;
             Matrix scaleMatrix = Matrix.Identity;
@@ -511,18 +511,18 @@ namespace BalatroPhysicsDemo
             else
             {
                 CompoundShape cShape = rb.Shape as CompoundShape;
-                JMatrix orientation = rb.Orientation;
+                System.Numerics.Matrix4x4 orientation = rb.Orientation;
                 System.Numerics.Vector3 position = rb.Position;
 
                 foreach (var ts in cShape.Shapes)
                 {
                     System.Numerics.Vector3 pos = ts.Position;
-                    JMatrix ori = ts.Orientation;
+                    System.Numerics.Matrix4x4 ori = ts.Orientation;
 
                     JMath.Transform(pos, orientation,out pos);
                     pos += position;
 
-                    JMatrix.Multiply(ori, orientation, out ori);
+                    ori = System.Numerics.Matrix4x4.Multiply(ori, orientation);
 
                     AddShapeToDrawList(ts.Shape, ori, pos);
                 }

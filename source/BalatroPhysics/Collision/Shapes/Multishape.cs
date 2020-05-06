@@ -114,7 +114,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(Matrix4x4 orientation, out JBBox box)
         {
             JBBox helpBox = JBBox.LargeBox;
             int length = this.Prepare(helpBox);
@@ -143,13 +143,13 @@ namespace BalatroPhysics.Collision.Shapes
             GeometricCenter = Vector3.Zero;
 
             // TODO: calc this right
-            Inertia = JMatrix.Identity;
+            Inertia = Matrix4x4.Identity;
 
             Vector3 size = BoundingBox.Max - BoundingBox.Min;
 
             Mass = size.X * size.Y * size.Z;
 
-            Inertia = new JMatrix(
+            Inertia = JMath.MatrixFromM11M22M33(
                 (1.0f / 12.0f) * Mass * (size.Y * size.Y + size.Z * size.Z),
                 (1.0f / 12.0f) * Mass * (size.X * size.X + size.Z * size.Z),
                 (1.0f / 12.0f) * Mass * (size.X * size.X + size.Y * size.Y));

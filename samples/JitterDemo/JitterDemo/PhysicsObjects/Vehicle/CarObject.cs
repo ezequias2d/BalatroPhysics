@@ -32,10 +32,10 @@ namespace BalatroPhysicsDemo.Vehicle
             World world = demo.World;
 
             TransformedShape lower = new TransformedShape(
-                new BoxShape(2.5f, 1f, 6.0f), JMatrix.Identity, System.Numerics.Vector3.Zero);
+                new BoxShape(2.5f, 1f, 6.0f), System.Numerics.Matrix4x4.Identity, System.Numerics.Vector3.Zero);
 
             TransformedShape upper = new TransformedShape(
-                new BoxShape(2.0f, 0.5f, 3.0f), JMatrix.Identity, JMath.Up * 0.75f + JMath.Backward * 1.0f);
+                new BoxShape(2.0f, 0.5f, 3.0f), System.Numerics.Matrix4x4.Identity, JMath.Up * 0.75f + JMath.Backward * 1.0f);
 
             TransformedShape[] subShapes = { lower, upper };
 

@@ -88,7 +88,7 @@ namespace BalatroPhysics.Collision.Shapes
         public override void CalculateMassInertia()
         {
             Mass = JMath.Pi * radius * radius * height;
-            Inertia = new JMatrix(
+            Inertia = JMath.MatrixFromM11M22M33(
                 (1.0f / 4.0f) * Mass * radius * radius + (1.0f / 12.0f) * Mass * height * height,
                 (1.0f / 2.0f) * Mass * radius * radius,
                 (1.0f / 4.0f) * Mass * radius * radius + (1.0f / 12.0f) * Mass * height * height);

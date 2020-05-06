@@ -47,12 +47,12 @@ namespace BalatroPhysics.Dynamics
         [Flags]
         public enum DampingType { None = 0x00, Angular = 0x01, Linear = 0x02 }
 
-        internal JMatrix inertia;
-        internal JMatrix invInertia;
+        internal Matrix4x4 inertia;
+        internal Matrix4x4 invInertia;
 
-        internal JMatrix invInertiaWorld;
-        internal JMatrix orientation;
-        internal JMatrix invOrientation;
+        internal Matrix4x4 invInertiaWorld;
+        internal Matrix4x4 orientation;
+        internal Matrix4x4 invOrientation;
         internal Vector3 position;
         internal Vector3 linearVelocity;
         internal Vector3 angularVelocity;
@@ -109,9 +109,9 @@ namespace BalatroPhysics.Dynamics
                 }
                 else if (!isParticle && value)
                 {
-                    this.inertia = JMatrix.Zero;
-                    this.invInertia = this.invInertiaWorld = JMatrix.Zero;
-                    this.invOrientation = this.orientation = JMatrix.Identity;
+                    this.inertia = JMath.ZeroMatrix;
+                    this.invInertia = this.invInertiaWorld = JMath.ZeroMatrix;
+                    this.invOrientation = this.orientation = Matrix4x4.Identity;
                     inverseMass = 1.0f;
 
                     this.Shape.ShapeUpdated -= updatedHandler;
@@ -145,7 +145,7 @@ namespace BalatroPhysics.Dynamics
             hashCode = CalculateHash(instance);
 
             this.Shape = shape;
-            orientation = JMatrix.Identity;
+            orientation = Matrix4x4.Identity;
 
             if (!isParticle)
             {
@@ -155,9 +155,9 @@ namespace BalatroPhysics.Dynamics
             }
             else
             {
-                this.inertia = JMatrix.Zero;
-                this.invInertia = this.invInertiaWorld = JMatrix.Zero;
-                this.invOrientation = this.orientation = JMatrix.Identity;
+                this.inertia = JMath.ZeroMatrix;
+                this.invInertia = this.invInertiaWorld = JMath.ZeroMatrix;
+                this.invOrientation = this.orientation = Matrix4x4.Identity;
                 inverseMass = 1.0f;
             }
 
@@ -336,7 +336,7 @@ namespace BalatroPhysics.Dynamics
         public void SetMassProperties()
         {
             inertia = Shape.Inertia;
-            JMatrix.Inverse(inertia, out invInertia);
+            Matrix4x4.Invert(inertia, out invInertia);
             inverseMass = 1.0f / Shape.Mass;
             useShapeMassProperties = true;
         }
@@ -349,14 +349,14 @@ namespace BalatroPhysics.Dynamics
         /// <param name="mass">The mass/inverse mass of the object.</param>
         /// <param name="setAsInverseValues">Sets the InverseInertia and the InverseMass
         /// to this values.</param>
-        public void SetMassProperties(JMatrix inertia, float mass, bool setAsInverseValues)
+        public void SetMassProperties(Matrix4x4 inertia, float mass, bool setAsInverseValues)
         {
             if (setAsInverseValues)
             {
                 if (!isParticle)
                 {
                     this.invInertia = inertia;
-                    JMatrix.Inverse(inertia, out this.inertia);
+                    Matrix4x4.Invert(inertia, out this.inertia);
                 }
                 this.inverseMass = mass;
             }
@@ -365,7 +365,7 @@ namespace BalatroPhysics.Dynamics
                 if (!isParticle)
                 {
                     this.inertia = inertia;
-                    JMatrix.Inverse(inertia, out this.invInertia);
+                    Matrix4x4.Invert(inertia, out this.invInertia);
                 }
                 this.inverseMass = 1.0f / mass;
             }
@@ -416,12 +416,12 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The inertia currently used for this body.
         /// </summary>
-        public JMatrix Inertia { get { return inertia; } }
+        public Matrix4x4 Inertia { get { return inertia; } }
 
         /// <summary>
         /// The inverse inertia currently used for this body.
         /// </summary>
-        public JMatrix InverseInertia { get { return invInertia; } }
+        public Matrix4x4 InverseInertia { get { return invInertia; } }
 
         /// <summary>
         /// The velocity of the body.
@@ -464,7 +464,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The current oriention of the body.
         /// </summary>
-        public JMatrix Orientation
+        public Matrix4x4 Orientation
         {
             get { return orientation; }
             set { orientation = value; Update(); }
@@ -498,7 +498,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// The inverse inertia tensor in world space.
         /// </summary>
-        public JMatrix InverseInertiaWorld
+        public Matrix4x4 InverseInertiaWorld
         {
             get
             {
@@ -520,8 +520,8 @@ namespace BalatroPhysics.Dynamics
                 // scale inertia
                 if (!isParticle)
                 {
-                    JMatrix.Multiply(Shape.Inertia, value / Shape.Mass, out inertia);
-                    JMatrix.Inverse(inertia, out invInertia);
+                    inertia = Matrix4x4.Multiply(Shape.Inertia, value / Shape.Mass);
+                    Matrix4x4.Invert(inertia, out invInertia);
                 }
 
                 inverseMass = 1.0f / value;
@@ -573,9 +573,9 @@ namespace BalatroPhysics.Dynamics
         {
             if (isParticle)
             {
-                this.inertia = JMatrix.Zero;
-                this.invInertia = this.invInertiaWorld = JMatrix.Zero;
-                this.invOrientation = this.orientation = JMatrix.Identity;
+                this.inertia = JMath.ZeroMatrix;
+                this.invInertia = this.invInertiaWorld = JMath.ZeroMatrix;
+                this.invOrientation = this.orientation = Matrix4x4.Identity;
                 this.boundingBox = shape.BoundingBox;
                 boundingBox.Min += position;
                 boundingBox.Max += position;
@@ -585,7 +585,7 @@ namespace BalatroPhysics.Dynamics
             else
             {
                 // Given: Orientation, Inertia
-                JMatrix.Transpose(orientation, out invOrientation);
+                invOrientation = Matrix4x4.Transpose(orientation);
                 this.Shape.GetBoundingBox(orientation, out boundingBox);
                 boundingBox.Min += position;
                 boundingBox.Max += position;
@@ -593,8 +593,7 @@ namespace BalatroPhysics.Dynamics
 
                 if (!isStatic)
                 {
-                    JMatrix.Multiply(invOrientation, invInertia, out invInertiaWorld);
-                    JMatrix.Multiply(invInertiaWorld, orientation, out invInertiaWorld);
+                    invInertiaWorld = Matrix4x4.Multiply(Matrix4x4.Multiply(invOrientation, invInertia), orientation);
                 }
             }
         }

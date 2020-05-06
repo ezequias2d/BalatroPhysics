@@ -63,7 +63,7 @@ namespace BalatroPhysics.Collision
         private const int MaximumIterations = 34;
 
         private static void SupportMapTransformed(ISupportMappable support,
-            JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
+            Matrix4x4 orientation, Vector3 position, Vector3 direction, out Vector3 result)
         {
             // THIS IS *THE* HIGH FREQUENCY CODE OF THE COLLLISION PART OF THE ENGINE
 
@@ -95,8 +95,8 @@ namespace BalatroPhysics.Collision
         /// <param name="normal">The normal pointing from body2 to body1.</param>
         /// <param name="penetration">Estimated penetration depth of the collision.</param>
         /// <returns>Returns true if there is a collision, false otherwise.</returns>
-        public static bool Detect(ISupportMappable support1, ISupportMappable support2, JMatrix orientation1,
-             JMatrix orientation2, Vector3 position1, Vector3 position2,
+        public static bool Detect(ISupportMappable support1, ISupportMappable support2, Matrix4x4 orientation1,
+             Matrix4x4 orientation2, Vector3 position1, Vector3 position2,
              out Vector3 point, out Vector3 normal, out float penetration)
         {
             // Used variables

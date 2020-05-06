@@ -29,8 +29,8 @@ namespace BalatroPhysics.Collision.Shapes
     public struct TransformedShape
     {
         private Vector3 position;
-        private JMatrix orientation;
-        private JMatrix invOrientation;
+        private Matrix4x4 orientation;
+        private Matrix4x4 invOrientation;
         private JBBox boundingBox;
 
         /// <summary>
@@ -59,12 +59,12 @@ namespace BalatroPhysics.Collision.Shapes
         /// <summary>
         /// The inverse orientation of the 'sub' shape.
         /// </summary>
-        public JMatrix InverseOrientation { get { return invOrientation; } }
+        public Matrix4x4 InverseOrientation { get { return invOrientation; } }
 
         /// <summary>
         /// The orienation of the 'sub' shape.
         /// </summary>
-        public JMatrix Orientation
+        public Matrix4x4 Orientation
         {
             get 
             { 
@@ -72,8 +72,8 @@ namespace BalatroPhysics.Collision.Shapes
             }
             set 
             {
-                orientation = value; 
-                JMatrix.Transpose(orientation, out invOrientation);
+                orientation = value;
+                invOrientation = Matrix4x4.Transpose(orientation);
                 UpdateBoundingBox();
             }
         }
@@ -92,11 +92,11 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="shape">The shape.</param>
         /// <param name="orientation">The orientation this shape should have.</param>
         /// <param name="position">The position this shape should have.</param>
-        public TransformedShape(Shape shape, JMatrix orientation, Vector3 position)
+        public TransformedShape(Shape shape, Matrix4x4 orientation, Vector3 position)
         {
             this.position = position;
             this.orientation = orientation;
-            JMatrix.Transpose(orientation, out invOrientation);
+            invOrientation = Matrix4x4.Transpose(orientation);
             Shape = shape;
             boundingBox = new JBBox();
             UpdateBoundingBox();

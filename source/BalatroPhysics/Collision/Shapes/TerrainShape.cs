@@ -221,7 +221,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            Inertia = JMatrix.Identity;
+            Inertia = Matrix4x4.Identity;
             Mass = 1.0f;
         }
 
@@ -231,7 +231,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(Matrix4x4 orientation, out JBBox box)
         {
             box = boundings;
 

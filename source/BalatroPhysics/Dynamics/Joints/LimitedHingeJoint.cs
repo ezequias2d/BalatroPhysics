@@ -77,7 +77,7 @@ namespace BalatroPhysics.Dynamics.Joints
             // anchor point for body 2 is chosen to be in the middle of the
             // angle range.  relative to hinge
             float angleToMiddle = 0.5f * (hingeFwdAngle - hingeBckAngle);
-            Vector3 hingeRelAnchorPos1 = JMath.Transform(hingeRelAnchorPos0, JMatrix.CreateFromAxisAngle(hingeAxis, -angleToMiddle / 360.0f * 2.0f * JMath.Pi));
+            Vector3 hingeRelAnchorPos1 = JMath.Transform(hingeRelAnchorPos0, Matrix4x4.CreateFromAxisAngle(hingeAxis, -angleToMiddle / 360.0f * 2.0f * JMath.Pi));
 
             // work out the "string" length
             float hingeHalfAngle = 0.5f * (hingeFwdAngle + hingeBckAngle);

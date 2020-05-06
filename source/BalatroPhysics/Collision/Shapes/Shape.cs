@@ -47,7 +47,7 @@ namespace BalatroPhysics.Collision.Shapes
     {
 
         // internal values so we can access them fast  without calling properties.
-        private JMatrix inertia = JMatrix.Identity;
+        private Matrix4x4 inertia = Matrix4x4.Identity;
         private float mass = 1.0f;
 
         private JBBox boundingBox = JBBox.LargeBox;
@@ -68,7 +68,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <summary>
         /// Returns the inertia of the untransformed shape.
         /// </summary>
-        public JMatrix Inertia { get { return inertia; } protected set { inertia = value; } }
+        public Matrix4x4 Inertia { get { return inertia; } protected set { inertia = value; } }
 
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace BalatroPhysics.Collision.Shapes
 
         public Vector3 SupportCenter { get { return GeometricCenter; } }
 
-        protected (float mass, Vector3 ceter, JMatrix inertia) MassCenterInertia
+        protected (float mass, Vector3 ceter, Matrix4x4 inertia) MassCenterInertia
         {
             set
             {
@@ -243,7 +243,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The resulting axis aligned bounding box.</param>
-        public virtual void GetBoundingBox(JMatrix orientation, out JBBox box)
+        public virtual void GetBoundingBox(Matrix4x4 orientation, out JBBox box)
         {
             // I don't think that this can be done faster.
             // 6 is the minimum number of SupportMap calls.
@@ -277,7 +277,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public virtual void UpdateShape()
         {
-            GetBoundingBox(JMatrix.InternalIdentity, out boundingBox);
+            GetBoundingBox(Matrix4x4.Identity, out boundingBox);
 
             CalculateMassInertia();
             RaiseShapeUpdated();
@@ -290,12 +290,12 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="centerOfMass"></param>
         /// <param name="inertia">Returns the inertia relative to the center of mass, not to the origin</param>
         /// <returns></returns>
-        #region  public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass, out JMatrix inertia)
-        public static (float mass, Vector3 centerOfMass, JMatrix inertia) CalculateMassInertia(Shape shape)
+        #region  public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass, out Matrix4x4 inertia)
+        public static (float mass, Vector3 centerOfMass, Matrix4x4 inertia) CalculateMassInertia(Shape shape)
         {
             float mass = 0.0f;
             Vector3 centerOfMass = Vector3.Zero;
-            JMatrix inertia = JMatrix.Zero;
+            Matrix4x4 inertia = JMath.ZeroMatrix;
 
             if (shape is Multishape) throw new ArgumentException("Can't calculate inertia of multishapes.", "shape");
 
@@ -306,7 +306,10 @@ namespace BalatroPhysics.Collision.Shapes
             // create inertia of tetrahedron with vertices at
             // (0,0,0) (1,0,0) (0,1,0) (0,0,1)
             float a = 1.0f / 60.0f, b = 1.0f / 120.0f;
-            JMatrix C = new JMatrix(a, b, b, b, a, b, b, b, a);
+            Matrix4x4 C = new Matrix4x4( a,  b,  b, 0f,
+                                         b,  a,  b, 0f, 
+                                         b,  b,  a, 0f,
+                                        0f, 0f, 0f, 1f);
 
             for (int i = 0; i < hullTriangles.Count; i += 3)
             {
@@ -314,15 +317,16 @@ namespace BalatroPhysics.Collision.Shapes
                 Vector3 column1 = hullTriangles[i + 1];
                 Vector3 column2 = hullTriangles[i + 2];
 
-                JMatrix A = new JMatrix(column0.X, column1.X, column2.X,
-                    column0.Y, column1.Y, column2.Y,
-                    column0.Z, column1.Z, column2.Z);
+                Matrix4x4 A = new Matrix4x4(column0.X, column1.X, column2.X, 0f,
+                    column0.Y, column1.Y, column2.Y, 0f,
+                    column0.Z, column1.Z, column2.Z, 0f,
+                    0f, 0f, 0f, 1f);
 
-                float detA = A.Determinant();
+                float detA = A.GetDeterminant();
 
                 // now transform this canonical tetrahedron to the target tetrahedron
                 // inertia by a linear transformation A
-                JMatrix tetrahedronInertia = JMatrix.Multiply(A * C * JMatrix.Transpose(A), detA);
+                Matrix4x4 tetrahedronInertia = Matrix4x4.Multiply(A * C * Matrix4x4.Transpose(A), detA);
 
                 Vector3 tetrahedronCOM = (1.0f / 4.0f) * (hullTriangles[i + 0] + hullTriangles[i + 1] + hullTriangles[i + 2]);
                 float tetrahedronMass = (1.0f / 6.0f) * detA;
@@ -332,7 +336,7 @@ namespace BalatroPhysics.Collision.Shapes
                 mass += tetrahedronMass;
             }
 
-            inertia = JMatrix.Multiply(JMatrix.Identity, inertia.Trace()) - inertia;
+            inertia = Matrix4x4.Multiply(Matrix4x4.Identity, inertia.Trace()) - inertia;
             centerOfMass = centerOfMass * (1.0f / mass);
 
             float x = centerOfMass.X;
@@ -340,12 +344,14 @@ namespace BalatroPhysics.Collision.Shapes
             float z = centerOfMass.Z;
 
             // now translate the inertia by the center of mass
-            JMatrix t = new JMatrix(
-                -mass * (y * y + z * z), mass * x * y, mass * x * z,
-                mass * y * x, -mass * (z * z + x * x), mass * y * z,
-                mass * z * x, mass * z * y, -mass * (x * x + y * y));
+            Matrix4x4 t = new Matrix4x4(
+                -mass * (y * y + z * z), mass * x * y, mass * x * z, 0f,
+                mass * y * x, -mass * (z * z + x * x), mass * y * z, 0f,
+                mass * z * x, mass * z * y, -mass * (x * x + y * y), 0f,
+                0f, 0f, 0f, 1f);
 
-            JMatrix.Add(inertia, t, out inertia);
+            inertia = Matrix4x4.Add(inertia, t);
+            inertia.M44 = 1f;
 
             return (mass, centerOfMass, inertia);
         }

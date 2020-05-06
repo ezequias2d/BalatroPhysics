@@ -219,7 +219,7 @@ namespace BalatroPhysicsDemo
 
             System.Numerics.Vector3 forward = new System.Numerics.Vector3(-car.Orientation.M31, -car.Orientation.M32, -car.Orientation.M33);
 
-            System.Numerics.Vector3 wheelFwd = JMath.Transform(forward, JMatrix.CreateFromAxisAngle(JMath.Up, SteerAngle / 360 * 2 * JMath.Pi));
+            System.Numerics.Vector3 wheelFwd = JMath.Transform(forward, System.Numerics.Matrix4x4.CreateFromAxisAngle(JMath.Up, SteerAngle / 360 * 2 * JMath.Pi));
             System.Numerics.Vector3 wheelLeft = System.Numerics.Vector3.Cross(JMath.Up, wheelFwd); wheelLeft = System.Numerics.Vector3.Normalize(wheelLeft);
             System.Numerics.Vector3 wheelUp = System.Numerics.Vector3.Cross(wheelFwd, wheelLeft);
 

@@ -31,7 +31,7 @@ namespace BalatroPhysicsDemo
             model.CopyAbsoluteBoneTransformsTo(bones_);
             foreach (ModelMesh modelmesh in model.Meshes)
             {
-                JMatrix xform = Conversion.ToJitterMatrix(bones_[modelmesh.ParentBone.Index]);
+                System.Numerics.Matrix4x4 xform = Conversion.ToJitterMatrix(bones_[modelmesh.ParentBone.Index]);
                 foreach (ModelMeshPart meshPart in modelmesh.MeshParts)
                 {
                     // Before we add any more where are we starting from 

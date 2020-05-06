@@ -69,7 +69,7 @@ namespace BalatroPhysics.Collision.Shapes
 
             Mass = massCylinder + massSphere;
 
-            Inertia = new JMatrix(
+            Inertia = JMath.MatrixFromM11M22M33(
                 (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere,
                 (1.0f / 2.0f) * massCylinder * radius * radius + (2.0f / 5.0f) * massSphere * radius * radius,
                 (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere);
