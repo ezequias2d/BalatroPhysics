@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5FC265FF-3CD8-4120-905C-B0548A8E1EF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysics", "source\BalatroPhysics\BalatroPhysics.csproj", "{AA03EF1A-94F7-4D30-AB14-2092863FF923}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BalatroPhysics", "source\BalatroPhysics\BalatroPhysics.csproj", "{AA03EF1A-94F7-4D30-AB14-2092863FF923}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysicsDemo", "samples\JitterDemo\JitterDemo\BalatroPhysicsDemo.csproj", "{6D78166B-77BC-4BAF-97CC-A946D013145B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysicsOpenGLDemo", "samples\JitterOpenGLDemo\JitterOpenGLDemo\BalatroPhysicsOpenGLDemo.csproj", "{5EB96E05-373F-4278-929A-5ADCCEC1F9C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalatroPhysics.Tests", "BalatroPhysics.Tests\BalatroPhysics.Tests.csproj", "{B0F5B139-0946-486E-8B2E-7E586049BE78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,18 @@ Global
 		{5EB96E05-373F-4278-929A-5ADCCEC1F9C7}.Release|ARM.Build.0 = Release|Any CPU
 		{5EB96E05-373F-4278-929A-5ADCCEC1F9C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{5EB96E05-373F-4278-929A-5ADCCEC1F9C7}.Release|x86.Build.0 = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|ARM.Build.0 = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Debug|x86.Build.0 = Debug|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|ARM.ActiveCfg = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|ARM.Build.0 = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|x86.ActiveCfg = Release|Any CPU
+		{B0F5B139-0946-486E-8B2E-7E586049BE78}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
