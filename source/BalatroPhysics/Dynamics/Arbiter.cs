@@ -116,7 +116,7 @@ namespace BalatroPhysics.Dynamics
                     return null;
                 }
 
-                index = GetCacheEntry(relPos1, contactSettings.breakThreshold);
+                index = GetCacheEntry(relPos1, contactSettings.BreakThreshold);
 
                 if (index >= 0)
                 {

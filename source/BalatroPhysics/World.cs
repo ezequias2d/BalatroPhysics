@@ -137,7 +137,7 @@ namespace BalatroPhysics
             #endregion
         }
 
-        private ContactSettings contactSettings = new ContactSettings();
+        private ContactSettings contactSettings = ContactSettings.Default;
 
         private float inactiveAngularThresholdSq = 0.1f;
         private float inactiveLinearThresholdSq = 0.1f;
@@ -177,7 +177,7 @@ namespace BalatroPhysics
 
         private Vector3 gravity = new Vector3(0, -9.81f, 0);
 
-        public ContactSettings ContactSettings { get { return contactSettings; } }
+        public ref ContactSettings ContactSettings { get { return ref contactSettings; } }
 
         /// <summary>
         /// Gets a read only collection of the <see cref="BalatroPhysics.Collision.CollisionIsland"/> objects managed by
@@ -672,7 +672,7 @@ namespace BalatroPhysics
                 Contact c = arbiter.contactList[i];
                 c.UpdatePosition();
 
-                if (c.penetration < -contactSettings.breakThreshold)
+                if (c.penetration < -contactSettings.BreakThreshold)
                 {
                     Contact.Pool.GiveBack(c);
                     arbiter.contactList.RemoveAt(i);
@@ -688,7 +688,7 @@ namespace BalatroPhysics
 
                     // hack (multiplication by factor 100) in the
                     // following line.
-                    if (distance > contactSettings.breakThreshold * contactSettings.breakThreshold * 100)
+                    if (distance > contactSettings.BreakThreshold * contactSettings.BreakThreshold * 100)
                     {
                         Contact.Pool.GiveBack(c);
                         arbiter.contactList.RemoveAt(i);
@@ -732,7 +732,7 @@ namespace BalatroPhysics
             for (int i = -1; i < thisIterations; i++)
             {
                 // Contact and Collision
-                foreach (Arbiter arbiter in island.arbiter)
+                foreach (Arbiter arbiter in island.Arbiter)
                 {
                     int contactCount = arbiter.contactList.Count;
                     for (int e = 0; e < contactCount; e++)
@@ -743,7 +743,7 @@ namespace BalatroPhysics
                 }
 
                 //  Constraints
-                foreach (Constraint c in island.constraints)
+                foreach (Constraint c in island.Constraints)
                 {
                     if (c.body1 != null && !c.body1.IsActive && c.body2 != null && !c.body2.IsActive)
                         continue;
@@ -930,7 +930,7 @@ namespace BalatroPhysics
                 if (!this.AllowDeactivation) deactivateIsland = false;
                 else
                 {
-                    foreach (RigidBody body in island.bodies)
+                    foreach (RigidBody body in island.Bodies)
                     {
                         // body allowdeactivation
                         if (body.AllowDeactivation && (body.angularVelocity.LengthSquared() < inactiveAngularThresholdSq &&
@@ -948,7 +948,7 @@ namespace BalatroPhysics
                     }
                 }
 
-                foreach (RigidBody body in island.bodies)
+                foreach (RigidBody body in island.Bodies)
                 {
                     if (body.isActive == deactivateIsland)
                     {

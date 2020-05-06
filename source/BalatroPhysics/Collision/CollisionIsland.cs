@@ -27,6 +27,7 @@ using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Dynamics.Constraints;
 using System.Collections.ObjectModel;
+using System.Collections;
 #endregion
 
 namespace BalatroPhysics.Collision
@@ -36,12 +37,9 @@ namespace BalatroPhysics.Collision
     /// </summary>
     public class CollisionIsland
     {
-
-        internal IslandManager islandManager;
-
-        internal HashSet<RigidBody> bodies = new HashSet<RigidBody>();
-        internal HashSet<Arbiter> arbiter = new HashSet<Arbiter>();
-        internal HashSet<Constraint> constraints = new HashSet<Constraint>();
+        private HashSet<RigidBody> bodies = new HashSet<RigidBody>();
+        private HashSet<Arbiter> arbiter = new HashSet<Arbiter>();
+        private HashSet<Constraint> constraints = new HashSet<Constraint>();
 
         /// <summary>
         /// Gets a read only list of <see cref="RigidBody"/> which are in contact with each other.
@@ -57,6 +55,8 @@ namespace BalatroPhysics.Collision
         /// Gets a read only list of <see cref="Constraint"/> which are involved in this island.
         /// </summary>
         public IReadOnlyCollection<Constraint> Constraints { get { return constraints; } }
+
+        internal IslandManager IslandManager { get; set; }
 
         /// Constructor of CollisionIsland class.
         /// </summary>
@@ -97,6 +97,33 @@ namespace BalatroPhysics.Collision
         internal void ClearLists()
         {
             arbiter.Clear(); bodies.Clear(); constraints.Clear();
+        }
+
+        internal void Add(Arbiter item)
+        {
+            arbiter.Add(item);
+        }
+        internal bool Remove(Arbiter item)
+        {
+            return arbiter.Remove(item);
+        }
+
+        internal void Add(RigidBody item)
+        {
+            bodies.Add(item);
+        }
+        internal bool Remove(RigidBody item)
+        {
+            return bodies.Remove(item);
+        }
+
+        internal void Add(Constraint item)
+        {
+            constraints.Add(item);
+        }
+        internal bool Remove(Constraint item)
+        {
+            return constraints.Remove(item);
         }
 
     }

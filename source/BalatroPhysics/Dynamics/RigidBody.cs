@@ -484,7 +484,7 @@ namespace BalatroPhysics.Dynamics
                 if (value && !isStatic)
                 {
                     if(island != null)
-                    island.islandManager.MakeBodyStatic(this);
+                    island.IslandManager.MakeBodyStatic(this);
 
                     this.angularVelocity = Vector3.Zero;
                     this.linearVelocity = Vector3.Zero;

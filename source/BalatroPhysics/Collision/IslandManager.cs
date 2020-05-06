@@ -17,7 +17,7 @@ namespace BalatroPhysics.Collision
     /// static bodies dont have any connections. Think of the islands as a graph:
     /// nodes are the bodies, and edges are the connections
     /// </summary>
-    class IslandManager : ReadOnlyCollection<CollisionIsland>
+    public class IslandManager : ReadOnlyCollection<CollisionIsland>
     {
 
         public static ResourcePool<CollisionIsland> Pool = new ResourcePool<CollisionIsland>();
@@ -38,9 +38,9 @@ namespace BalatroPhysics.Collision
             arbiter.body2.arbiters.Add(arbiter);
 
             if (arbiter.body1.island != null)
-                arbiter.body1.island.arbiter.Add(arbiter);
+                arbiter.body1.island.Add(arbiter);
             else if (arbiter.body2.island != null)
-                arbiter.body2.island.arbiter.Add(arbiter);
+                arbiter.body2.island.Add(arbiter);
         }
 
         public void ArbiterRemoved(Arbiter arbiter)
@@ -49,9 +49,9 @@ namespace BalatroPhysics.Collision
             arbiter.body2.arbiters.Remove(arbiter);
 
             if (arbiter.body1.island != null)
-                arbiter.body1.island.arbiter.Remove(arbiter);
+                arbiter.body1.island.Remove(arbiter);
             else if (arbiter.body2.island != null)
-                arbiter.body2.island.arbiter.Remove(arbiter);
+                arbiter.body2.island.Remove(arbiter);
 
             RemoveConnection(arbiter.body1, arbiter.body2);
         }
@@ -64,9 +64,9 @@ namespace BalatroPhysics.Collision
             if (constraint.body2 != null) constraint.body2.constraints.Add(constraint);
 
             if (constraint.body1.island != null)
-                constraint.body1.island.constraints.Add(constraint);
+                constraint.body1.island.Add(constraint);
             else if (constraint.body2 != null && constraint.body2.island != null)
-                constraint.body2.island.constraints.Add(constraint);
+                constraint.body2.island.Add(constraint);
         }
 
         public void ConstraintRemoved(Constraint constraint)
@@ -77,9 +77,9 @@ namespace BalatroPhysics.Collision
                 constraint.body2.constraints.Remove(constraint);
 
             if (constraint.body1.island != null)
-                constraint.body1.island.constraints.Remove(constraint);
+                constraint.body1.island.Remove(constraint);
             else if (constraint.body2 != null && constraint.body2.island != null)
-                constraint.body2.island.constraints.Remove(constraint);
+                constraint.body2.island.Remove(constraint);
 
             RemoveConnection(constraint.body1, constraint.body2);
         }
@@ -95,9 +95,9 @@ namespace BalatroPhysics.Collision
 
             if (body.island != null)
             {
-                body.island.bodies.Remove(body);
+                body.island.Remove(body);
 
-                if (body.island.bodies.Count == 0)
+                if (body.island.Bodies.Count == 0)
                 {
                     body.island.ClearLists();
                     Pool.GiveBack(body.island);
@@ -125,14 +125,14 @@ namespace BalatroPhysics.Collision
 
             if (body.island != null)
             {
-                System.Diagnostics.Debug.Assert(body.island.islandManager == this,
+                System.Diagnostics.Debug.Assert(body.island.IslandManager == this,
                     "IslandManager Inconsistency: IslandManager doesn't own the Island.");
 
 
                 // the body should now form an island on his own.
                 // thats okay, but since static bodies dont have islands
                 // remove this island.
-                System.Diagnostics.Debug.Assert(body.island.bodies.Count == 1,
+                System.Diagnostics.Debug.Assert(body.island.Bodies.Count == 1,
                 "IslandManager Inconsistency: Removed all connections of a body - body is still in a non single Island.");
 
                 body.island.ClearLists();
@@ -150,7 +150,7 @@ namespace BalatroPhysics.Collision
         {
             foreach (CollisionIsland island in islands)
             {
-                foreach (RigidBody body in island.bodies)
+                foreach (RigidBody body in island.Bodies)
                 {
                     body.arbiters.Clear();
                     body.constraints.Clear();
@@ -172,10 +172,10 @@ namespace BalatroPhysics.Collision
                 if (body2.island == null)
                 {
                     CollisionIsland newIsland = Pool.GetNew();
-                    newIsland.islandManager = this;
+                    newIsland.IslandManager = this;
 
                     body2.island = newIsland;
-                    body2.island.bodies.Add(body2);
+                    body2.island.Add(body2);
                     islands.Add(newIsland);
                 }
             }
@@ -184,10 +184,10 @@ namespace BalatroPhysics.Collision
                 if (body1.island == null)
                 {
                     CollisionIsland newIsland = Pool.GetNew();
-                    newIsland.islandManager = this;
+                    newIsland.IslandManager = this;
 
                     body1.island = newIsland;
-                    body1.island.bodies.Add(body1);
+                    body1.island.Add(body1);
                     islands.Add(newIsland);
                 }
             }
@@ -304,7 +304,7 @@ namespace BalatroPhysics.Collision
             }
 
             CollisionIsland island = Pool.GetNew();
-            island.islandManager = this;
+            island.IslandManager = this;
 
             islands.Add(island);
 
@@ -313,20 +313,20 @@ namespace BalatroPhysics.Collision
                 for (int i = 0; i < visitedBodiesLeft.Count; i++)
                 {
                     RigidBody body = visitedBodiesLeft[i];
-                    body1.island.bodies.Remove(body);
-                    island.bodies.Add(body);
+                    body1.island.Remove(body);
+                    island.Add(body);
                     body.island = island;
 
                     foreach (Arbiter a in body.arbiters)
                     {
-                        body1.island.arbiter.Remove(a);
-                        island.arbiter.Add(a);
+                        body1.island.Remove(a);
+                        island.Add(a);
                     }
 
                     foreach (Constraint c in body.constraints)
                     {
-                        body1.island.constraints.Remove(c);
-                        island.constraints.Add(c);
+                        body1.island.Remove(c);
+                        island.Add(c);
                     }
                 }
 
@@ -337,20 +337,20 @@ namespace BalatroPhysics.Collision
                 for (int i = 0; i < visitedBodiesRight.Count; i++)
                 {
                     RigidBody body = visitedBodiesRight[i];
-                    body0.island.bodies.Remove(body);
-                    island.bodies.Add(body);
+                    body0.island.Remove(body);
+                    island.Add(body);
                     body.island = island;
 
                     foreach (Arbiter a in body.arbiters)
                     {
-                        body0.island.arbiter.Remove(a);
-                        island.arbiter.Add(a);
+                        body0.island.Remove(a);
+                        island.Add(a);
                     }
 
                     foreach (Constraint c in body.constraints)
                     {
-                        body0.island.constraints.Remove(c);
-                        island.constraints.Add(c);
+                        body0.island.Remove(c);
+                        island.Add(c);
                     }
                 }
 
@@ -381,19 +381,19 @@ namespace BalatroPhysics.Collision
                 if (body0.island == null) // <- one island is null
                 {
                     body0.island = body1.island;
-                    body0.island.bodies.Add(body0);
+                    body0.island.Add(body0);
                 }
                 else if (body1.island == null)  // <- one island is null
                 {
                     body1.island = body0.island;
-                    body1.island.bodies.Add(body1);
+                    body1.island.Add(body1);
                 }
                 else // <- both islands are different,
                 {
                     // merge smaller into larger
                     RigidBody smallIslandOwner, largeIslandOwner;
 
-                    if (body0.island.bodies.Count > body1.island.bodies.Count)
+                    if (body0.island.Bodies.Count > body1.island.Bodies.Count)
                     {
                         smallIslandOwner = body1;
                         largeIslandOwner = body0;
@@ -409,20 +409,20 @@ namespace BalatroPhysics.Collision
                     Pool.GiveBack(giveBackIsland);
                     islands.Remove(giveBackIsland);
 
-                    foreach (RigidBody b in giveBackIsland.bodies)
+                    foreach (RigidBody b in giveBackIsland.Bodies)
                     {
                         b.island = largeIslandOwner.island;
-                        largeIslandOwner.island.bodies.Add(b);
+                        largeIslandOwner.island.Add(b);
                     }
 
-                    foreach (Arbiter a in giveBackIsland.arbiter)
+                    foreach (Arbiter a in giveBackIsland.Arbiter)
                     {
-                        largeIslandOwner.island.arbiter.Add(a);
+                        largeIslandOwner.island.Add(a);
                     }
 
-                    foreach (Constraint c in giveBackIsland.constraints)
+                    foreach (Constraint c in giveBackIsland.Constraints)
                     {
-                        largeIslandOwner.island.constraints.Add(c);
+                        largeIslandOwner.island.Add(c);
                     }
 
                     giveBackIsland.ClearLists();
@@ -432,12 +432,12 @@ namespace BalatroPhysics.Collision
             else if (body0.island == null) // <- both are null
             {
                 CollisionIsland island = Pool.GetNew();
-                island.islandManager = this;
+                island.IslandManager = this;
 
                 body0.island = body1.island = island;
 
-                body0.island.bodies.Add(body0);
-                body0.island.bodies.Add(body1);
+                body0.island.Add(body0);
+                body0.island.Add(body1);
 
                 islands.Add(island);
             }

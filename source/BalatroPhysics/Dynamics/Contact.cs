@@ -30,35 +30,6 @@ using System.Numerics;
 
 namespace BalatroPhysics.Dynamics
 {
-
-    #region public class ContactSettings
-    public class ContactSettings
-    {
-        public enum MaterialCoefficientMixingType { TakeMaximum, TakeMinimum, UseAverage }
-
-        internal float maximumBias = 10.0f;
-        internal float bias = 0.25f;
-        internal float minVelocity = 0.001f;
-        internal float allowedPenetration = 0.01f;
-        internal float breakThreshold = 0.01f;
-
-        internal MaterialCoefficientMixingType materialMode = MaterialCoefficientMixingType.UseAverage;
-
-        public float MaximumBias { get { return maximumBias; } set { maximumBias = value; } }
-
-        public float BiasFactor { get { return bias; } set { bias = value; } }
-
-        public float MinimumVelocity { get { return minVelocity; } set { minVelocity = value; } }
-
-        public float AllowedPenetration { get { return allowedPenetration; } set { allowedPenetration = value; } }
-
-        public float BreakThreshold { get { return breakThreshold; } set { breakThreshold = value; } }
-
-        public MaterialCoefficientMixingType MaterialCoefficientMixing { get { return materialMode; } set { materialMode = value; } }
-    }
-    #endregion
-
-
     /// <summary>
     /// </summary>
     public class Contact : IConstraint
@@ -211,7 +182,7 @@ namespace BalatroPhysics.Dynamics
             }
 
             // this gets us some performance
-            if (dvx * dvx + dvy * dvy + dvz * dvz < settings.minVelocity * settings.minVelocity)
+            if (dvx * dvx + dvy * dvy + dvz * dvz < settings.MinimumVelocity * settings.MinimumVelocity)
             { return; }
 
             float vn = normal.X * dvx + normal.Y * dvy + normal.Z * dvz;
@@ -580,10 +551,10 @@ namespace BalatroPhysics.Dynamics
 
             float relNormalVel = normal.X * dvx + normal.Y * dvy + normal.Z * dvz; //Vector3.Dot(normal, dv);
 
-            if (Penetration > settings.allowedPenetration)
+            if (Penetration > settings.AllowedPenetration)
             {
-                restitutionBias = settings.bias * (1.0f / timestep) * JMath.Max(0.0f, Penetration - settings.allowedPenetration);
-                restitutionBias = JMath.Clamp(restitutionBias, 0.0f, settings.maximumBias);
+                restitutionBias = settings.BiasFactor * (1.0f / timestep) * JMath.Max(0.0f, Penetration - settings.AllowedPenetration);
+                restitutionBias = JMath.Clamp(restitutionBias, 0.0f, settings.MaximumBias);
               //  body1IsMassPoint = body2IsMassPoint = false;
             }
       
@@ -616,7 +587,7 @@ namespace BalatroPhysics.Dynamics
             // if the penetration is negative (which means the bodies are not already in contact, but they will
             // be in the future) we store the current bounce bias in the variable 'lostSpeculativeBounce'
             // and apply it the next frame, when the speculative contact was already solved.
-            if (penetration < -settings.allowedPenetration)
+            if (penetration < -settings.AllowedPenetration)
             {
                 speculativeVelocity = penetration / timestep;
 
