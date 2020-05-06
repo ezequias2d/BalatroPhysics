@@ -43,13 +43,12 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        void SupportMapping(Vector3 direction, out Vector3 result);
+        Vector3 SupportMapping(Vector3 direction);
 
         /// <summary>
         /// The center of the SupportMap.
         /// </summary>
-        /// <param name="center"></param>
-        void SupportCenter(out Vector3 center);
+        Vector3 SupportCenter { get; }
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ namespace BalatroPhysics.Collision
             result.Y = ((direction.X * orientation.M21) + (direction.Y * orientation.M22)) + (direction.Z * orientation.M23);
             result.Z = ((direction.X * orientation.M31) + (direction.Y * orientation.M32)) + (direction.Z * orientation.M33);
 
-            support.SupportMapping(result, out result);
+            result = support.SupportMapping(result);
 
             float x = ((result.X * orientation.M11) + (result.Y * orientation.M21)) + (result.Z * orientation.M31);
             float y = ((result.X * orientation.M12) + (result.Y * orientation.M22)) + (result.Z * orientation.M32);
@@ -115,12 +114,12 @@ namespace BalatroPhysics.Collision
             //Vector3 right = JMath.Right;
 
             // Get the center of shape1 in world coordinates -> v01
-            support1.SupportCenter(out v01);
+            v01 = support1.SupportCenter;
             JMath.Transform(v01, orientation1, out v01);
             v01 += position1;
 
             // Get the center of shape2 in world coordinates -> v02
-            support2.SupportCenter(out v02);
+            v02 = support2.SupportCenter;
             JMath.Transform(v02, orientation2, out v02);
             v02 += position2;
 

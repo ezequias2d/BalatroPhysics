@@ -31,13 +31,13 @@ namespace BalatroPhysicsDemo.Vehicle
             JitterDemo demo = this.Game as JitterDemo;
             World world = demo.World;
 
-            CompoundShape.TransformedShape lower = new CompoundShape.TransformedShape(
+            TransformedShape lower = new TransformedShape(
                 new BoxShape(2.5f, 1f, 6.0f), JMatrix.Identity, System.Numerics.Vector3.Zero);
 
-            CompoundShape.TransformedShape upper = new CompoundShape.TransformedShape(
+            TransformedShape upper = new TransformedShape(
                 new BoxShape(2.0f, 0.5f, 3.0f), JMatrix.Identity, JMath.Up * 0.75f + JMath.Backward * 1.0f);
 
-            CompoundShape.TransformedShape[] subShapes = { lower, upper };
+            TransformedShape[] subShapes = { lower, upper };
 
             Shape chassis = new CompoundShape(subShapes);
 

@@ -335,9 +335,9 @@ namespace BalatroPhysics.Dynamics
         /// </summary>
         public void SetMassProperties()
         {
-            this.inertia = Shape.inertia;
+            inertia = Shape.Inertia;
             JMatrix.Inverse(inertia, out invInertia);
-            this.inverseMass = 1.0f / Shape.mass;
+            inverseMass = 1.0f / Shape.Mass;
             useShapeMassProperties = true;
         }
 
@@ -520,7 +520,7 @@ namespace BalatroPhysics.Dynamics
                 // scale inertia
                 if (!isParticle)
                 {
-                    JMatrix.Multiply(Shape.inertia, value / Shape.mass, out inertia);
+                    JMatrix.Multiply(Shape.Inertia, value / Shape.Mass, out inertia);
                     JMatrix.Inverse(inertia, out invInertia);
                 }
 
@@ -576,7 +576,7 @@ namespace BalatroPhysics.Dynamics
                 this.inertia = JMatrix.Zero;
                 this.invInertia = this.invInertiaWorld = JMatrix.Zero;
                 this.invOrientation = this.orientation = JMatrix.Identity;
-                this.boundingBox = shape.boundingBox;
+                this.boundingBox = shape.BoundingBox;
                 boundingBox.Min += position;
                 boundingBox.Max += position;
 

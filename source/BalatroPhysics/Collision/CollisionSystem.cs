@@ -548,8 +548,8 @@ namespace BalatroPhysics.Collision
         {
             Vector3 mn = -normal;
 
-            Vector3 sA; SupportMapping(body1, shape1, mn, out sA);
-            Vector3 sB; SupportMapping(body2, shape2, normal, out sB);
+            Vector3 sA = SupportMapping(body1, shape1, mn);
+            Vector3 sB = SupportMapping(body2, shape2, normal);
 
             sA -= point;
             sB -= point;
@@ -564,12 +564,14 @@ namespace BalatroPhysics.Collision
             point2 = point + sB;
         }
 
-        private void SupportMapping(RigidBody body, Shape workingShape, Vector3 direction, out Vector3 result)
+        private Vector3 SupportMapping(RigidBody body, Shape workingShape, Vector3 direction)
         {
+            Vector3 result;
             JMath.Transform(direction, body.invOrientation, out result);
-            workingShape.SupportMapping(result, out result);
+            result = workingShape.SupportMapping(result);
             JMath.Transform(result, body.orientation, out result);
             result += body.position;
+            return result;
         }
 
         #endregion

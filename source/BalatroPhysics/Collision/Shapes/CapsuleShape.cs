@@ -67,11 +67,12 @@ namespace BalatroPhysics.Collision.Shapes
             float massSphere = (3.0f / 4.0f) * JMath.Pi * radius * radius * radius;
             float massCylinder = JMath.Pi * radius * radius * length;
 
-            mass = massCylinder + massSphere;
+            Mass = massCylinder + massSphere;
 
-            this.inertia.M11 = (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere;
-            this.inertia.M22 = (1.0f / 2.0f) * massCylinder * radius * radius + (2.0f / 5.0f) * massSphere * radius * radius;
-            this.inertia.M33 = (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere;
+            Inertia = new JMatrix(
+                (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere,
+                (1.0f / 2.0f) * massCylinder * radius * radius + (2.0f / 5.0f) * massSphere * radius * radius,
+                (1.0f / 4.0f) * massCylinder * radius * radius + (1.0f / 12.0f) * massCylinder * length * length + (2.0f / 5.0f) * massSphere * radius * radius + (1.0f / 4.0f) * length * length * massSphere);
 
             //this.inertia.M11 = (1.0f / 4.0f) * mass * radius * radius + (1.0f / 12.0f) * mass * height * height;
             //this.inertia.M22 = (1.0f / 2.0f) * mass * radius * radius;
@@ -86,27 +87,16 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
             float r = (float)Math.Sqrt(direction.X * direction.X + direction.Z * direction.Z);
 
             if (Math.Abs(direction.Y) > 0.0f)
-            {
-                result = Vector3.Normalize(direction) * radius;
-                result.Y += Math.Sign(direction.Y) * 0.5f * length;              
-            }
+                return (Vector3.Normalize(direction) * radius) + new Vector3(0f, Math.Sign(direction.Y) * 0.5f * length, 0f);
             else if (r > 0.0f)
-            {
-                result.X = direction.X / r * radius;
-                result.Y = 0.0f;
-                result.Z = direction.Z / r * radius;
-            }
+                return new Vector3(direction.X, 0f, direction.Z) / r * radius;
             else
-            {
-                result.X = 0.0f;
-                result.Y = 0.0f;
-                result.Z = 0.0f;
-            }
+                return Vector3.Zero;
         }
     }
 }

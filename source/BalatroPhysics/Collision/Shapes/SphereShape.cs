@@ -59,9 +59,9 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
-            result = Vector3.Normalize(direction) * radius;
+            return Vector3.Normalize(direction) * radius;
         }
 
         /// <summary>
@@ -84,14 +84,12 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            mass = (4.0f / 3.0f) * JMath.Pi * radius * radius * radius;
+            Mass = (4.0f / 3.0f) * JMath.Pi * radius * radius * radius;
 
             // (0,0,0) is the center of mass, so only
             // the main matrix elements are != 0
-            inertia = JMatrix.Identity;
-            inertia.M11 = 0.4f * this.mass * radius * radius;
-            inertia.M22 = 0.4f * this.mass * radius * radius;
-            inertia.M33 = 0.4f * this.mass * radius * radius;
+            float value = 0.4f * Mass * radius * radius;
+            Inertia = new JMatrix(value, value, value);
         }
 
 

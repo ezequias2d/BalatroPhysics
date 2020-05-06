@@ -226,6 +226,19 @@ namespace BalatroPhysics.LinearMath
             this.M32 = m32;
             this.M33 = m33;
         }
+
+        public JMatrix(float m11, float m22, float m33)
+        {
+            this.M11 = m11;
+            this.M12 = 0f;
+            this.M13 = 0f;
+            this.M21 = 0f;
+            this.M22 = m22;
+            this.M23 = 0f;
+            this.M31 = 0f;
+            this.M32 = 0f;
+            this.M33 = m33;
+        }
         #endregion
 
         /// <summary>

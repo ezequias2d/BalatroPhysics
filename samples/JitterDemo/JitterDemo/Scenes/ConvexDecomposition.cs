@@ -29,12 +29,12 @@ namespace BalatroPhysicsDemo.Scenes
 
             List<ConvexHullShape> shapes = BuildFromHACDTestObjFile(@"Content/ConvexDecomposition.obj");
 
-            CompoundShape.TransformedShape[] transformedShapes
-                = new CompoundShape.TransformedShape[shapes.Count];
+            TransformedShape[] transformedShapes
+                = new TransformedShape[shapes.Count];
 
             for (int i = 0; i < shapes.Count; i++)
             {
-                transformedShapes[i] = new CompoundShape.TransformedShape();
+                transformedShapes[i] = new TransformedShape();
                 transformedShapes[i].Shape = shapes[i];
                 transformedShapes[i].Orientation = JMatrix.Identity;
                 transformedShapes[i].Position = -1.0f * shapes[i].Shift;

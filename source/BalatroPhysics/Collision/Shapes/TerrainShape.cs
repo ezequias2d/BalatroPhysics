@@ -47,6 +47,9 @@ namespace BalatroPhysics.Collision.Shapes
 
         private float sphericalExpansion = 0.05f;
 
+        private Vector3[] points;
+        private Vector3 normal;
+
         /// <summary>
         /// Expands the triangles by the specified amount.
         /// This stabilizes collision detection for flat shapes.
@@ -65,6 +68,9 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="scaleZ">The y-scale factor. (The y-space between neighbour heights)</param>
         public TerrainShape(float[,] heights, float scaleX, float scaleZ)
         {
+            points = new Vector3[3];
+            normal = JMath.Up;
+
             heightsLength0 = heights.GetLength(0);
             heightsLength1 = heights.GetLength(1);
 
@@ -97,25 +103,25 @@ namespace BalatroPhysics.Collision.Shapes
             UpdateShape();
         }
 
-        internal TerrainShape() { }
+        private TerrainShape() 
+        {
+            points = new Vector3[3];
+            normal = JMath.Up;
+        }
 
  
         protected override Multishape CreateWorkingClone()
         {
             TerrainShape clone = new TerrainShape();
-            clone.heights = this.heights;
-            clone.scaleX = this.scaleX;
-            clone.scaleZ = this.scaleZ;
-            clone.boundings = this.boundings;
-            clone.heightsLength0 = this.heightsLength0;
-            clone.heightsLength1 = this.heightsLength1;
-            clone.sphericalExpansion = this.sphericalExpansion;
+            clone.heights = heights;
+            clone.scaleX = scaleX;
+            clone.scaleZ = scaleZ;
+            clone.boundings = boundings;
+            clone.heightsLength0 = heightsLength0;
+            clone.heightsLength1 = heightsLength1;
+            clone.sphericalExpansion = sphericalExpansion;
             return clone;
         }
-
-
-        private Vector3[] points = new Vector3[3];
-        private Vector3 normal = JMath.Up;
 
         /// <summary>
         /// Sets the current shape. First <see cref="Prepare"/> has to be called.
@@ -149,15 +155,9 @@ namespace BalatroPhysics.Collision.Shapes
                 points[2] = new Vector3((minX + quadIndexX + 0) * scaleX, heights[minX + quadIndexX + 0, minZ + quadIndexZ + 1], (minZ + quadIndexZ + 1) * scaleZ);
             }
 
-            Vector3 sum = points[0];
-            sum += points[1];
-            sum += points[2];
-            sum *= 1.0f / 3.0f;
-            geomCen = sum;
+            GeometricCenter = (points[0] + points[1] + points[2]) * (1.0f / 3.0f);
 
-            sum = points[1] - points[0];
-            normal = points[2] - points[0];
-            normal = Vector3.Cross(sum, normal);
+            normal = Vector3.Cross(points[1] - points[0], points[2] - points[0]);
         }
 
         public void CollisionNormal(out Vector3 normal)
@@ -221,8 +221,8 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            this.inertia = JMatrix.Identity;
-            this.Mass = 1.0f;
+            Inertia = JMatrix.Identity;
+            Mass = 1.0f;
         }
 
         /// <summary>
@@ -236,12 +236,9 @@ namespace BalatroPhysics.Collision.Shapes
             box = boundings;
 
             #region Expand Spherical
-            box.Min.X -= sphericalExpansion;
-            box.Min.Y -= sphericalExpansion;
-            box.Min.Z -= sphericalExpansion;
-            box.Max.X += sphericalExpansion;
-            box.Max.Y += sphericalExpansion;
-            box.Max.Z += sphericalExpansion;
+            Vector3 expansion = new Vector3(sphericalExpansion, sphericalExpansion, sphericalExpansion);
+            box.Min -= expansion;
+            box.Max += expansion;
             #endregion
 
             box.Transform(orientation);
@@ -254,13 +251,13 @@ namespace BalatroPhysics.Collision.Shapes
                 int quadIndexX = index % (heightsLength0 - 1);
                 int quadIndexZ = index / (heightsLength0 - 1);
 
-                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3( quadIndexX      * scaleX, heights[quadIndexX    , quadIndexZ    ],  quadIndexZ      * scaleZ));
+                triangleList.Add(new Vector3((quadIndexX + 1) * scaleX, heights[quadIndexX + 1, quadIndexZ    ],  quadIndexZ      * scaleZ));
+                triangleList.Add(new Vector3( quadIndexX      * scaleX, heights[quadIndexX    , quadIndexZ + 1], (quadIndexZ + 1) * scaleZ));
 
-                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 0], (0 + quadIndexZ + 0) * scaleZ));
-                triangleList.Add(new Vector3((0 + quadIndexX + 1) * scaleX, heights[0 + quadIndexX + 1, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
-                triangleList.Add(new Vector3((0 + quadIndexX + 0) * scaleX, heights[0 + quadIndexX + 0, 0 + quadIndexZ + 1], (0 + quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3((quadIndexX + 1) * scaleX, heights[quadIndexX + 1, quadIndexZ    ],  quadIndexZ      * scaleZ));
+                triangleList.Add(new Vector3((quadIndexX + 1) * scaleX, heights[quadIndexX + 1, quadIndexZ + 1], (quadIndexZ + 1) * scaleZ));
+                triangleList.Add(new Vector3( quadIndexX      * scaleX, heights[quadIndexX    , quadIndexZ + 1], (quadIndexZ + 1) * scaleZ));
             }
         }
 
@@ -271,7 +268,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
             Vector3 expandVector;
             expandVector = Vector3.Normalize(direction);
@@ -288,11 +285,10 @@ namespace BalatroPhysics.Collision.Shapes
             dot = Vector3.Dot(points[2], direction);
             if (dot > min)
             {
-                min = dot;
                 minIndex = 2;
             }
 
-            result = points[minIndex] + expandVector;
+            return points[minIndex] + expandVector;
         }
 
         /// <summary>
@@ -314,7 +310,7 @@ namespace BalatroPhysics.Collision.Shapes
             box.AddPoint(rayOrigin);
             box.AddPoint(rayEnd);
 
-            return this.Prepare(box);
+            return Prepare(box);
         }
     }
 }

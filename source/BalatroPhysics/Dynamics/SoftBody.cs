@@ -279,7 +279,7 @@ namespace BalatroPhysics.Dynamics
                     owner.points[indices.I2].position - owner.points[indices.I0].position).Length();
             }
 
-            public void SupportMapping(Vector3 direction, out Vector3 result)
+            public Vector3 SupportMapping(Vector3 direction)
             {
 
                 float min = Vector3.Dot(owner.points[indices.I0].position, direction);
@@ -299,21 +299,15 @@ namespace BalatroPhysics.Dynamics
                     minVertex = owner.points[indices.I2].position;
                 }
 
-
-                Vector3 exp;
-                exp = Vector3.Normalize(direction);
-                exp *= owner.triangleExpansion;
-                result = minVertex + exp;
-
-
+                return minVertex + (Vector3.Normalize(direction) * owner.triangleExpansion);
             }
 
-            public void SupportCenter(out Vector3 center)
+            public Vector3 SupportCenter
             {
-                center = owner.points[indices.I0].position;
-                center += owner.points[indices.I1].position;
-                center += owner.points[indices.I2].position;
-                center *= 1.0f / 3.0f;
+                get
+                {
+                    return (owner.points[indices.I0].position + owner.points[indices.I1].position + owner.points[indices.I2].position) * (1.0f / 3.0f);
+                }
             }
         }
         #endregion

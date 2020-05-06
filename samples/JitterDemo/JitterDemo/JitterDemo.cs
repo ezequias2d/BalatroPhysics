@@ -379,11 +379,11 @@ namespace BalatroPhysicsDemo
                     Shape b2 = new BoxShape(new System.Numerics.Vector3(1, 1, 3));
                     Shape b3 = new CylinderShape(3.0f, 0.5f);
 
-                    CompoundShape.TransformedShape t1 = new CompoundShape.TransformedShape(b1, JMatrix.Identity, System.Numerics.Vector3.Zero);
-                    CompoundShape.TransformedShape t2 = new CompoundShape.TransformedShape(b2, JMatrix.Identity, System.Numerics.Vector3.Zero);
-                    CompoundShape.TransformedShape t3 = new CompoundShape.TransformedShape(b3, JMatrix.Identity, new System.Numerics.Vector3(0, 0, 0));
+                    TransformedShape t1 = new TransformedShape(b1, JMatrix.Identity, System.Numerics.Vector3.Zero);
+                    TransformedShape t2 = new TransformedShape(b2, JMatrix.Identity, System.Numerics.Vector3.Zero);
+                    TransformedShape t3 = new TransformedShape(b3, JMatrix.Identity, new System.Numerics.Vector3(0, 0, 0));
 
-                    CompoundShape ms = new CompoundShape(new CompoundShape.TransformedShape[3] { t1, t2, t3 });
+                    CompoundShape ms = new CompoundShape(new TransformedShape[3] { t1, t2, t3 });
 
                     body = new RigidBody(ms);
                     break;

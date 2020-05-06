@@ -47,11 +47,11 @@ namespace BalatroPhysics.Collision.Shapes
     {
 
         // internal values so we can access them fast  without calling properties.
-        internal JMatrix inertia = JMatrix.Identity;
-        internal float mass = 1.0f;
+        private JMatrix inertia = JMatrix.Identity;
+        private float mass = 1.0f;
 
-        internal JBBox boundingBox = JBBox.LargeBox;
-        internal Vector3 geomCen = Vector3.Zero;
+        private JBBox boundingBox = JBBox.LargeBox;
+        private Vector3 geomCen = Vector3.Zero;
 
         /// <summary>
         /// Gets called when the shape changes one of the parameters.
@@ -75,6 +75,20 @@ namespace BalatroPhysics.Collision.Shapes
         /// Gets the mass of the shape. This is the volume. (density = 1)
         /// </summary>
         public float Mass { get { return mass; } protected set { mass = value; } }
+
+        public Vector3 GeometricCenter { get; protected set; }
+
+        public Vector3 SupportCenter { get { return GeometricCenter; } }
+
+        protected (float mass, Vector3 ceter, JMatrix inertia) MassCenterInertia
+        {
+            set
+            {
+                Mass = value.mass;
+                GeometricCenter = value.ceter;
+                Inertia = value.inertia;
+            }
+        }
 
         /// <summary>
         /// Informs all listener that the shape changed.
@@ -160,9 +174,9 @@ namespace BalatroPhysics.Collision.Shapes
             {
                 ClipTriangle tri = activeTriList.Pop();
 
-                Vector3 p1; SupportMapping(tri.n1, out p1);
-                Vector3 p2; SupportMapping(tri.n2, out p2);
-                Vector3 p3; SupportMapping(tri.n3, out p3);
+                Vector3 p1 = SupportMapping(tri.n1);
+                Vector3 p2 = SupportMapping(tri.n2);
+                Vector3 p3 = SupportMapping(tri.n3);
 
                 float d1 = (p2 - p1).LengthSquared();
                 float d2 = (p3 - p2).LengthSquared();
@@ -236,28 +250,22 @@ namespace BalatroPhysics.Collision.Shapes
 
             Vector3 vec = Vector3.Zero;
 
-            vec = new Vector3(orientation.M11, orientation.M21, orientation.M31);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(orientation.M11, orientation.M21, orientation.M31));
             box.Max.X = orientation.M11 * vec.X + orientation.M21 * vec.Y + orientation.M31 * vec.Z;
 
-            vec = new Vector3(orientation.M12, orientation.M22, orientation.M32);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(orientation.M12, orientation.M22, orientation.M32));
             box.Max.Y = orientation.M12 * vec.X + orientation.M22 * vec.Y + orientation.M32 * vec.Z;
 
-            vec = new Vector3(orientation.M13, orientation.M23, orientation.M33);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(orientation.M13, orientation.M23, orientation.M33));
             box.Max.Z = orientation.M13 * vec.X + orientation.M23 * vec.Y + orientation.M33 * vec.Z;
 
-            vec = new Vector3(-orientation.M11, -orientation.M21, -orientation.M31);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(-orientation.M11, -orientation.M21, -orientation.M31));
             box.Min.X = orientation.M11 * vec.X + orientation.M21 * vec.Y + orientation.M31 * vec.Z;
 
-            vec = new Vector3(-orientation.M12, -orientation.M22, -orientation.M32);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(-orientation.M12, -orientation.M22, -orientation.M32));
             box.Min.Y = orientation.M12 * vec.X + orientation.M22 * vec.Y + orientation.M32 * vec.Z;
 
-            vec = new Vector3(-orientation.M13, -orientation.M23, -orientation.M33);
-            SupportMapping(vec, out vec);
+            vec = SupportMapping(new Vector3(-orientation.M13, -orientation.M23, -orientation.M33));
             box.Min.Z = orientation.M13 * vec.X + orientation.M23 * vec.Y + orientation.M33 * vec.Z;
         }
 
@@ -283,11 +291,11 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="inertia">Returns the inertia relative to the center of mass, not to the origin</param>
         /// <returns></returns>
         #region  public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass, out JMatrix inertia)
-        public static float CalculateMassInertia(Shape shape, out Vector3 centerOfMass,
-            out JMatrix inertia)
+        public static (float mass, Vector3 centerOfMass, JMatrix inertia) CalculateMassInertia(Shape shape)
         {
             float mass = 0.0f;
-            centerOfMass = Vector3.Zero; inertia = JMatrix.Zero;
+            Vector3 centerOfMass = Vector3.Zero;
+            JMatrix inertia = JMatrix.Zero;
 
             if (shape is Multishape) throw new ArgumentException("Can't calculate inertia of multishapes.", "shape");
 
@@ -339,7 +347,7 @@ namespace BalatroPhysics.Collision.Shapes
 
             JMatrix.Add(inertia, t, out inertia);
 
-            return mass;
+            return (mass, centerOfMass, inertia);
         }
         #endregion
         
@@ -350,7 +358,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public virtual void CalculateMassInertia()
         {
-            this.mass = Shape.CalculateMassInertia(this, out geomCen, out inertia);
+            MassCenterInertia = Shape.CalculateMassInertia(this);
         }
 
         /// <summary>
@@ -360,16 +368,6 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public abstract void SupportMapping(Vector3 direction, out Vector3 result);
-
-        /// <summary>
-        /// The center of the SupportMap.
-        /// </summary>
-        /// <param name="geomCenter">The center of the SupportMap.</param>
-        public void SupportCenter(out Vector3 geomCenter)
-        {
-            geomCenter = this.geomCen;
-        }
-
+        public abstract Vector3 SupportMapping(Vector3 direction);
     }
 }

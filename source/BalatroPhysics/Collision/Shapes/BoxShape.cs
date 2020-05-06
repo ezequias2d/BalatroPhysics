@@ -41,8 +41,15 @@ namespace BalatroPhysics.Collision.Shapes
         /// The sidelength of the box.
         /// </summary>
         public Vector3 Size { 
-            get { return size; }
-            set { size = value; UpdateShape(); }
+            get 
+            {
+                return size;
+            }
+            set 
+            {
+                size = value; 
+                UpdateShape();
+            }
         }
         
         /// <summary>
@@ -52,7 +59,7 @@ namespace BalatroPhysics.Collision.Shapes
         public BoxShape(Vector3 size)
         {
             this.size = size;
-            this.UpdateShape();
+            UpdateShape();
         }
 
         /// <summary>
@@ -63,10 +70,8 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="width">The width of the box</param>
         public BoxShape(float length, float height, float width)
         {
-            this.size.X = length;
-            this.size.Y = height;
-            this.size.Z = width;
-            this.UpdateShape();
+            size = new Vector3(length, height, width);
+            UpdateShape();
         }
 
         private Vector3 halfSize = Vector3.Zero;
@@ -79,7 +84,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void UpdateShape()
         {
-            this.halfSize = size * 0.5f;
+            halfSize = size * 0.5f;
             base.UpdateShape();
         }
 
@@ -91,9 +96,7 @@ namespace BalatroPhysics.Collision.Shapes
         public override void GetBoundingBox(JMatrix orientation, out JBBox box)
         {
             JMatrix abs; JMath.Absolute(orientation, out abs);
-            Vector3 temp;
-            JMath.Transform(halfSize, abs, out temp);
-
+            JMath.Transform(halfSize, abs, out Vector3 temp);
             box.Max = temp;
             box.Min = -temp;
         }
@@ -106,14 +109,13 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            mass = size.X * size.Y * size.Z;
+            Mass = size.X * size.Y * size.Z;
 
-            inertia = JMatrix.Identity;
-            inertia.M11 = (1.0f / 12.0f) * mass * (size.Y * size.Y + size.Z * size.Z);
-            inertia.M22 = (1.0f / 12.0f) * mass * (size.X * size.X + size.Z * size.Z);
-            inertia.M33 = (1.0f / 12.0f) * mass * (size.X * size.X + size.Y * size.Y);
+            Inertia = new JMatrix((1.0f / 12.0f) * Mass * (size.Y * size.Y + size.Z * size.Z),
+                                   (1.0f / 12.0f) * Mass * (size.X * size.X + size.Z * size.Z),
+                                   (1.0f / 12.0f) * Mass * (size.X * size.X + size.Y * size.Y));
 
-            this.geomCen = Vector3.Zero;
+            GeometricCenter = Vector3.Zero;
         }
 
         /// <summary>
@@ -123,11 +125,9 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
-            result.X = (float)Math.Sign(direction.X) * halfSize.X;
-            result.Y = (float)Math.Sign(direction.Y) * halfSize.Y;
-            result.Z = (float)Math.Sign(direction.Z) * halfSize.Z;
+            return halfSize * new Vector3(Math.Sign(direction.X), Math.Sign(direction.Y), Math.Sign(direction.Z));
         }
     }
 }

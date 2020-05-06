@@ -31,8 +31,16 @@ namespace BalatroPhysics.Collision.Shapes
 {
     public class MinkowskiSumShape : Shape
     {
-        Vector3 shifted;
-        List<Shape> shapes = new List<Shape>();
+        private Vector3 shifted;
+        private List<Shape> shapes = new List<Shape>();
+
+        public Vector3 Shift
+        {
+            get
+            {
+                return shifted;
+            }
+        }
 
         public MinkowskiSumShape(IEnumerable<Shape> shapes)
         {
@@ -47,7 +55,7 @@ namespace BalatroPhysics.Collision.Shapes
                 this.shapes.Add(shape);
             }
 
-            this.UpdateShape();
+            UpdateShape();
         }
 
         public void AddShape(Shape shape)
@@ -55,7 +63,7 @@ namespace BalatroPhysics.Collision.Shapes
             if (shape is Multishape) throw new Exception("Multishapes not supported by MinkowskiSumShape.");
             shapes.Add(shape);
 
-            this.UpdateShape();
+            UpdateShape();
         }
 
         public bool Remove(Shape shape)
@@ -66,27 +74,22 @@ namespace BalatroPhysics.Collision.Shapes
             return result;
         }
 
-        public Vector3 Shift()
-        {
-            return -1 * this.shifted;
-        }
-
         public override void CalculateMassInertia()
         {
-            this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);
+            MassCenterInertia = Shape.CalculateMassInertia(this);
+            shifted = -shifted;
         }
 
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
-            Vector3 temp1, temp2 = Vector3.Zero;
+            Vector3 temp1 = Vector3.Zero;
 
             for (int i = 0; i < shapes.Count; i++)
             {
-                shapes[i].SupportMapping(direction, out temp1);
-                temp2 += temp1;
+                temp1 += shapes[i].SupportMapping(direction);
             }
 
-            result = temp2 - shifted;
+            return temp1 + shifted;
         }
 
     }

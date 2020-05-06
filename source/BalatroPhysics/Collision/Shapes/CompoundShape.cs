@@ -36,81 +36,11 @@ namespace BalatroPhysics.Collision.Shapes
     /// </summary>
     public class CompoundShape : Multishape
     {
-        #region public struct TransformedShape
-
-        /// <summary>
-        /// Holds a 'sub' shape and it's transformation. This TransformedShape can
-        /// be added to the <see cref="CompoundShape"/>
-        /// </summary>
-        public struct TransformedShape
-        {
-            private Shape shape;
-            internal Vector3 position;
-            internal JMatrix orientation;
-            internal JMatrix invOrientation;
-            internal JBBox boundingBox;
-
-            /// <summary>
-            /// The 'sub' shape.
-            /// </summary>
-            public Shape Shape { get { return shape; } set { shape = value; } }
-
-            /// <summary>
-            /// The position of a 'sub' shape
-            /// </summary>
-            public Vector3 Position { get { return position; } set { position = value; UpdateBoundingBox(); } }
-
-            public JBBox BoundingBox { get { return boundingBox; } }
-
-            /// <summary>
-            /// The inverse orientation of the 'sub' shape.
-            /// </summary>
-            public JMatrix InverseOrientation
-            {
-                get { return invOrientation; }
-            }
-
-            /// <summary>
-            /// The orienation of the 'sub' shape.
-            /// </summary>
-            public JMatrix Orientation
-            {
-                get { return orientation; }
-                set { orientation = value; JMatrix.Transpose(orientation, out invOrientation); UpdateBoundingBox(); }
-            }
-
-            public void UpdateBoundingBox()
-            {
-                Shape.GetBoundingBox(orientation, out boundingBox);
-
-                boundingBox.Min += position;
-                boundingBox.Max += position;
-            }
-
-            /// <summary>
-            /// Creates a new instance of the TransformedShape struct.
-            /// </summary>
-            /// <param name="shape">The shape.</param>
-            /// <param name="orientation">The orientation this shape should have.</param>
-            /// <param name="position">The position this shape should have.</param>
-            public TransformedShape(Shape shape, JMatrix orientation, Vector3 position)
-            {
-                this.position = position;
-                this.orientation = orientation;
-                JMatrix.Transpose(orientation, out invOrientation);
-                this.shape = shape;
-                this.boundingBox = new JBBox();
-                UpdateBoundingBox();
-            }
-        }
-        #endregion
-
-        private TransformedShape[] shapes;
-
+        private TransformedShape[] _shapes;
         /// <summary>
         /// An array conaining all 'sub' shapes and their transforms.
         /// </summary>
-        public TransformedShape[] Shapes { get { return this.shapes; } }
+        public TransformedShape[] Shapes { get { return _shapes; } }
 
         Vector3 shifted;
         public Vector3 Shift { get { return -1.0f * this.shifted; } }
@@ -124,8 +54,8 @@ namespace BalatroPhysics.Collision.Shapes
         /// class.</param>
         public CompoundShape(List<TransformedShape> shapes)
         {
-            this.shapes = new TransformedShape[shapes.Count];
-            shapes.CopyTo(this.shapes);
+            _shapes = new TransformedShape[shapes.Count];
+            shapes.CopyTo(_shapes);
 
             if (!TestValidity()) 
                 throw new ArgumentException("Multishapes are not supported!");
@@ -135,8 +65,8 @@ namespace BalatroPhysics.Collision.Shapes
 
         public CompoundShape(TransformedShape[] shapes)
         {
-            this.shapes = new TransformedShape[shapes.Length];
-            Array.Copy(shapes, this.shapes, shapes.Length);
+            _shapes = new TransformedShape[shapes.Length];
+            Array.Copy(shapes, _shapes, shapes.Length);
 
             if (!TestValidity())
                 throw new ArgumentException("Multishapes are not supported!");
@@ -144,11 +74,21 @@ namespace BalatroPhysics.Collision.Shapes
             this.UpdateShape();
         }
 
+        private CompoundShape(ref TransformedShape[] shapes)
+        {
+            _shapes = shapes;
+
+            if (!TestValidity())
+                throw new ArgumentException("Multishapes are not supported!");
+
+            UpdateShape();
+        }
+
         private bool TestValidity()
         {
-            for (int i = 0; i < shapes.Length; i++)
+            for (int i = 0; i < Shapes.Length; i++)
             {
-                if (shapes[i].Shape is Multishape) return false;
+                if (Shapes[i].Shape is Multishape) return false;
             }
 
             return true;
@@ -158,14 +98,14 @@ namespace BalatroPhysics.Collision.Shapes
         {
             List<Vector3> triangles = new List<Vector3>();
 
-            for (int i = 0; i < shapes.Length; i++)
+            for (int i = 0; i < Shapes.Length; i++)
             {
-                shapes[i].Shape.MakeHull(triangles, 4);
+                Shapes[i].Shape.MakeHull(triangles, 4);
                 for (int e = 0; e < triangles.Count; e++)
                 {
                     Vector3 pos = triangles[e];
-                    JMath.Transform(pos,shapes[i].orientation,out pos);
-                    pos += shapes[i].position;
+                    JMath.Transform(pos, Shapes[i].Orientation,out pos);
+                    pos += Shapes[i].Position;
                     triangleList.Add(pos);
                 }
                 triangles.Clear();
@@ -178,16 +118,16 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         private void DoShifting()
         {
-            for (int i = 0; i < Shapes.Length; i++) shifted += Shapes[i].position;
-            shifted *= (1.0f / shapes.Length);
+            for (int i = 0; i < Shapes.Length; i++) shifted += Shapes[i].Position;
+            shifted *= (1.0f / Shapes.Length);
 
-            for (int i = 0; i < Shapes.Length; i++) Shapes[i].position -= shifted;
+            for (int i = 0; i < Shapes.Length; i++) Shapes[i].Position -= shifted;
         }
 
         public override void CalculateMassInertia()
         {
-            base.inertia = JMatrix.Zero;
-            base.mass = 0.0f;
+            Inertia = JMatrix.Zero;
+            Mass = 0.0f;
 
             for (int i = 0; i < Shapes.Length; i++)
             {
@@ -208,21 +148,14 @@ namespace BalatroPhysics.Collision.Shapes
                 currentInertia.M32 += -p.Y * p.Z * m;
                 currentInertia.M23 += -p.Y * p.Z * m;
 
-                base.inertia += currentInertia;
-                base.mass += m;
+                Inertia += currentInertia;
+                Mass += m;
             }
-        }
-
-
-        internal CompoundShape()
-        {
         }
 
         protected override Multishape CreateWorkingClone()
         {
-            CompoundShape clone = new CompoundShape();
-            clone.shapes = this.shapes;
-            return clone;
+            return new CompoundShape(ref _shapes);
         }
 
 
@@ -233,12 +166,16 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
-            JMath.Transform(direction, shapes[currentShape].invOrientation, out result);
-            shapes[currentShape].Shape.SupportMapping(direction, out result);
-            JMath.Transform(result, shapes[currentShape].orientation, out result);
-            result += shapes[currentShape].position;
+            Vector3 result;
+
+            JMath.Transform(direction, Shapes[currentShape].InverseOrientation, out result);
+            result = Shapes[currentShape].Shape.SupportMapping(direction);
+            JMath.Transform(result, Shapes[currentShape].Orientation, out result);
+            result += Shapes[currentShape].Position;
+
+            return result;
         }
 
         /// <summary>
@@ -277,8 +214,8 @@ namespace BalatroPhysics.Collision.Shapes
         public override void SetCurrentShape(int index)
         {
             currentShape = currentSubShapes[index];
-            shapes[currentShape].Shape.SupportCenter(out geomCen);
-            geomCen += shapes[currentShape].Position;
+            GeometricCenter = Shapes[currentShape].Shape.SupportCenter;
+            GeometricCenter += Shapes[currentShape].Position;
         }
 
         /// <summary>
@@ -292,9 +229,9 @@ namespace BalatroPhysics.Collision.Shapes
         {
             currentSubShapes.Clear();
 
-            for (int i = 0; i < shapes.Length; i++)
+            for (int i = 0; i < Shapes.Length; i++)
             {
-                if (shapes[i].boundingBox.Contains(box) != JBBox.ContainmentType.Disjoint)
+                if (Shapes[i].BoundingBox.Contains(box) != JBBox.ContainmentType.Disjoint)
                     currentSubShapes.Add(i);
             }
 
@@ -330,11 +267,11 @@ namespace BalatroPhysics.Collision.Shapes
             mInternalBBox.Min = new Vector3(float.MaxValue);
             mInternalBBox.Max = new Vector3(float.MinValue);
 
-            for (int i = 0; i < shapes.Length; i++)
+            for (int i = 0; i < Shapes.Length; i++)
             {
-                shapes[i].UpdateBoundingBox();
+                Shapes[i].UpdateBoundingBox();
 
-                JBBox.CreateMerged(mInternalBBox, shapes[i].boundingBox, out mInternalBBox);
+                JBBox.CreateMerged(mInternalBBox, Shapes[i].BoundingBox, out mInternalBBox);
             }
         }
     }

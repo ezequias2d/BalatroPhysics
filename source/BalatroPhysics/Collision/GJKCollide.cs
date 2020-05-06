@@ -51,7 +51,7 @@ namespace BalatroPhysics.Collision
             result.Y = ((direction.X * orientation.M21) + (direction.Y * orientation.M22)) + (direction.Z * orientation.M23);
             result.Z = ((direction.X * orientation.M31) + (direction.Y * orientation.M32)) + (direction.Z * orientation.M33);
 
-            support.SupportMapping(result, out result);
+            result = support.SupportMapping(result);
 
             float x = ((result.X * orientation.M11) + (result.Y * orientation.M21)) + (result.Z * orientation.M31);
             float y = ((result.X * orientation.M12) + (result.Y * orientation.M22)) + (result.Z * orientation.M32);
@@ -79,7 +79,7 @@ namespace BalatroPhysics.Collision
             SupportMapTransformed(support, orientation, position, point, out arbitraryPoint);
             arbitraryPoint = point - arbitraryPoint;
 
-            Vector3 r; support.SupportCenter(out r);
+            Vector3 r = support.SupportCenter;
             JMath.Transform(r, orientation, out r);
             r += position;
             r = point - r;

@@ -64,15 +64,20 @@ namespace BalatroPhysics.Collision.Shapes
 
         protected abstract Multishape CreateWorkingClone();
 
-        internal bool isClone = false;
+        public bool IsClone { get; private set; }
 
-        public bool IsClone { get{ return isClone;} }
+        private Stack<Multishape> workingCloneStack;
 
-        Stack<Multishape> workingCloneStack = new Stack<Multishape>();
+        public Multishape()
+        {
+            IsClone = false;
+            workingCloneStack = new Stack<Multishape>();
+        }
+
         public Multishape RequestWorkingClone()
         {
             Debug.Assert(this.workingCloneStack.Count<10, "Unusual size of the workingCloneStack. Forgot to call ReturnWorkingClone?");
-            Debug.Assert(!this.isClone, "Can't clone clones! Something wrong here!");
+            Debug.Assert(!this.IsClone, "Can't clone clones! Something wrong here!");
 
             Multishape multiShape;
 
@@ -85,7 +90,7 @@ namespace BalatroPhysics.Collision.Shapes
                     workingCloneStack.Push(multiShape);
                 }
                 multiShape = workingCloneStack.Pop();
-                multiShape.isClone = true;
+                multiShape.IsClone = true;
             }
 
             return multiShape;
@@ -99,7 +104,7 @@ namespace BalatroPhysics.Collision.Shapes
 
         public void ReturnWorkingClone()
         {
-            Debug.Assert(this.isClone, "Only clones can be returned!");
+            Debug.Assert(this.IsClone, "Only clones can be returned!");
             lock (workingCloneStack) { workingCloneStack.Push(this); }
         }
 
@@ -135,18 +140,19 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            geomCen = Vector3.Zero;
+            GeometricCenter = Vector3.Zero;
 
             // TODO: calc this right
-            inertia = JMatrix.Identity;
+            Inertia = JMatrix.Identity;
 
-            Vector3 size = boundingBox.Max - boundingBox.Min;
+            Vector3 size = BoundingBox.Max - BoundingBox.Min;
 
-            mass = size.X * size.Y * size.Z;
+            Mass = size.X * size.Y * size.Z;
 
-            inertia.M11 = (1.0f / 12.0f) * mass * (size.Y * size.Y + size.Z * size.Z);
-            inertia.M22 = (1.0f / 12.0f) * mass * (size.X * size.X + size.Z * size.Z);
-            inertia.M33 = (1.0f / 12.0f) * mass * (size.X * size.X + size.Y * size.Y);
+            Inertia = new JMatrix(
+                (1.0f / 12.0f) * Mass * (size.Y * size.Y + size.Z * size.Z),
+                (1.0f / 12.0f) * Mass * (size.X * size.X + size.Z * size.Z),
+                (1.0f / 12.0f) * Mass * (size.X * size.X + size.Y * size.Y));
         }
 
     }

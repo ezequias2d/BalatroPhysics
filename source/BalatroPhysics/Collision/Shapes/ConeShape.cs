@@ -35,17 +35,40 @@ namespace BalatroPhysics.Collision.Shapes
     /// </summary>
     public class ConeShape : Shape
     {
-        float height,radius;
+        private float height;
+        private float radius;
 
         /// <summary>
         /// The height of the cone.
         /// </summary>
-        public float Height { get { return height; } set { height = value; UpdateShape(); } }
+        public float Height 
+        { 
+            get 
+            { 
+                return height; 
+            } 
+            set 
+            { 
+                height = value; 
+                UpdateShape(); 
+            }
+        }
 
         /// <summary>
         /// The radius of the cone base.
         /// </summary>
-        public float Radius { get { return radius; } set { radius = value; UpdateShape(); } }
+        public float Radius 
+        { 
+            get 
+            { 
+                return radius; 
+            } 
+            set 
+            { 
+                radius = value; 
+                UpdateShape();
+            } 
+        }
 
         /// <summary>
         /// Initializes a new instance of the ConeShape class.
@@ -57,7 +80,7 @@ namespace BalatroPhysics.Collision.Shapes
             this.height = height;
             this.radius = radius;
 
-            this.UpdateShape();
+            UpdateShape();
         }
 
         public override void UpdateShape()
@@ -73,18 +96,18 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         public override void CalculateMassInertia()
         {
-            mass = (1.0f / 3.0f) * JMath.Pi * radius * radius * height;
+            Mass = (1.0f / 3.0f) * JMath.Pi * radius * radius * height;
 
             // inertia through center of mass axis.
-            inertia = JMatrix.Identity;
-            inertia.M11 = (3.0f / 80.0f) * mass * (radius * radius + 4 * height * height);
-            inertia.M22 = (3.0f / 10.0f) * mass * radius * radius;
-            inertia.M33 = (3.0f / 80.0f) * mass * (radius * radius + 4 * height * height);
+            Inertia = new JMatrix(
+                (3.0f / 80.0f) * Mass * (radius * radius + 4 * height * height),
+                (3.0f / 10.0f) * Mass * radius * radius,
+                (3.0f / 80.0f) * Mass * (radius * radius + 4 * height * height));
 
             // J_x=J_y=3/20 M (R^2+4 H^2)
 
             // the supportmap center is in the half height, the real geomcenter is:
-            geomCen = Vector3.Zero;
+            GeometricCenter = Vector3.Zero;
         }
 
         /// <summary>
@@ -94,28 +117,16 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
             float sigma = (float)Math.Sqrt((float)(direction.X * direction.X + direction.Z * direction.Z));
 
             if (direction.Y > direction.Length() * sina)
-            {
-                result.X = 0.0f;
-                result.Y = (2.0f / 3.0f) * height;
-                result.Z = 0.0f;
-            }
+                return new Vector3(0f, (2.0f / 3.0f) * height, 0f);
             else if (sigma > 0.0f)
-            {
-                result.X = radius * direction.X / sigma;
-                result.Y = -(1.0f / 3.0f) * height;
-                result.Z = radius * direction.Z / sigma;
-            }
+                return new Vector3(radius * direction.X / sigma, -(1.0f / 3.0f) * height, radius * direction.Z / sigma);
             else
-            {
-                result.X = 0.0f;
-                result.Y = -(1.0f / 3.0f) * height;
-                result.Z = 0.0f;
-            }
+                return new Vector3(0f, -(1.0f / 3.0f) * height, 0f);
 
         }
     }

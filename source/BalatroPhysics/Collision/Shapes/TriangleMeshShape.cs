@@ -60,9 +60,6 @@ namespace BalatroPhysics.Collision.Shapes
             this.octree = octree;
             UpdateShape();
         }
-
-        internal TriangleMeshShape() { }
-
  
         protected override Multishape CreateWorkingClone()
         {
@@ -145,7 +142,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
             Vector3 exp;
             exp = Vector3.Normalize(direction);
@@ -162,11 +159,10 @@ namespace BalatroPhysics.Collision.Shapes
             dot = Vector3.Dot(vecs[2], direction);
             if (dot > min)
             {
-                min = dot;
                 minIndex = 2;
             }
 
-            result = vecs[minIndex] + exp;
+            return vecs[minIndex] + exp;
         }
 
         /// <summary>
@@ -211,7 +207,7 @@ namespace BalatroPhysics.Collision.Shapes
             sum *= 1.0f / 3.0f;
 
       
-            geomCen = sum;
+            GeometricCenter = sum;
 
             sum = vecs[1] - vecs[0];
             normal = vecs[2] - vecs[0];

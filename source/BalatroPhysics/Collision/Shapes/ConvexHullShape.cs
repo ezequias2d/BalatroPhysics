@@ -50,11 +50,14 @@ namespace BalatroPhysics.Collision.Shapes
             UpdateShape();
         }
 
-        public Vector3 Shift { get { return -1 * this.shifted; } }
+        public Vector3 Shift { get { return shifted; } }
 
         public override void CalculateMassInertia()
         {
-            this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);
+            (float Mass, Vector3 Center, JMatrix Inertia) temp = Shape.CalculateMassInertia(this);
+            Mass = temp.Mass;
+            shifted = -temp.Center;
+            Inertia = temp.Inertia;
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(Vector3 direction, out Vector3 result)
+        public override Vector3 SupportMapping(Vector3 direction)
         {
             float maxDotProduct = float.MinValue;
             int maxIndex = 0;
@@ -80,7 +83,7 @@ namespace BalatroPhysics.Collision.Shapes
                 }
             }
 
-            result = vertices[maxIndex] - this.shifted;
+            return vertices[maxIndex] + shifted;
         }
     }
 }
