@@ -30,99 +30,40 @@ using BalatroPhysics.Collision;
 
 namespace BalatroPhysics.Dynamics
 {
-    /// <summary>
-    /// For easy access, Arbiters are stored in a Hashtable(ArbiterMap). 
-    /// To find the Arbiter fortwo RigidBodies, build an ArbiterKey for the two bodies
-    /// and use it as the lookup key for the ArbiterMap.
-    /// </summary>
-    public struct ArbiterKey
-    {
-        // internal values for faster access within the engine
-        internal RigidBody body1, body2;
-
-        /// <summary>
-        /// Initializes a new instance of the ArbiterKey class.
-        /// </summary>
-        /// <param name="body1"></param>
-        /// <param name="body2"></param>
-        public ArbiterKey(RigidBody body1, RigidBody body2)
-        {
-            this.body1 = body1;
-            this.body2 = body2;
-        }
-
-        /// <summary>
-        /// Don't call this, while the key is used in the arbitermap.
-        /// It changes the hashcode of this object.
-        /// </summary>
-        /// <param name="body1">The first body.</param>
-        /// <param name="body2">The second body.</param>
-        internal void SetBodies(RigidBody body1, RigidBody body2)
-        {
-            this.body1 = body1;
-            this.body2 = body2;
-        }
-
-        #region public override bool Equals(object obj)
-        /// <summary>
-        /// Checks if two objects are equal.
-        /// </summary>
-        /// <param name="obj">The object to check against.</param>
-        /// <returns>Returns true if they are equal, otherwise false.</returns>
-        public override bool Equals(object obj)
-        {
-            ArbiterKey other = (ArbiterKey)obj;
-            return (other.body1.Equals(body1) && other.body2.Equals(body2) ||
-                other.body1.Equals(body2) && other.body2.Equals(body1));
-        }
-        #endregion
-
-        #region public override int GetHashCode()
-        /// <summary>
-        /// Returns the hashcode of the ArbiterKey.
-        /// The hashcode is the same if an ArbiterKey contains the same bodies.
-        /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return body1.GetHashCode() + body2.GetHashCode();
-        }
-        #endregion
-
-
-    }
-
-    internal class ArbiterKeyComparer : IEqualityComparer<ArbiterKey>
-    {
-        public bool Equals(ArbiterKey x, ArbiterKey y)
-        {
-            return (x.body1.Equals(y.body1) && x.body2.Equals(y.body2) ||
-                x.body1.Equals(y.body2) && x.body2.Equals(y.body1));
-        }
-
-        public int GetHashCode(ArbiterKey obj)
-        {
-            return obj.body1.GetHashCode() + obj.body2.GetHashCode();
-        }
-    }
 
     /// <summary>
     /// The ArbiterMap is a dictionary which stores all arbiters.
     /// </summary>
-    public class ArbiterMap : IEnumerable
+    public class ArbiterMap : ICollection<Arbiter>
     {
-        private Dictionary<ArbiterKey, Arbiter> dictionary =
-            new Dictionary<ArbiterKey, Arbiter>(2048, arbiterKeyComparer);
+        private Dictionary<(RigidBody, RigidBody), Arbiter> dictionary =
+            new Dictionary<(RigidBody, RigidBody), Arbiter>(2048, arbiterKeyComparer);
 
-        private ArbiterKey lookUpKey;
-        private static ArbiterKeyComparer arbiterKeyComparer = new ArbiterKeyComparer();
+        private (RigidBody, RigidBody) lookUpKey;
+        private static Tuple2EqualityComparer<RigidBody> arbiterKeyComparer = new Tuple2EqualityComparer<RigidBody>();
+
+        public int Count
+        {
+            get
+            {
+                return dictionary.Count;
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the ArbiterMap class.
         /// </summary>
         public ArbiterMap()
         {
-            lookUpKey = new ArbiterKey(null,null);
+            lookUpKey = default((RigidBody, RigidBody));
         }
 
         /// <summary>
@@ -134,29 +75,24 @@ namespace BalatroPhysics.Dynamics
         /// <returns>Returns true if the arbiter could be found, otherwise false.</returns>
         public bool LookUpArbiter(RigidBody body1, RigidBody body2,out Arbiter arbiter)
         {
-            lookUpKey.SetBodies(body1, body2);
+            lookUpKey = (body1, body2);
             return dictionary.TryGetValue(lookUpKey, out arbiter);
         }
 
-        public Dictionary<ArbiterKey, Arbiter>.ValueCollection Arbiters
+        public void Add(Arbiter arbiter)
         {
-            get { return dictionary.Values; }
+            dictionary.Add((arbiter.body1, arbiter.body2), arbiter);
         }
 
-        internal void Add(ArbiterKey key, Arbiter arbiter)
-        {
-            dictionary.Add(key, arbiter);
-        }
-
-        internal void Clear()
+        public void Clear()
         {
             dictionary.Clear();
         }
 
-        internal void Remove(Arbiter arbiter)
+        public bool Remove(Arbiter arbiter)
         {
-            lookUpKey.SetBodies(arbiter.body1, arbiter.body2);
-            dictionary.Remove(lookUpKey);
+            lookUpKey = (arbiter.body1, arbiter.body2);
+            return dictionary.Remove(lookUpKey);
         }
 
         /// <summary>
@@ -165,15 +101,31 @@ namespace BalatroPhysics.Dynamics
         /// <param name="body1">The first body.</param>
         /// <param name="body2">The second body.</param>
         /// <returns>Returns true if the arbiter could be found, otherwise false.</returns>
-        public bool ContainsArbiter(RigidBody body1, RigidBody body2)
+        public bool Contains(RigidBody body1, RigidBody body2)
         {
-            lookUpKey.SetBodies(body1, body2);
+            lookUpKey = (body1, body2);
             return dictionary.ContainsKey(lookUpKey);
         }
 
-        public IEnumerator GetEnumerator()
+        public bool Contains(Arbiter arbiter)
+        {
+            lookUpKey = (arbiter.body1, arbiter.body2);
+            return dictionary.ContainsKey(lookUpKey);
+        }
+
+        public void CopyTo(Arbiter[] array, int arrayIndex)
+        {
+            dictionary.Values.CopyTo(array, arrayIndex);
+        }
+
+        public IEnumerator<Arbiter> GetEnumerator()
         {
             return dictionary.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 

@@ -416,7 +416,7 @@ namespace BalatroPhysicsDemo
             accUpdateTime = 0.0f;
 
             int contactCount = 0;
-            foreach (Arbiter ar in World.ArbiterMap.Arbiters)
+            foreach (Arbiter ar in World.ArbiterMap)
                 contactCount += ar.ContactList.Count;
 
 
@@ -424,7 +424,7 @@ namespace BalatroPhysicsDemo
 
             Display.DisplayText[0] = "Current Scene: " + PhysicScenes[currentScene].ToString();
             //
-            Display.DisplayText[2] = "Arbitercount: " + World.ArbiterMap.Arbiters.Count.ToString() + ";" + " Contactcount: " + contactCount.ToString();
+            Display.DisplayText[2] = "Arbitercount: " + World.ArbiterMap.Count.ToString() + ";" + " Contactcount: " + contactCount.ToString();
             Display.DisplayText[3] = "Islandcount: " + World.Islands.Count.ToString();
             Display.DisplayText[4] = "Bodycount: " + World.RigidBodies.Count + " (" + activeBodies.ToString() + ")";
             Display.DisplayText[5] = (multithread) ? "Multithreaded" : "Single Threaded";

@@ -120,7 +120,7 @@ namespace BalatroPhysics.Dynamics.Constraints
             jacobian[3] = -1.0f * Vector3.Cross(r2, t);         // angularVel Body2
 
             effectiveMass = body1.inverseMass + body2.inverseMass
-                + Vector3.Dot(JMath.Transform(jacobian[1], body1.invInertiaWorld), jacobian[10])
+                + Vector3.Dot(JMath.Transform(jacobian[1], body1.invInertiaWorld), jacobian[1])
                 + Vector3.Dot(JMath.Transform(jacobian[3], body2.invInertiaWorld), jacobian[3]);
 
             softnessOverDt = softness / timestep;

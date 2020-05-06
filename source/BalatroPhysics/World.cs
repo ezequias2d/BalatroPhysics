@@ -703,7 +703,7 @@ namespace BalatroPhysics
 
         private void UpdateContacts()
         {
-            foreach (Arbiter arbiter in arbiterMap.Arbiters)
+            foreach (Arbiter arbiter in arbiterMap)
             {
                 UpdateArbiterContacts(arbiter);
             }
@@ -891,7 +891,7 @@ namespace BalatroPhysics
                 {
                     arbiter = Arbiter.Pool.GetNew();
                     arbiter.body1 = body1; arbiter.body2 = body2;
-                    arbiterMap.Add(new ArbiterKey(body1, body2), arbiter);
+                    arbiterMap.Add(arbiter);
 
                     addedArbiterQueue.Enqueue(arbiter);
 
