@@ -27,7 +27,6 @@ using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Dynamics.Constraints;
 using System.Collections.ObjectModel;
-using BalatroPhysics.DataStructures;
 #endregion
 
 namespace BalatroPhysics.Collision
@@ -47,29 +46,22 @@ namespace BalatroPhysics.Collision
         /// <summary>
         /// Gets a read only list of <see cref="RigidBody"/> which are in contact with each other.
         /// </summary>
-        public ReadOnlyHashset<RigidBody> Bodies { get { return readOnlyBodies; } }
+        public IReadOnlyCollection<RigidBody> Bodies { get { return bodies; } }
 
         /// <summary>
         /// Gets a read only list of <see cref="Arbiter"/> which are involved in this island.
         /// </summary>
-        public ReadOnlyHashset<Arbiter> Arbiter { get { return readOnlyArbiter; } }
+        public IReadOnlyCollection<Arbiter> Arbiter { get { return arbiter; } }
 
         /// <summary>
         /// Gets a read only list of <see cref="Constraint"/> which are involved in this island.
         /// </summary>
-        public ReadOnlyHashset<Constraint> Constraints { get { return readOnlyConstraints; } }
-
-        private ReadOnlyHashset<RigidBody> readOnlyBodies;
-        private ReadOnlyHashset<Arbiter> readOnlyArbiter;
-        private ReadOnlyHashset<Constraint> readOnlyConstraints;
+        public IReadOnlyCollection<Constraint> Constraints { get { return constraints; } }
 
         /// Constructor of CollisionIsland class.
         /// </summary>
         public CollisionIsland()
         {
-            readOnlyBodies = new ReadOnlyHashset<RigidBody>(bodies);
-            readOnlyArbiter = new ReadOnlyHashset<Arbiter>(arbiter);
-            readOnlyConstraints = new ReadOnlyHashset<Constraint>(constraints);
         }
 
         /// <summary>

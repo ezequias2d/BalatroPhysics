@@ -64,7 +64,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
+        public override void SupportMapping(Vector3 direction, out Vector3 result)
         {
             float maxDotProduct = float.MinValue;
             int maxIndex = 0;

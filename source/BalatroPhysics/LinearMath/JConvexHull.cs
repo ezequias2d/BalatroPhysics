@@ -76,7 +76,7 @@ namespace BalatroPhysics.LinearMath
 
                     Vector3 dir = new Vector3(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi);
 
-                    int index = FindExtremePoint(pointCloud, ref dir);
+                    int index = FindExtremePoint(pointCloud, dir);
                     allIndices.Add(index);
                 }
             }
@@ -95,7 +95,7 @@ namespace BalatroPhysics.LinearMath
             // return allIndices.Distinct().ToArray();
         }
 
-        private static int FindExtremePoint(List<Vector3> points,ref Vector3 dir)
+        private static int FindExtremePoint(List<Vector3> points,Vector3 dir)
         {
             int index = 0;
             float current = float.MinValue;

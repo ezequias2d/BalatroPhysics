@@ -99,7 +99,7 @@ namespace BalatroPhysics.LinearMath
             JMatrix matrix;
             JQuaternion quaternion;
             JQuaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
-            CreateFromQuaternion(ref quaternion, out matrix);
+            CreateFromQuaternion(quaternion, out matrix);
             return matrix;
         }
 
@@ -249,7 +249,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix Multiply(JMatrix matrix1, JMatrix matrix2)
         {
             JMatrix result;
-            JMatrix.Multiply(ref matrix1, ref matrix2, out result);
+            JMatrix.Multiply(matrix1, matrix2, out result);
             return result;
         }
 
@@ -259,7 +259,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="matrix1">The first matrix.</param>
         /// <param name="matrix2">The second matrix.</param>
         /// <param name="result">The product of both matrices.</param>
-        public static void Multiply(ref JMatrix matrix1, ref JMatrix matrix2, out JMatrix result)
+        public static void Multiply(JMatrix matrix1, JMatrix matrix2, out JMatrix result)
         {
             float num0 = ((matrix1.M11 * matrix2.M11) + (matrix1.M12 * matrix2.M21)) + (matrix1.M13 * matrix2.M31);
             float num1 = ((matrix1.M11 * matrix2.M12) + (matrix1.M12 * matrix2.M22)) + (matrix1.M13 * matrix2.M32);
@@ -293,7 +293,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix Add(JMatrix matrix1, JMatrix matrix2)
         {
             JMatrix result;
-            JMatrix.Add(ref matrix1, ref matrix2, out result);
+            JMatrix.Add(matrix1, matrix2, out result);
             return result;
         }
 
@@ -303,7 +303,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="matrix1">The first matrix.</param>
         /// <param name="matrix2">The second matrix.</param>
         /// <param name="result">The sum of both matrices.</param>
-        public static void Add(ref JMatrix matrix1, ref JMatrix matrix2, out JMatrix result)
+        public static void Add(JMatrix matrix1, JMatrix matrix2, out JMatrix result)
         {
             result.M11 = matrix1.M11 + matrix2.M11;
             result.M12 = matrix1.M12 + matrix2.M12;
@@ -326,7 +326,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix Inverse(JMatrix matrix)
         {
             JMatrix result;
-            JMatrix.Inverse(ref matrix, out result);
+            JMatrix.Inverse(matrix, out result);
             return result;
         }
 
@@ -336,7 +336,7 @@ namespace BalatroPhysics.LinearMath
                    M31 * M22 * M13 - M32 * M23 * M11 - M33 * M21 * M12;
         }
 
-        public static void Invert(ref JMatrix matrix, out JMatrix result)
+        public static void Invert(JMatrix matrix, out JMatrix result)
         {
             float determinantInverse = 1 / matrix.Determinant();
             float m11 = (matrix.M22 * matrix.M33 - matrix.M23 * matrix.M32) * determinantInverse;
@@ -369,7 +369,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">The matrix to invert.</param>
         /// <param name="result">The inverted JMatrix.</param>
-        public static void Inverse(ref JMatrix matrix, out JMatrix result)
+        public static void Inverse(JMatrix matrix, out JMatrix result)
         {
             float det = matrix.M11 * matrix.M22 * matrix.M33 -
                 matrix.M11 * matrix.M23 * matrix.M32 -
@@ -412,7 +412,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix Multiply(JMatrix matrix1, float scaleFactor)
         {
             JMatrix result;
-            JMatrix.Multiply(ref matrix1, scaleFactor, out result);
+            JMatrix.Multiply(matrix1, scaleFactor, out result);
             return result;
         }
 
@@ -422,7 +422,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="matrix1">The matrix.</param>
         /// <param name="scaleFactor">The scale factor.</param>
         /// <param name="result">A JMatrix multiplied by the scale factor.</param>
-        public static void Multiply(ref JMatrix matrix1, float scaleFactor, out JMatrix result)
+        public static void Multiply(JMatrix matrix1, float scaleFactor, out JMatrix result)
         {
             float num = scaleFactor;
             result.M11 = matrix1.M11 * num;
@@ -447,7 +447,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix CreateFromQuaternion(JQuaternion quaternion)
         {
             JMatrix result;
-            JMatrix.CreateFromQuaternion(ref quaternion,out result);
+            JMatrix.CreateFromQuaternion(quaternion,out result);
             return result;
         }
 
@@ -456,7 +456,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="quaternion">The quaternion the matrix should be created from.</param>
         /// <param name="result">JMatrix representing an orientation.</param>
-        public static void CreateFromQuaternion(ref JQuaternion quaternion, out JMatrix result)
+        public static void CreateFromQuaternion(JQuaternion quaternion, out JMatrix result)
         {
             float num9 = quaternion.X * quaternion.X;
             float num8 = quaternion.Y * quaternion.Y;
@@ -488,7 +488,7 @@ namespace BalatroPhysics.LinearMath
         public static JMatrix Transpose(JMatrix matrix)
         {
             JMatrix result;
-            JMatrix.Transpose(ref matrix, out result);
+            JMatrix.Transpose(matrix, out result);
             return result;
         }
 
@@ -497,7 +497,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">The matrix which should be transposed.</param>
         /// <param name="result">The transposed JMatrix.</param>
-        public static void Transpose(ref JMatrix matrix, out JMatrix result)
+        public static void Transpose(JMatrix matrix, out JMatrix result)
         {
             result.M11 = matrix.M11;
             result.M12 = matrix.M21;
@@ -520,7 +520,7 @@ namespace BalatroPhysics.LinearMath
         #region public static JMatrix operator *(JMatrix value1,JMatrix value2)
         public static JMatrix operator *(JMatrix value1,JMatrix value2)
         {
-            JMatrix result; JMatrix.Multiply(ref value1, ref value2, out result);
+            JMatrix result; JMatrix.Multiply(value1, value2, out result);
             return result;
         }
         #endregion
@@ -540,7 +540,7 @@ namespace BalatroPhysics.LinearMath
         #region public static JMatrix operator +(JMatrix value1, JMatrix value2)
         public static JMatrix operator +(JMatrix value1, JMatrix value2)
         {
-            JMatrix result; JMatrix.Add(ref value1, ref value2, out result);
+            JMatrix result; JMatrix.Add(value1, value2, out result);
             return result;
         }
         #endregion
@@ -554,8 +554,8 @@ namespace BalatroPhysics.LinearMath
         #region public static JMatrix operator -(JMatrix value1, JMatrix value2)
         public static JMatrix operator -(JMatrix value1, JMatrix value2)
         {
-            JMatrix result; JMatrix.Multiply(ref value2, -1.0f, out value2);
-            JMatrix.Add(ref value1, ref value2, out result);
+            JMatrix result; JMatrix.Multiply(value2, -1.0f, out value2);
+            JMatrix.Add(value1, value2, out result);
             return result;
         }
         #endregion
@@ -567,8 +567,8 @@ namespace BalatroPhysics.LinearMath
         /// <param name="axis">The axis.</param>
         /// <param name="angle">The angle.</param>
         /// <param name="result">The resulting rotation matrix</param>
-        #region public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out JMatrix result)
-        public static void CreateFromAxisAngle(ref Vector3 axis, float angle, out JMatrix result)
+        #region public static void CreateFromAxisAngle(Vector3 axis, float angle, out JMatrix result)
+        public static void CreateFromAxisAngle(Vector3 axis, float angle, out JMatrix result)
         {
             float x = axis.X;
             float y = axis.Y;
@@ -600,7 +600,7 @@ namespace BalatroPhysics.LinearMath
         /// <returns>The resulting rotation matrix</returns>
         public static JMatrix CreateFromAxisAngle(Vector3 axis, float angle)
         {
-            JMatrix result; CreateFromAxisAngle(ref axis, angle, out result);
+            JMatrix result; CreateFromAxisAngle(axis, angle, out result);
             return result;
         }
 

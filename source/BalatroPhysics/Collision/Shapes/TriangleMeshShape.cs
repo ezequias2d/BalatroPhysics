@@ -79,7 +79,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="box">The bounding box where collision could occur.</param>
         /// <returns>The upper index with which <see cref="SetCurrentShape"/> can be 
         /// called.</returns>
-        public override int Prepare(ref JBBox box)
+        public override int Prepare(JBBox box)
         {
             potentialTriangles.Clear();
 
@@ -94,17 +94,17 @@ namespace BalatroPhysics.Collision.Shapes
             exp.Max.Z += sphericalExpansion;
             #endregion
 
-            octree.GetTrianglesIntersectingtAABox(potentialTriangles, ref exp);
+            octree.GetTrianglesIntersectingtAABox(potentialTriangles, exp);
 
             return potentialTriangles.Count;
         }
 
-        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
+        public override void MakeHull(List<Vector3> triangleList, int generationThreshold)
         {
             JBBox large = JBBox.LargeBox;
 
             List<int> indices = new List<int>();
-            octree.GetTrianglesIntersectingtAABox(indices, ref large);
+            octree.GetTrianglesIntersectingtAABox(indices, large);
 
             for (int i = 0; i < indices.Count; i++)
             {
@@ -121,7 +121,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayDelta"></param>
         /// <returns></returns>
-        public override int Prepare(ref Vector3 rayOrigin, ref Vector3 rayDelta)
+        public override int Prepare(Vector3 rayOrigin, Vector3 rayDelta)
         {
             potentialTriangles.Clear();
 
@@ -145,7 +145,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
+        public override void SupportMapping(Vector3 direction, out Vector3 result)
         {
             Vector3 exp;
             exp = Vector3.Normalize(direction);
@@ -175,7 +175,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(ref JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
         {
             box = octree.rootNodeBox;
 
@@ -188,7 +188,7 @@ namespace BalatroPhysics.Collision.Shapes
             box.Max.Z += sphericalExpansion;
             #endregion
 
-            box.Transform(ref orientation);
+            box.Transform(orientation);
         }
 
         private bool flipNormal = false;

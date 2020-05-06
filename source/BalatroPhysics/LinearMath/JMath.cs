@@ -183,8 +183,8 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">The matrix.</param>
         /// <param name="result">The absolute matrix.</param>
-        #region public static void Absolute(ref JMatrix matrix,out JMatrix result)
-        public static void Absolute(ref JMatrix matrix,out JMatrix result)
+        #region public static void Absolute(JMatrix matrix,out JMatrix result)
+        public static void Absolute(JMatrix matrix,out JMatrix result)
         {
             result.M11 = Math.Abs(matrix.M11);
             result.M12 = Math.Abs(matrix.M12);
@@ -204,7 +204,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <param name="result">The transformed vector.</param>
-        public static void Transform(ref Vector3 position, ref JMatrix matrix, out Vector3 result)
+        public static void Transform(Vector3 position, JMatrix matrix, out Vector3 result)
         {
             float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M21)) + (position.Z * matrix.M31);
             float num1 = ((position.X * matrix.M12) + (position.Y * matrix.M22)) + (position.Z * matrix.M32);
@@ -224,7 +224,7 @@ namespace BalatroPhysics.LinearMath
         public static Vector3 Transform(Vector3 position, JMatrix matrix)
         {
             Vector3 result;
-            JMath.Transform(ref position, ref matrix, out result);
+            JMath.Transform(position, matrix, out result);
             return result;
         }
 
@@ -234,7 +234,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <param name="result">The transformed vector.</param>
-        public static void TransposedTransform(ref Vector3 position, ref JMatrix matrix, out Vector3 result)
+        public static void TransposedTransform(Vector3 position, JMatrix matrix, out Vector3 result)
         {
             float num0 = ((position.X * matrix.M11) + (position.Y * matrix.M12)) + (position.Z * matrix.M13);
             float num1 = ((position.X * matrix.M21) + (position.Y * matrix.M22)) + (position.Z * matrix.M23);
@@ -259,7 +259,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="vector1">The first vector to swap with the second.</param>
         /// <param name="vector2">The second vector to swap with the first.</param>
-        public static void Swap(ref Vector3 vector1, ref Vector3 vector2)
+        public static void Swap(Vector3 vector1, Vector3 vector2)
         {
             float temp;
 

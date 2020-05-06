@@ -197,13 +197,13 @@ namespace BalatroPhysics.Collision
                 int nodeIndex = 0;
                 JBBox box = rootNodeBox;
 
-                while (box.Contains(ref triBoxes[triNum]) == JBBox.ContainmentType.Contains)
+                while (box.Contains(triBoxes[triNum]) == JBBox.ContainmentType.Contains)
                 {
                     int childCon = -1;
                     for (int i = 0; i < 8; ++i)
                     {
-                        CreateAABox(ref box, (EChild)i,out children[i]);
-                        if (children[i].Contains(ref triBoxes[triNum]) == JBBox.ContainmentType.Contains)
+                        CreateAABox(box, (EChild)i,out children[i]);
+                        if (children[i].Contains(triBoxes[triNum]) == JBBox.ContainmentType.Contains)
                         {
                             // this box contains the tri, it can be the only one that does,
                             // so we can stop our child search now and recurse into it
@@ -291,8 +291,8 @@ namespace BalatroPhysics.Collision
         /// <param name="aabb"></param>
         /// <param name="child"></param>
         /// <param name="result"></param>
-        #region  private void CreateAABox(ref JBBox aabb, EChild child,out JBBox result)
-        private void CreateAABox(ref JBBox aabb, EChild child,out JBBox result)
+        #region  private void CreateAABox(JBBox aabb, EChild child,out JBBox result)
+        private void CreateAABox(JBBox aabb, EChild child,out JBBox result)
         {
             Vector3 dims;
             dims = aabb.Max - aabb.Min;
@@ -331,8 +331,8 @@ namespace BalatroPhysics.Collision
         }
         #endregion
 
-        #region private void GatherTriangles(int nodeIndex, ref List<int> tris)
-        private void GatherTriangles(int nodeIndex, ref List<int> tris)
+        #region private void GatherTriangles(int nodeIndex, List<int> tris)
+        private void GatherTriangles(int nodeIndex, List<int> tris)
         {
             // add this nodes triangles
             tris.AddRange(nodes[nodeIndex].triIndices);
@@ -342,7 +342,7 @@ namespace BalatroPhysics.Collision
             for (int i = 0; i < numChildren; ++i)
             {
                 int childNodeIndex = nodes[nodeIndex].nodeIndices[i];
-                GatherTriangles(childNodeIndex, ref tris);
+                GatherTriangles(childNodeIndex, tris);
             }
         }
         #endregion
@@ -354,8 +354,8 @@ namespace BalatroPhysics.Collision
         /// <param name="triangles">The list to add the triangles to.</param>
         /// <param name="testBox">The axis alignes bounding box.</param>
         /// <returns></returns>
-        #region public int GetTrianglesIntersectingtAABox(List<int> triangles, ref JBBox testBox)
-        public int GetTrianglesIntersectingtAABox(List<int> triangles, ref JBBox testBox)
+        #region public int GetTrianglesIntersectingtAABox(List<int> triangles, JBBox testBox)
+        public int GetTrianglesIntersectingtAABox(List<int> triangles, JBBox testBox)
         {
             if (nodes.Length == 0)
                 return 0;
@@ -372,11 +372,11 @@ namespace BalatroPhysics.Collision
             {
                 UInt16 nodeIndex = nodeStack[curStackIndex];
                 curStackIndex++;
-                if (nodes[nodeIndex].box.Contains(ref testBox) != JBBox.ContainmentType.Disjoint)
+                if (nodes[nodeIndex].box.Contains(testBox) != JBBox.ContainmentType.Disjoint)
                 {
                     for (int i = 0; i < nodes[nodeIndex].triIndices.Length; ++i)
                     {
-                        if (triBoxes[nodes[nodeIndex].triIndices[i]].Contains(ref testBox) != JBBox.ContainmentType.Disjoint)
+                        if (triBoxes[nodes[nodeIndex].triIndices[i]].Contains(testBox) != JBBox.ContainmentType.Disjoint)
                         {
                             triangles.Add(nodes[nodeIndex].triIndices[i]);
                             triCount++;
@@ -423,11 +423,11 @@ namespace BalatroPhysics.Collision
             {
                 UInt16 nodeIndex = nodeStack[curStackIndex];
                 curStackIndex++;
-                if (nodes[nodeIndex].box.SegmentIntersect(ref rayOrigin, ref rayDelta))
+                if (nodes[nodeIndex].box.SegmentIntersect(rayOrigin, rayDelta))
                 {
                     for (int i = 0; i < nodes[nodeIndex].triIndices.Length; ++i)
                     {
-                        if (triBoxes[nodes[nodeIndex].triIndices[i]].SegmentIntersect(ref rayOrigin, ref rayDelta))
+                        if (triBoxes[nodes[nodeIndex].triIndices[i]].SegmentIntersect(rayOrigin, rayDelta))
                         {
                             triangles.Add(nodes[nodeIndex].triIndices[i]);
                             triCount++;

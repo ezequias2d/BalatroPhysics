@@ -71,7 +71,7 @@ namespace BalatroPhysicsDemo
                     // Transform them based on the relative bone location and the world if provided 
                     for (int i = 0; i != allVertex.Length; ++i)
                     {
-                        JMath.Transform(ref allVertex[i], ref xform, out allVertex[i]);
+                        JMath.Transform(allVertex[i], xform, out allVertex[i]);
                     }
                     // Store the transformed vertices with those from all the other meshes in this model 
                     vertices.AddRange(allVertex);

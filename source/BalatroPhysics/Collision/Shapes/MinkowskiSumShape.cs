@@ -76,13 +76,13 @@ namespace BalatroPhysics.Collision.Shapes
             this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);
         }
 
-        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
+        public override void SupportMapping(Vector3 direction, out Vector3 result)
         {
             Vector3 temp1, temp2 = Vector3.Zero;
 
             for (int i = 0; i < shapes.Count; i++)
             {
-                shapes[i].SupportMapping(ref direction, out temp1);
+                shapes[i].SupportMapping(direction, out temp1);
                 temp2 += temp1;
             }
 

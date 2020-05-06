@@ -27,7 +27,6 @@ using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Collision;
 using BalatroPhysics.Dynamics.Constraints;
-using BalatroPhysics.DataStructures;
 using System.Numerics;
 #endregion
 
@@ -83,9 +82,6 @@ namespace BalatroPhysics.Dynamics
 
         internal HashSet<Arbiter> arbiters = new HashSet<Arbiter>();
         internal HashSet<Constraint> constraints = new HashSet<Constraint>();
-
-        private ReadOnlyHashset<Arbiter> readOnlyArbiters;
-        private ReadOnlyHashset<Constraint> readOnlyConstraints;
 
         internal int marker = 0;
 
@@ -144,8 +140,6 @@ namespace BalatroPhysics.Dynamics
         /// Also contacts are only solved for the linear motion part.</param>
         public RigidBody(Shape shape, Material material, bool isParticle)
         {
-            readOnlyArbiters = new ReadOnlyHashset<Arbiter>(arbiters);
-            readOnlyConstraints = new ReadOnlyHashset<Constraint>(constraints);
 
             instance = Interlocked.Increment(ref instanceCount);
             hashCode = CalculateHash(instance);
@@ -188,8 +182,8 @@ namespace BalatroPhysics.Dynamics
             return hashCode;
         }
 
-        public ReadOnlyHashset<Arbiter> Arbiters { get { return readOnlyArbiters; } }
-        public ReadOnlyHashset<Constraint> Constraints { get { return readOnlyConstraints; } }
+        public IReadOnlyCollection<Arbiter> Arbiters { get { return arbiters; } }
+        public IReadOnlyCollection<Constraint> Constraints { get { return constraints; } }
 
         /// <summary>
         /// If set to false the body will never be deactived by the
@@ -262,9 +256,7 @@ namespace BalatroPhysics.Dynamics
             if (this.isStatic)
                 throw new InvalidOperationException("Can't apply an impulse to a static body.");
 
-            Vector3 temp;
-            temp = impulse * inverseMass;
-            linearVelocity += temp;
+            linearVelocity += impulse * inverseMass;
         }
 
         /// <summary>
@@ -279,12 +271,10 @@ namespace BalatroPhysics.Dynamics
             if (this.isStatic)
                 throw new InvalidOperationException("Can't apply an impulse to a static body.");
 
-            Vector3 temp;
-            temp = impulse * inverseMass;
-            linearVelocity += temp;
+            linearVelocity += impulse * inverseMass;
 
-            temp = Vector3.Cross(relativePosition, impulse);
-            JMath.Transform(ref temp, ref invInertiaWorld, out temp);
+            Vector3 temp = Vector3.Cross(relativePosition, impulse);
+            JMath.Transform(temp, invInertiaWorld, out temp);
             angularVelocity += temp;
         }
 
@@ -346,7 +336,7 @@ namespace BalatroPhysics.Dynamics
         public void SetMassProperties()
         {
             this.inertia = Shape.inertia;
-            JMatrix.Inverse(ref inertia, out invInertia);
+            JMatrix.Inverse(inertia, out invInertia);
             this.inverseMass = 1.0f / Shape.mass;
             useShapeMassProperties = true;
         }
@@ -366,7 +356,7 @@ namespace BalatroPhysics.Dynamics
                 if (!isParticle)
                 {
                     this.invInertia = inertia;
-                    JMatrix.Inverse(ref inertia, out this.inertia);
+                    JMatrix.Inverse(inertia, out this.inertia);
                 }
                 this.inverseMass = mass;
             }
@@ -375,7 +365,7 @@ namespace BalatroPhysics.Dynamics
                 if (!isParticle)
                 {
                     this.inertia = inertia;
-                    JMatrix.Inverse(ref inertia, out this.invInertia);
+                    JMatrix.Inverse(inertia, out this.invInertia);
                 }
                 this.inverseMass = 1.0f / mass;
             }
@@ -530,8 +520,8 @@ namespace BalatroPhysics.Dynamics
                 // scale inertia
                 if (!isParticle)
                 {
-                    JMatrix.Multiply(ref Shape.inertia, value / Shape.mass, out inertia);
-                    JMatrix.Inverse(ref inertia, out invInertia);
+                    JMatrix.Multiply(Shape.inertia, value / Shape.mass, out inertia);
+                    JMatrix.Inverse(inertia, out invInertia);
                 }
 
                 inverseMass = 1.0f / value;
@@ -595,16 +585,16 @@ namespace BalatroPhysics.Dynamics
             else
             {
                 // Given: Orientation, Inertia
-                JMatrix.Transpose(ref orientation, out invOrientation);
-                this.Shape.GetBoundingBox(ref orientation, out boundingBox);
+                JMatrix.Transpose(orientation, out invOrientation);
+                this.Shape.GetBoundingBox(orientation, out boundingBox);
                 boundingBox.Min += position;
                 boundingBox.Max += position;
 
 
                 if (!isStatic)
                 {
-                    JMatrix.Multiply(ref invOrientation, ref invInertia, out invInertiaWorld);
-                    JMatrix.Multiply(ref invInertiaWorld, ref orientation, out invInertiaWorld);
+                    JMatrix.Multiply(invOrientation, invInertia, out invInertiaWorld);
+                    JMatrix.Multiply(invInertiaWorld, orientation, out invInertiaWorld);
                 }
             }
         }
@@ -657,7 +647,7 @@ namespace BalatroPhysics.Dynamics
         {
             hullPoints.Clear();
 
-            if(enableDebugDraw) shape.MakeHull(ref hullPoints, 3);
+            if(enableDebugDraw) shape.MakeHull(hullPoints, 3);
         }
 
 
@@ -671,13 +661,13 @@ namespace BalatroPhysics.Dynamics
                 pos2 = hullPoints[i + 1];
                 pos3 = hullPoints[i + 2];
 
-                JMath.Transform(ref pos1, ref orientation, out pos1);
+                JMath.Transform(pos1, orientation, out pos1);
                 pos1 += position;
 
-                JMath.Transform(ref pos2, ref orientation, out pos2);
+                JMath.Transform(pos2, orientation, out pos2);
                 pos2 += position;
 
-                JMath.Transform(ref pos3, ref orientation, out pos3);
+                JMath.Transform(pos3, orientation, out pos3);
                 pos3 += position;
 
                 drawer.DrawTriangle(pos1, pos2, pos3);

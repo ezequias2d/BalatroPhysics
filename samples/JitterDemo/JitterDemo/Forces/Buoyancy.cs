@@ -22,7 +22,7 @@ namespace BalatroPhysics.Forces
         /// </summary>
         /// <param name="point">The point.</param>
         /// <returns>True if the given point is within the area.</returns>
-        public delegate bool DefineFluidArea(ref System.Numerics.Vector3 point);
+        public delegate bool DefineFluidArea(System.Numerics.Vector3 point);
 
         private Dictionary<Shape, System.Numerics.Vector3[]> samples = new Dictionary<Shape, System.Numerics.Vector3[]>();
         private List<RigidBody> bodies = new List<RigidBody>();
@@ -124,7 +124,7 @@ namespace BalatroPhysics.Forces
             if (ms != null)
             {
                 JBBox largeBox = JBBox.LargeBox;
-                values = ms.Prepare(ref largeBox);
+                values = ms.Prepare(largeBox);
             }
 
             for (int i = 0; i < subdivisions; i++)
@@ -148,8 +148,8 @@ namespace BalatroPhysics.Forces
                                 ms.SetCurrentShape(j);
 
                
-                                if (GJKCollide.Pointcast(body.Shape, ref ident,
-                                    ref zero, ref testVector))
+                                if (GJKCollide.Pointcast(body.Shape, ident,
+                                    zero, testVector))
                                 {
                                     massPoints.Add(testVector);
                                 }
@@ -157,8 +157,8 @@ namespace BalatroPhysics.Forces
                         }
                         else
                         {
-                            if (GJKCollide.Pointcast(body.Shape,ref ident,
-                                ref zero, ref testVector))
+                            if (GJKCollide.Pointcast(body.Shape,ident,
+                                zero, testVector))
                             {
                                 massPoints.Add(testVector);
                             }
@@ -196,8 +196,8 @@ namespace BalatroPhysics.Forces
 
                         bool containsCoord = false;
 
-                        if (fluidArea == null) containsCoord = FluidBox.Contains(ref currentCoord) != JBBox.ContainmentType.Disjoint;
-                        else containsCoord = fluidArea(ref currentCoord);
+                        if (fluidArea == null) containsCoord = FluidBox.Contains(currentCoord) != JBBox.ContainmentType.Disjoint;
+                        else containsCoord = fluidArea(currentCoord);
 
                         if (containsCoord)
                         {

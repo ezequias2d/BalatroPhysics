@@ -122,11 +122,11 @@ namespace BalatroPhysics.Dynamics.Constraints
             effectiveMass.M22 += softnessOverDt;
             effectiveMass.M33 += softnessOverDt;
 
-            JMatrix.Inverse(ref effectiveMass, out effectiveMass);
+            JMatrix.Inverse(effectiveMass, out effectiveMass);
 
             JMatrix orientationDifference;
-            JMatrix.Multiply(ref initialOrientation1, ref initialOrientation2, out orientationDifference);
-            JMatrix.Transpose(ref orientationDifference, out orientationDifference);
+            JMatrix.Multiply(initialOrientation1, initialOrientation2, out orientationDifference);
+            JMatrix.Transpose(orientationDifference, out orientationDifference);
 
             JMatrix q = orientationDifference * body2.invOrientation * body1.orientation;
             Vector3 axis;

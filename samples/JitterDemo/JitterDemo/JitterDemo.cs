@@ -19,7 +19,6 @@ using System.Diagnostics;
 
 using SingleBodyConstraints = BalatroPhysics.Dynamics.Constraints.SingleBody;
 using System.IO;
-using BalatroPhysics.DataStructures;
 #endregion
 
 namespace BalatroPhysicsDemo
@@ -520,10 +519,10 @@ namespace BalatroPhysicsDemo
                     System.Numerics.Vector3 pos = ts.Position;
                     JMatrix ori = ts.Orientation;
 
-                    JMath.Transform(ref pos,ref orientation,out pos);
+                    JMath.Transform(pos, orientation,out pos);
                     pos += position;
 
-                    JMatrix.Multiply(ref ori, ref orientation, out ori);
+                    JMatrix.Multiply(ori, orientation, out ori);
 
                     AddShapeToDrawList(ts.Shape, ori, pos);
                 }

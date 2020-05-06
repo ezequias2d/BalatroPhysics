@@ -39,19 +39,19 @@ namespace BalatroPhysics.Collision
 
         private static ResourcePool<VoronoiSimplexSolver> simplexSolverPool = new ResourcePool<VoronoiSimplexSolver>();
 
-        #region private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref Vector3 position, ref Vector3 direction, out Vector3 result)
-        private static void SupportMapTransformed(ISupportMappable support, ref JMatrix orientation, ref Vector3 position, ref Vector3 direction, out Vector3 result)
+        #region private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
+        private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
         {
-            //JMath.Transform(ref direction, ref invOrientation, out result);
-            //support.SupportMapping(ref result, out result);
-            //JMath.Transform(ref result, ref orientation, out result);
-            //Vector3.Add(ref result, ref position, out result);
+            //JMath.Transform(direction, invOrientation, out result);
+            //support.SupportMapping(result, out result);
+            //JMath.Transform(result, orientation, out result);
+            //Vector3.Add(result, position, out result);
 
             result.X = ((direction.X * orientation.M11) + (direction.Y * orientation.M12)) + (direction.Z * orientation.M13);
             result.Y = ((direction.X * orientation.M21) + (direction.Y * orientation.M22)) + (direction.Z * orientation.M23);
             result.Z = ((direction.X * orientation.M31) + (direction.Y * orientation.M32)) + (direction.Z * orientation.M33);
 
-            support.SupportMapping(ref result, out result);
+            support.SupportMapping(result, out result);
 
             float x = ((result.X * orientation.M11) + (result.Y * orientation.M21)) + (result.Z * orientation.M31);
             float y = ((result.X * orientation.M12) + (result.Y * orientation.M22)) + (result.Z * orientation.M32);
@@ -72,15 +72,15 @@ namespace BalatroPhysics.Collision
         /// <param name="position">The position of the shape.</param>
         /// <param name="point">The point to check.</param>
         /// <returns>Returns true if the point is within the shape, otherwise false.</returns>
-        public static bool Pointcast(ISupportMappable support, ref JMatrix orientation,ref Vector3 position,ref Vector3 point)
+        public static bool Pointcast(ISupportMappable support, JMatrix orientation,Vector3 position,Vector3 point)
         {
             Vector3 arbitraryPoint; 
 
-            SupportMapTransformed(support, ref orientation, ref position, ref point, out arbitraryPoint);
+            SupportMapTransformed(support, orientation, position, point, out arbitraryPoint);
             arbitraryPoint = point - arbitraryPoint;
 
             Vector3 r; support.SupportCenter(out r);
-            JMath.Transform(ref r, ref orientation, out r);
+            JMath.Transform(r, orientation, out r);
             r += position;
             r = point - r;
 
@@ -100,7 +100,7 @@ namespace BalatroPhysics.Collision
 
             while ((dist > epsilon) && (maxIter-- != 0))
             {
-                SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
+                SupportMapTransformed(support, orientation, position, v, out p);
                 w = x - p;
 
                 float VdotW = Vector3.Dot(v, w);
@@ -124,8 +124,8 @@ namespace BalatroPhysics.Collision
         }
 
 
-        public static bool ClosestPoints(ISupportMappable support1, ISupportMappable support2, ref JMatrix orientation1,
-            ref JMatrix orientation2, ref Vector3 position1, ref Vector3 position2,
+        public static bool ClosestPoints(ISupportMappable support1, ISupportMappable support2, JMatrix orientation1,
+            JMatrix orientation2, Vector3 position1, Vector3 position2,
             out Vector3 p1, out Vector3 p2, out Vector3 normal)
         {
 
@@ -142,10 +142,10 @@ namespace BalatroPhysics.Collision
 
             rn = Vector3.Negate(r);
 
-            SupportMapTransformed(support1, ref orientation1, ref position1, ref rn, out supVertexA);
+            SupportMapTransformed(support1, orientation1, position1, rn, out supVertexA);
 
             Vector3 supVertexB;
-            SupportMapTransformed(support2, ref orientation2, ref position2, ref r, out supVertexB);
+            SupportMapTransformed(support2, orientation2, position2, r, out supVertexB);
 
             v = supVertexA - supVertexB;
 
@@ -159,8 +159,8 @@ namespace BalatroPhysics.Collision
             while ((distSq > epsilon) && (maxIter-- != 0))
             {
                 vn = Vector3.Negate(v);
-                SupportMapTransformed(support1, ref orientation1, ref position1, ref vn, out supVertexA);
-                SupportMapTransformed(support2, ref orientation2, ref position2, ref v, out supVertexB);
+                SupportMapTransformed(support1, orientation1, position1, vn, out supVertexA);
+                SupportMapTransformed(support2, orientation2, position2, v, out supVertexB);
                 w = supVertexA - supVertexB;
 
                 if (!simplexSolver.InSimplex(w)) simplexSolver.AddVertex(w, supVertexA, supVertexB);
@@ -185,8 +185,8 @@ namespace BalatroPhysics.Collision
         }
 
         #region TimeOfImpact Conservative Advancement - Depricated
-    //    public static bool TimeOfImpact(ISupportMappable support1, ISupportMappable support2, ref JMatrix orientation1,
-    //ref JMatrix orientation2, ref Vector3 position1, ref Vector3 position2, ref Vector3 sweptA, ref Vector3 sweptB,
+    //    public static bool TimeOfImpact(ISupportMappable support1, ISupportMappable support2, JMatrix orientation1,
+    //JMatrix orientation2, Vector3 position1, Vector3 position2, Vector3 sweptA, Vector3 sweptB,
     //out Vector3 p1, out Vector3 p2, out Vector3 normal)
     //    {
 
@@ -205,10 +205,10 @@ namespace BalatroPhysics.Collision
 
     //        Vector3 supVertexA;
     //        Vector3 rn = Vector3.Negate(r);
-    //        SupportMapTransformed(support1, ref orientation1, ref x1, ref rn, out supVertexA);
+    //        SupportMapTransformed(support1, orientation1, x1, rn, out supVertexA);
 
     //        Vector3 supVertexB;
-    //        SupportMapTransformed(support2, ref orientation2, ref x2, ref r, out supVertexB);
+    //        SupportMapTransformed(support2, orientation2, x2, r, out supVertexB);
 
     //        v = supVertexA - supVertexB;
 
@@ -230,15 +230,15 @@ namespace BalatroPhysics.Collision
     //        {
 
     //            Vector3 vn = Vector3.Negate(v);
-    //            SupportMapTransformed(support1, ref orientation1, ref x1, ref vn, out supVertexA);
-    //            SupportMapTransformed(support2, ref orientation2, ref x2, ref v, out supVertexB);
+    //            SupportMapTransformed(support1, orientation1, x1, vn, out supVertexA);
+    //            SupportMapTransformed(support2, orientation2, x2, v, out supVertexB);
     //            w = supVertexA - supVertexB;
 
-    //            float VdotW = Vector3.Dot(ref v, ref w);
+    //            float VdotW = Vector3.Dot(v, w);
 
     //            if (VdotW > 0.0f)
     //            {
-    //                VdotR = Vector3.Dot(ref v, ref r);
+    //                VdotR = Vector3.Dot(v, r);
 
     //                if (VdotR >= -JMath.Epsilon)
     //                {
@@ -302,8 +302,8 @@ namespace BalatroPhysics.Collision
         /// ray the collision occured. The hitPoint is calculated by: origin+friction*direction.</param>
         /// <param name="normal">The normal from the ray collision.</param>
         /// <returns>Returns true if the ray hit the shape, false otherwise.</returns>
-        public static bool Raycast(ISupportMappable support, ref JMatrix orientation, ref JMatrix invOrientation,
-            ref Vector3 position,ref Vector3 origin,ref Vector3 direction, out float fraction, out Vector3 normal)
+        public static bool Raycast(ISupportMappable support, JMatrix orientation, JMatrix invOrientation,
+            Vector3 position,Vector3 origin,Vector3 direction, out float fraction, out Vector3 normal)
         {
             VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
             simplexSolver.Reset();
@@ -318,7 +318,7 @@ namespace BalatroPhysics.Collision
             Vector3 w, p, v;
 
             Vector3 arbitraryPoint; 
-            SupportMapTransformed(support, ref orientation, ref position, ref r, out arbitraryPoint);
+            SupportMapTransformed(support, orientation, position, r, out arbitraryPoint);
             v = x - arbitraryPoint;
 
             int maxIter = MaxIterations;
@@ -330,7 +330,7 @@ namespace BalatroPhysics.Collision
 
             while ((distSq > epsilon) && (maxIter-- != 0))
             {
-                SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
+                SupportMapTransformed(support, orientation, position, v, out p);
                 w = x - p;
 
                 float VdotW = Vector3.Dot(v, w);
@@ -704,7 +704,7 @@ namespace BalatroPhysics.Collision
                             b = _simplexVectorW[1];
                             c = _simplexVectorW[2];
 
-                            ClosestPtPointTriangle(p, a, b, c, ref _cachedBC);
+                            ClosestPtPointTriangle(p, a, b, c, _cachedBC);
                             _cachedPA = _simplexPointsP[0] * _cachedBC.BarycentricCoords[0] +
                                             _simplexPointsP[1] * _cachedBC.BarycentricCoords[1] +
                                             _simplexPointsP[2] * _cachedBC.BarycentricCoords[2] +
@@ -727,7 +727,7 @@ namespace BalatroPhysics.Collision
                             c = _simplexVectorW[2];
                             d = _simplexVectorW[3];
 
-                            bool hasSeperation = ClosestPtPointTetrahedron(p, a, b, c, d, ref _cachedBC);
+                            bool hasSeperation = ClosestPtPointTetrahedron(p, a, b, c, d, _cachedBC);
 
                             if (hasSeperation)
                             {
@@ -773,7 +773,7 @@ namespace BalatroPhysics.Collision
             }
 
             public bool ClosestPtPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c,
-                ref SubSimplexClosestResult result)
+                SubSimplexClosestResult result)
             {
                 result.UsedVertices.Reset();
 
@@ -887,7 +887,7 @@ namespace BalatroPhysics.Collision
             }
 
             public bool ClosestPtPointTetrahedron(Vector3 p, Vector3 a, Vector3 b, Vector3 c, Vector3 d,
-                ref SubSimplexClosestResult finalResult)
+                SubSimplexClosestResult finalResult)
             {
                 tempResult.Reset();
 
@@ -917,7 +917,7 @@ namespace BalatroPhysics.Collision
                 // If point outside face abc then compute closest point on abc
                 if (pointOutsideABC != 0)
                 {
-                    ClosestPtPointTriangle(p, a, b, c, ref tempResult);
+                    ClosestPtPointTriangle(p, a, b, c, tempResult);
                     Vector3 q = tempResult.ClosestPointOnSimplex;
 
                     float sqDist = ((Vector3)(q - p)).LengthSquared();
@@ -942,7 +942,7 @@ namespace BalatroPhysics.Collision
                 // Repeat test for face acd
                 if (pointOutsideACD != 0)
                 {
-                    ClosestPtPointTriangle(p, a, c, d, ref tempResult);
+                    ClosestPtPointTriangle(p, a, c, d, tempResult);
                     Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
 
@@ -966,7 +966,7 @@ namespace BalatroPhysics.Collision
 
                 if (pointOutsideADB != 0)
                 {
-                    ClosestPtPointTriangle(p, a, d, b, ref tempResult);
+                    ClosestPtPointTriangle(p, a, d, b, tempResult);
                     Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
 
@@ -991,7 +991,7 @@ namespace BalatroPhysics.Collision
 
                 if (pointOutsideBDC != 0)
                 {
-                    ClosestPtPointTriangle(p, b, d, c, ref tempResult);
+                    ClosestPtPointTriangle(p, b, d, c, tempResult);
                     Vector3 q = tempResult.ClosestPointOnSimplex;
                     //convert result bitmask!
                     float sqDist = ((Vector3)(q - p)).LengthSquared();

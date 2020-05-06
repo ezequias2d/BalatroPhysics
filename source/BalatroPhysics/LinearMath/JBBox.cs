@@ -100,7 +100,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="position"></param>
         /// <param name="orientation"></param>
         /// <param name="result"></param>
-        internal void InverseTransform(ref Vector3 position, ref JMatrix orientation)
+        internal void InverseTransform(Vector3 position, JMatrix orientation)
         {
             Max -= position;
             Min -= position;
@@ -109,24 +109,24 @@ namespace BalatroPhysics.LinearMath
 
             Vector3 halfExtents = (Max - Min) * 0.5f;
 
-            JMath.TransposedTransform(ref center, ref orientation, out center);
+            JMath.TransposedTransform(center, orientation, out center);
 
-            JMatrix abs; JMath.Absolute(ref orientation, out abs);
-            JMath.TransposedTransform(ref halfExtents, ref abs, out halfExtents);
+            JMatrix abs; JMath.Absolute(orientation, out abs);
+            JMath.TransposedTransform(halfExtents, abs, out halfExtents);
 
             Max = center + halfExtents;
             Min = center - halfExtents;
         }
 
-        public void Transform(ref JMatrix orientation)
+        public void Transform(JMatrix orientation)
         {
             Vector3 halfExtents = 0.5f * (Max - Min);
             Vector3 center = 0.5f * (Max + Min);
 
-            JMath.Transform(ref center, ref orientation, out center);
+            JMath.Transform(center, orientation, out center);
 
-            JMatrix abs; JMath.Absolute(ref orientation, out abs);
-            JMath.Transform(ref halfExtents, ref abs, out halfExtents);
+            JMatrix abs; JMath.Absolute(orientation, out abs);
+            JMath.Transform(halfExtents, abs, out halfExtents);
 
             Max = center + halfExtents;
             Min = center - halfExtents;
@@ -140,7 +140,7 @@ namespace BalatroPhysics.LinearMath
         #region public Ray/Segment Intersection
 
         private bool Intersect1D(float start, float dir, float min, float max,
-            ref float enter,ref float exit)
+            float enter,float exit)
         {
             if (dir * dir < JMath.Epsilon * JMath.Epsilon) return (start >= min && start <= max);
 
@@ -157,56 +157,36 @@ namespace BalatroPhysics.LinearMath
         }
 
 
-        public bool SegmentIntersect(ref Vector3 origin,ref Vector3 direction)
+        public bool SegmentIntersect(Vector3 origin,Vector3 direction)
         {
             float enter = 0.0f, exit = 1.0f;
 
-            if (!Intersect1D(origin.X, direction.X, Min.X, Max.X,ref enter,ref exit))
+            if (!Intersect1D(origin.X, direction.X, Min.X, Max.X,enter,exit))
                 return false;
 
-            if (!Intersect1D(origin.Y, direction.Y, Min.Y, Max.Y, ref enter, ref exit))
+            if (!Intersect1D(origin.Y, direction.Y, Min.Y, Max.Y, enter, exit))
                 return false;
 
-            if (!Intersect1D(origin.Z, direction.Z, Min.Z, Max.Z,ref enter,ref exit))
-                return false;
-
-            return true;
-        }
-
-        public bool RayIntersect(ref Vector3 origin, ref Vector3 direction)
-        {
-            float enter = 0.0f, exit = float.MaxValue;
-
-            if (!Intersect1D(origin.X, direction.X, Min.X, Max.X, ref enter, ref exit))
-                return false;
-
-            if (!Intersect1D(origin.Y, direction.Y, Min.Y, Max.Y, ref enter, ref exit))
-                return false;
-
-            if (!Intersect1D(origin.Z, direction.Z, Min.Z, Max.Z, ref enter, ref exit))
+            if (!Intersect1D(origin.Z, direction.Z, Min.Z, Max.Z,enter,exit))
                 return false;
 
             return true;
-        }
-
-        public bool SegmentIntersect(Vector3 origin, Vector3 direction)
-        {
-            return SegmentIntersect(ref origin, ref direction);
         }
 
         public bool RayIntersect(Vector3 origin, Vector3 direction)
         {
-            return RayIntersect(ref origin, ref direction);
-        }
+            float enter = 0.0f, exit = float.MaxValue;
 
-        /// <summary>
-        /// Checks wether a point is within a box or not.
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public ContainmentType Contains(Vector3 point)
-        {
-            return this.Contains(ref point);
+            if (!Intersect1D(origin.X, direction.X, Min.X, Max.X, enter, exit))
+                return false;
+
+            if (!Intersect1D(origin.Y, direction.Y, Min.Y, Max.Y, enter, exit))
+                return false;
+
+            if (!Intersect1D(origin.Z, direction.Z, Min.Z, Max.Z, enter, exit))
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -215,7 +195,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="point">A point in space.</param>
         /// <returns>The ContainmentType of the point.</returns>
-        public ContainmentType Contains(ref Vector3 point)
+        public ContainmentType Contains(Vector3 point)
         {
             return ((((this.Min.X <= point.X) && (point.X <= this.Max.X)) &&
                 ((this.Min.Y <= point.Y) && (point.Y <= this.Max.Y))) &&
@@ -244,13 +224,7 @@ namespace BalatroPhysics.LinearMath
 
         #endregion
 
-
         public void AddPoint(Vector3 point)
-        {
-            AddPoint(ref point);
-        }
-
-        public void AddPoint(ref Vector3 point)
         {
             Max = Vector3.Max(Max, point);
             Min = Vector3.Min(Min, point);
@@ -287,18 +261,13 @@ namespace BalatroPhysics.LinearMath
         /// <returns>The ContainmentType of the box.</returns>
         #region public ContainmentType Contains(JBBox box)
 
-        public ContainmentType Contains(JBBox box)
-        {
-            return this.Contains(ref box);
-        }
-
         /// <summary>
         /// Checks whether another bounding box is inside, outside or intersecting
         /// this box. 
         /// </summary>
         /// <param name="box">The other bounding box to check.</param>
         /// <returns>The ContainmentType of the box.</returns>
-        public ContainmentType Contains(ref JBBox box)
+        public ContainmentType Contains(JBBox box)
         {
             ContainmentType result = ContainmentType.Disjoint;
             if ((((this.Max.X >= box.Min.X) && (this.Min.X <= box.Max.X)) && ((this.Max.Y >= box.Min.Y) && (this.Min.Y <= box.Max.Y))) && ((this.Max.Z >= box.Min.Z) && (this.Min.Z <= box.Max.Z)))
@@ -322,7 +291,7 @@ namespace BalatroPhysics.LinearMath
         public static JBBox CreateMerged(JBBox original, JBBox additional)
         {
             JBBox result;
-            JBBox.CreateMerged(ref original, ref additional, out result);
+            JBBox.CreateMerged(original, additional, out result);
             return result;
         }
 
@@ -332,7 +301,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="original">First box.</param>
         /// <param name="additional">Second box.</param>
         /// <param name="result">A JBBox containing the two given boxes.</param>
-        public static void CreateMerged(ref JBBox original, ref JBBox additional, out JBBox result)
+        public static void CreateMerged(JBBox original, JBBox additional, out JBBox result)
         {
             Vector3 vector;
             Vector3 vector2;

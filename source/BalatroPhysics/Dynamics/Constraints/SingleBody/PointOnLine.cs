@@ -96,7 +96,7 @@ namespace BalatroPhysics.Dynamics.Constraints.SingleBody
         /// <param name="timestep">The simulation timestep</param>
         public override void PrepareForIteration(float timestep)
         {
-            JMath.Transform(ref localAnchor1, ref body1.orientation, out r1);
+            JMath.Transform(localAnchor1, body1.orientation, out r1);
 
             Vector3 p1, dp;
             p1 = body1.position + r1;

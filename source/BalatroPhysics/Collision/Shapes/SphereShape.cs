@@ -59,7 +59,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
+        public override void SupportMapping(Vector3 direction, out Vector3 result)
         {
             result = Vector3.Normalize(direction) * radius;
         }
@@ -69,7 +69,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The resulting axis aligned bounding box.</param>
-        public override void GetBoundingBox(ref JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
         {
             box.Min.X = -radius;
             box.Min.Y = -radius;

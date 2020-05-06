@@ -28,7 +28,6 @@ using BalatroPhysics.LinearMath;
 using BalatroPhysics.Collision.Shapes;
 using BalatroPhysics.Collision;
 using BalatroPhysics.Dynamics.Constraints;
-using BalatroPhysics.DataStructures;
 using System.Numerics;
 #endregion
 
@@ -157,9 +156,9 @@ namespace BalatroPhysics
         private HashSet<Constraint> constraints = new HashSet<Constraint>();
         private HashSet<SoftBody> softbodies = new HashSet<SoftBody>();
 
-        public ReadOnlyHashset<RigidBody> RigidBodies { get; private set; }
-        public ReadOnlyHashset<Constraint> Constraints { get; private set; }
-        public ReadOnlyHashset<SoftBody> SoftBodies { get; private set; }
+        public IReadOnlyCollection<RigidBody> RigidBodies { get { return rigidBodies; } }
+        public IReadOnlyCollection<Constraint> Constraints { get { return constraints; } }
+        public IReadOnlyCollection<SoftBody> SoftBodies { get { return softbodies; } }
 
         private WorldEvents events = new WorldEvents();
         public WorldEvents Events { get { return events; } }
@@ -205,11 +204,6 @@ namespace BalatroPhysics
 
             arbiterCallback = new Action<object>(ArbiterCallback);
             integrateCallback = new Action<object>(IntegrateCallback);
-
-            // Create the readonly wrappers
-            this.RigidBodies = new ReadOnlyHashset<RigidBody>(rigidBodies);
-            this.Constraints = new ReadOnlyHashset<Constraint>(constraints);
-            this.SoftBodies = new ReadOnlyHashset<SoftBody>(softbodies);
 
             this.CollisionSystem = collision;
 
@@ -796,7 +790,7 @@ namespace BalatroPhysics
                     if (!(body.isParticle))
                     {
                         temp = body.torque * timestep;
-                        JMath.Transform(ref temp, ref body.invInertiaWorld, out temp);
+                        JMath.Transform(temp, body.invInertiaWorld, out temp);
                         body.angularVelocity += temp;
                     }
 
@@ -842,11 +836,11 @@ namespace BalatroPhysics
                 }
 
                 JQuaternion dorn = new JQuaternion(axis.X, axis.Y, axis.Z, (float)Math.Cos(angle * timestep * 0.5f));
-                JQuaternion ornA; JQuaternion.CreateFromMatrix(ref body.orientation, out ornA);
+                JQuaternion ornA; JQuaternion.CreateFromMatrix(body.orientation, out ornA);
 
-                JQuaternion.Multiply(ref dorn, ref ornA, out dorn);
+                JQuaternion.Multiply(dorn, ornA, out dorn);
 
-                dorn.Normalize(); JMatrix.CreateFromQuaternion(ref dorn, out body.orientation);
+                dorn.Normalize(); JMatrix.CreateFromQuaternion(dorn, out body.orientation);
             }
 
             if ((body.Damping & RigidBody.DampingType.Linear) != 0)

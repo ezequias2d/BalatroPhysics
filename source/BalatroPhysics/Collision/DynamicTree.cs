@@ -126,7 +126,7 @@ namespace BalatroPhysics.Collision
         /// <param name="aabb">The aabb.</param>
         /// <param name="userData">The user data.</param>
         /// <returns>Index of the created proxy</returns>
-        public int AddProxy(ref JBBox aabb, T userData)
+        public int AddProxy(JBBox aabb, T userData)
         {
             int proxyId = AllocateNode();
 
@@ -166,13 +166,13 @@ namespace BalatroPhysics.Collision
         /// <param name="aabb">The aabb.</param>
         /// <param name="displacement">The displacement.</param>
         /// <returns>true if the proxy was re-inserted.</returns>
-        public bool MoveProxy(int proxyId, ref JBBox aabb, Vector3 displacement)
+        public bool MoveProxy(int proxyId, JBBox aabb, Vector3 displacement)
         {
             Debug.Assert(0 <= proxyId && proxyId < _nodeCapacity);
 
             Debug.Assert(_nodes[proxyId].IsLeaf());
 
-            if (_nodes[proxyId].AABB.Contains(ref aabb) != JBBox.ContainmentType.Disjoint)
+            if (_nodes[proxyId].AABB.Contains(aabb) != JBBox.ContainmentType.Disjoint)
             {
                 return false;
             }
@@ -268,13 +268,13 @@ namespace BalatroPhysics.Collision
                 int nodeId = stack.Pop();
                 DynamicTreeNode<T> node = _nodes[nodeId];
 
-                if (node.AABB.RayIntersect(ref origin, ref direction))
+                if (node.AABB.RayIntersect(origin, direction))
                 {
                     if (node.IsLeaf()) collisions.Add(nodeId);
                     else
                     {
-                        if (_nodes[node.Child1].AABB.RayIntersect(ref origin, ref direction)) stack.Push(node.Child1);
-                        if (_nodes[node.Child2].AABB.RayIntersect(ref origin, ref direction)) stack.Push(node.Child2);
+                        if (_nodes[node.Child1].AABB.RayIntersect(origin, direction)) stack.Push(node.Child1);
+                        if (_nodes[node.Child2].AABB.RayIntersect(origin, direction)) stack.Push(node.Child2);
                     }
                 }
             }
@@ -298,7 +298,7 @@ namespace BalatroPhysics.Collision
                 if (nodeId1 == NullNode) continue;
                 if (nodeId2 == NullNode) continue;
 
-                if (tree._nodes[nodeId2].AABB.Contains(ref _nodes[nodeId1].AABB) != JBBox.ContainmentType.Disjoint)
+                if (tree._nodes[nodeId2].AABB.Contains(_nodes[nodeId1].AABB) != JBBox.ContainmentType.Disjoint)
                 {
                     if (_nodes[nodeId1].IsLeaf() && tree._nodes[nodeId2].IsLeaf())
                     {
@@ -353,7 +353,7 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="callback">The callback.</param>
         /// <param name="aabb">The aabb.</param>
-        public void Query(List<int> my, ref JBBox aabb)
+        public void Query(List<int> my, JBBox aabb)
         {
             //Stack<int> _stack = new Stack<int>(256);
             Stack<int> _stack = stackPool.GetNew();
@@ -370,8 +370,8 @@ namespace BalatroPhysics.Collision
 
                 DynamicTreeNode<T> node = _nodes[nodeId];
 
-                //if (JBBox.TestOverlap(ref node.AABB, ref aabb))
-                if(aabb.Contains(ref node.AABB) != JBBox.ContainmentType.Disjoint)
+                //if (JBBox.TestOverlap(node.AABB, aabb))
+                if(aabb.Contains(node.AABB) != JBBox.ContainmentType.Disjoint)
                 {
                     if (node.IsLeaf())
                     {
@@ -484,15 +484,15 @@ namespace BalatroPhysics.Collision
                 int child2 = _nodes[sibling].Child2;
 
                 // Expand the node's AABB.
-                //_nodes[sibling].AABB.Combine(ref leafAABB);
-                JBBox.CreateMerged(ref _nodes[sibling].AABB, ref leafAABB, out _nodes[sibling].AABB);
+                //_nodes[sibling].AABB.Combine(leafAABB);
+                JBBox.CreateMerged(_nodes[sibling].AABB, leafAABB, out _nodes[sibling].AABB);
 
                 _nodes[sibling].LeafCount += 1;
 
                 float siblingArea = _nodes[sibling].AABB.Perimeter;
                 JBBox parentAABB = new JBBox();
-                //parentAABB.Combine(ref _nodes[sibling].AABB, ref leafAABB);
-                JBBox.CreateMerged(ref _nodes[sibling].AABB, ref leafAABB, out _nodes[sibling].AABB);
+                //parentAABB.Combine(_nodes[sibling].AABB, leafAABB);
+                JBBox.CreateMerged(_nodes[sibling].AABB, leafAABB, out _nodes[sibling].AABB);
 
                 float parentArea = parentAABB.Perimeter;
                 float cost1 = 2.0f * parentArea;
@@ -503,15 +503,15 @@ namespace BalatroPhysics.Collision
                 if (_nodes[child1].IsLeaf())
                 {
                     JBBox aabb = new JBBox();
-                    //aabb.Combine(ref leafAABB, ref _nodes[child1].AABB);
-                    JBBox.CreateMerged(ref leafAABB, ref _nodes[child1].AABB, out aabb);
+                    //aabb.Combine(leafAABB, _nodes[child1].AABB);
+                    JBBox.CreateMerged(leafAABB, _nodes[child1].AABB, out aabb);
                     cost2 = aabb.Perimeter + inheritanceCost;
                 }
                 else
                 {
                     JBBox aabb = new JBBox();
-                    //aabb.Combine(ref leafAABB, ref _nodes[child1].AABB);
-                    JBBox.CreateMerged(ref leafAABB, ref _nodes[child1].AABB, out aabb);
+                    //aabb.Combine(leafAABB, _nodes[child1].AABB);
+                    JBBox.CreateMerged(leafAABB, _nodes[child1].AABB, out aabb);
 
                     float oldArea = _nodes[child1].AABB.Perimeter;
                     float newArea = aabb.Perimeter;
@@ -522,15 +522,15 @@ namespace BalatroPhysics.Collision
                 if (_nodes[child2].IsLeaf())
                 {
                     JBBox aabb = new JBBox();
-                    //aabb.Combine(ref leafAABB, ref _nodes[child2].AABB);
-                    JBBox.CreateMerged(ref leafAABB, ref _nodes[child2].AABB, out aabb);
+                    //aabb.Combine(leafAABB, _nodes[child2].AABB);
+                    JBBox.CreateMerged(leafAABB, _nodes[child2].AABB, out aabb);
                     cost3 = aabb.Perimeter + inheritanceCost;
                 }
                 else
                 {
                     JBBox aabb = new JBBox();
-                    //aabb.Combine(ref leafAABB, ref _nodes[child2].AABB);
-                    JBBox.CreateMerged(ref leafAABB, ref _nodes[child2].AABB, out aabb);
+                    //aabb.Combine(leafAABB, _nodes[child2].AABB);
+                    JBBox.CreateMerged(leafAABB, _nodes[child2].AABB, out aabb);
                     float oldArea = _nodes[child2].AABB.Perimeter;
                     float newArea = aabb.Perimeter;
                     cost3 = newArea - oldArea + inheritanceCost;
@@ -543,8 +543,8 @@ namespace BalatroPhysics.Collision
                 }
 
                 // Expand the node's AABB to account for the new leaf.
-                //_nodes[sibling].AABB.Combine(ref leafAABB);
-                JBBox.CreateMerged(ref leafAABB, ref _nodes[sibling].AABB, out _nodes[sibling].AABB);
+                //_nodes[sibling].AABB.Combine(leafAABB);
+                JBBox.CreateMerged(leafAABB, _nodes[sibling].AABB, out _nodes[sibling].AABB);
 
                 // Descend
                 if (cost2 < cost3)
@@ -562,8 +562,8 @@ namespace BalatroPhysics.Collision
             int newParent = AllocateNode();
             _nodes[newParent].ParentOrNext = oldParent;
             _nodes[newParent].UserData = default(T);
-            //_nodes[newParent].AABB.Combine(ref leafAABB, ref _nodes[sibling].AABB);
-            JBBox.CreateMerged(ref leafAABB, ref _nodes[sibling].AABB, out _nodes[newParent].AABB);
+            //_nodes[newParent].AABB.Combine(leafAABB, _nodes[sibling].AABB);
+            JBBox.CreateMerged(leafAABB, _nodes[sibling].AABB, out _nodes[newParent].AABB);
             _nodes[newParent].LeafCount = _nodes[sibling].LeafCount + 1;
 
             if (oldParent != NullNode)
@@ -632,11 +632,11 @@ namespace BalatroPhysics.Collision
                 parent = grandParent;
                 while (parent != NullNode)
                 {
-                    //_nodes[parent].AABB.Combine(ref _nodes[_nodes[parent].Child1].AABB,
-                    //                            ref _nodes[_nodes[parent].Child2].AABB);
+                    //_nodes[parent].AABB.Combine(_nodes[_nodes[parent].Child1].AABB,
+                    //                            _nodes[_nodes[parent].Child2].AABB);
 
-                    JBBox.CreateMerged(ref _nodes[_nodes[parent].Child1].AABB,
-                        ref _nodes[_nodes[parent].Child2].AABB,out _nodes[parent].AABB);
+                    JBBox.CreateMerged(_nodes[_nodes[parent].Child1].AABB,
+                        _nodes[_nodes[parent].Child2].AABB,out _nodes[parent].AABB);
 
                     Debug.Assert(_nodes[parent].LeafCount > 0);
                     _nodes[parent].LeafCount -= 1;

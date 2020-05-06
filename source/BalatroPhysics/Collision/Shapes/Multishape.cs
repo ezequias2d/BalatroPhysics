@@ -52,7 +52,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="box">The bounding box where collision could occur.</param>
         /// <returns>The upper index with which <see cref="SetCurrentShape"/> can be 
         /// called.</returns>
-        public abstract int Prepare(ref JBBox box);
+        public abstract int Prepare(JBBox box);
 
         /// <summary>
         /// 
@@ -60,7 +60,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// <param name="rayOrigin"></param>
         /// <param name="rayDelta"></param>
         /// <returns></returns>
-        public abstract int Prepare(ref Vector3 rayOrigin, ref Vector3 rayDelta);
+        public abstract int Prepare(Vector3 rayOrigin, Vector3 rayDelta);
 
         protected abstract Multishape CreateWorkingClone();
 
@@ -109,22 +109,22 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(ref JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
         {
             JBBox helpBox = JBBox.LargeBox;
-            int length = this.Prepare(ref helpBox);
+            int length = this.Prepare(helpBox);
 
             box = JBBox.SmallBox;
 
             for (int i = 0; i < length; i++)
             {
                 this.SetCurrentShape(i);
-                base.GetBoundingBox(ref orientation, out helpBox);
-                JBBox.CreateMerged(ref box, ref helpBox, out box);
+                base.GetBoundingBox(orientation, out helpBox);
+                JBBox.CreateMerged(box, helpBox, out box);
             }
         }
 
-        public override void MakeHull(ref List<Vector3> triangleList, int generationThreshold)
+        public override void MakeHull(List<Vector3> triangleList, int generationThreshold)
         {
             //throw new NotImplementedException();
         }

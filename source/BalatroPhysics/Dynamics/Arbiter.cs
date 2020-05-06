@@ -174,40 +174,40 @@ namespace BalatroPhysics.Dynamics
             {
                 if (this.contactList.Count == 4)
                 {
-                    index = SortCachedPoints(ref relPos1, penetration);
-                    ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
+                    index = SortCachedPoints(relPos1, penetration);
+                    ReplaceContact(point1, point2, normal, penetration, index, contactSettings);
                     return null;
                 }
 
-                index = GetCacheEntry(ref relPos1, contactSettings.breakThreshold);
+                index = GetCacheEntry(relPos1, contactSettings.breakThreshold);
 
                 if (index >= 0)
                 {
-                    ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
+                    ReplaceContact(point1, point2, normal, penetration, index, contactSettings);
                     return null;
                 }
                 else
                 {
                     Contact contact = Contact.Pool.GetNew();
-                    contact.Initialize(body1, body2, ref point1, ref point2, ref normal, penetration, true, contactSettings);
+                    contact.Initialize(body1, body2, point1, point2, normal, penetration, true, contactSettings);
                     contactList.Add(contact);
                     return contact;
                 }
             }
         }
 
-        private void ReplaceContact(ref Vector3 point1, ref Vector3 point2, ref Vector3 n, float p, int index,
+        private void ReplaceContact(Vector3 point1, Vector3 point2, Vector3 n, float p, int index,
             ContactSettings contactSettings)
         {
             Contact contact = contactList[index];
 
             Debug.Assert(body1 == contact.body1, "Body1 and Body2 not consistent.");
 
-            contact.Initialize(body1, body2, ref point1, ref point2, ref n, p, false, contactSettings);
+            contact.Initialize(body1, body2, point1, point2, n, p, false, contactSettings);
 
         }
 
-        private int GetCacheEntry(ref Vector3 realRelPos1, float contactBreakThreshold)
+        private int GetCacheEntry(Vector3 realRelPos1, float contactBreakThreshold)
         {
             float shortestDist = contactBreakThreshold * contactBreakThreshold;
             int size = contactList.Count;
@@ -226,7 +226,7 @@ namespace BalatroPhysics.Dynamics
         }
 
         // sort cached points so most isolated points come first
-        private int SortCachedPoints(ref Vector3 realRelPos1, float pen)
+        private int SortCachedPoints(Vector3 realRelPos1, float pen)
         {
             //calculate 4 possible cases areas, and take biggest area
             //also need to keep 'deepest'

@@ -75,7 +75,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion Add(JQuaternion quaternion1, JQuaternion quaternion2)
         {
             JQuaternion result;
-            JQuaternion.Add(ref quaternion1, ref quaternion2, out result);
+            JQuaternion.Add(quaternion1, quaternion2, out result);
             return result;
         }
 
@@ -105,7 +105,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="quaternion1">The first quaternion.</param>
         /// <param name="quaternion2">The second quaternion.</param>
         /// <param name="result">The sum of both quaternions.</param>
-        public static void Add(ref JQuaternion quaternion1, ref JQuaternion quaternion2, out JQuaternion result)
+        public static void Add(JQuaternion quaternion1, JQuaternion quaternion2, out JQuaternion result)
         {
             result.X = quaternion1.X + quaternion2.X;
             result.Y = quaternion1.Y + quaternion2.Y;
@@ -134,7 +134,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion Subtract(JQuaternion quaternion1, JQuaternion quaternion2)
         {
             JQuaternion result;
-            JQuaternion.Subtract(ref quaternion1, ref quaternion2, out result);
+            JQuaternion.Subtract(quaternion1, quaternion2, out result);
             return result;
         }
 
@@ -144,7 +144,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="quaternion1">The first quaternion.</param>
         /// <param name="quaternion2">The second quaternion.</param>
         /// <param name="result">The difference of both quaternions.</param>
-        public static void Subtract(ref JQuaternion quaternion1, ref JQuaternion quaternion2, out JQuaternion result)
+        public static void Subtract(JQuaternion quaternion1, JQuaternion quaternion2, out JQuaternion result)
         {
             result.X = quaternion1.X - quaternion2.X;
             result.Y = quaternion1.Y - quaternion2.Y;
@@ -163,7 +163,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion Multiply(JQuaternion quaternion1, JQuaternion quaternion2)
         {
             JQuaternion result;
-            JQuaternion.Multiply(ref quaternion1, ref quaternion2, out result);
+            JQuaternion.Multiply(quaternion1, quaternion2, out result);
             return result;
         }
 
@@ -173,7 +173,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="quaternion1">The first quaternion.</param>
         /// <param name="quaternion2">The second quaternion.</param>
         /// <param name="result">The product of both quaternions.</param>
-        public static void Multiply(ref JQuaternion quaternion1, ref JQuaternion quaternion2, out JQuaternion result)
+        public static void Multiply(JQuaternion quaternion1, JQuaternion quaternion2, out JQuaternion result)
         {
             float x = quaternion1.X;
             float y = quaternion1.Y;
@@ -204,7 +204,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion Multiply(JQuaternion quaternion1, float scaleFactor)
         {
             JQuaternion result;
-            JQuaternion.Multiply(ref quaternion1, scaleFactor, out result);
+            JQuaternion.Multiply(quaternion1, scaleFactor, out result);
             return result;
         }
 
@@ -214,7 +214,7 @@ namespace BalatroPhysics.LinearMath
         /// <param name="quaternion1">The quaternion to scale.</param>
         /// <param name="scaleFactor">Scale factor.</param>
         /// <param name="result">The scaled quaternion.</param>
-        public static void Multiply(ref JQuaternion quaternion1, float scaleFactor, out JQuaternion result)
+        public static void Multiply(JQuaternion quaternion1, float scaleFactor, out JQuaternion result)
         {
             result.X = quaternion1.X * scaleFactor;
             result.Y = quaternion1.Y * scaleFactor;
@@ -247,7 +247,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion CreateFromMatrix(JMatrix matrix)
         {
             JQuaternion result;
-            JQuaternion.CreateFromMatrix(ref matrix, out result);
+            JQuaternion.CreateFromMatrix(matrix, out result);
             return result;
         }
 
@@ -256,7 +256,7 @@ namespace BalatroPhysics.LinearMath
         /// </summary>
         /// <param name="matrix">A matrix representing an orientation.</param>
         /// <param name="result">JQuaternion representing an orientation.</param>
-        public static void CreateFromMatrix(ref JMatrix matrix, out JQuaternion result)
+        public static void CreateFromMatrix(JMatrix matrix, out JQuaternion result)
         {
             float num8 = (matrix.M11 + matrix.M22) + matrix.M33;
             if (num8 > 0f)
@@ -308,7 +308,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion operator *(JQuaternion value1, JQuaternion value2)
         {
             JQuaternion result;
-            JQuaternion.Multiply(ref value1, ref value2,out result);
+            JQuaternion.Multiply(value1, value2,out result);
             return result;
         }
         #endregion
@@ -323,7 +323,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion operator +(JQuaternion value1, JQuaternion value2)
         {
             JQuaternion result;
-            JQuaternion.Add(ref value1, ref value2, out result);
+            JQuaternion.Add(value1, value2, out result);
             return result;
         }
         #endregion
@@ -338,7 +338,7 @@ namespace BalatroPhysics.LinearMath
         public static JQuaternion operator -(JQuaternion value1, JQuaternion value2)
         {
             JQuaternion result;
-            JQuaternion.Subtract(ref value1, ref value2, out result);
+            JQuaternion.Subtract(value1, value2, out result);
             return result;
         }
         #endregion

@@ -88,11 +88,11 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="orientation">The orientation of the shape.</param>
         /// <param name="box">The axis aligned bounding box of the shape.</param>
-        public override void GetBoundingBox(ref JMatrix orientation, out JBBox box)
+        public override void GetBoundingBox(JMatrix orientation, out JBBox box)
         {
-            JMatrix abs; JMath.Absolute(ref orientation, out abs);
+            JMatrix abs; JMath.Absolute(orientation, out abs);
             Vector3 temp;
-            JMath.Transform(ref halfSize, ref abs, out temp);
+            JMath.Transform(halfSize, abs, out temp);
 
             box.Max = temp;
             box.Min = -temp;
@@ -123,7 +123,7 @@ namespace BalatroPhysics.Collision.Shapes
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        public override void SupportMapping(ref Vector3 direction, out Vector3 result)
+        public override void SupportMapping(Vector3 direction, out Vector3 result)
         {
             result.X = (float)Math.Sign(direction.X) * halfSize.X;
             result.Y = (float)Math.Sign(direction.Y) * halfSize.Y;

@@ -323,7 +323,7 @@ namespace BalatroPhysics.Dynamics
             }
             else
             {
-                JMath.Transform(ref realRelPos1, ref body1.orientation, out p1);
+                JMath.Transform(realRelPos1, body1.orientation, out p1);
                 p1 += body1.position;
             }
 
@@ -333,7 +333,7 @@ namespace BalatroPhysics.Dynamics
             }
             else
             {
-                JMath.Transform(ref realRelPos2, ref body2.orientation, out p2);
+                JMath.Transform(realRelPos2, body2.orientation, out p2);
                 p2 += body2.position;
             }
 
@@ -346,74 +346,6 @@ namespace BalatroPhysics.Dynamics
         /// An impulse is applied an both contact points.
         /// </summary>
         /// <param name="impulse">The impulse to apply.</param>
-        public void ApplyImpulse(ref Vector3 impulse)
-        {
-            #region INLINE - HighFrequency
-            //Vector3 temp;
-
-            if (!treatBody1AsStatic)
-            {
-                body1.linearVelocity.X -= (impulse.X * body1.inverseMass);
-                body1.linearVelocity.Y -= (impulse.Y * body1.inverseMass);
-                body1.linearVelocity.Z -= (impulse.Z * body1.inverseMass);
-
-                float num0, num1, num2;
-                num0 = relativePos1.Y * impulse.Z - relativePos1.Z * impulse.Y;
-                num1 = relativePos1.Z * impulse.X - relativePos1.X * impulse.Z;
-                num2 = relativePos1.X * impulse.Y - relativePos1.Y * impulse.X;
-
-                float num3 =
-                    (((num0 * body1.invInertiaWorld.M11) +
-                    (num1 * body1.invInertiaWorld.M21)) +
-                    (num2 * body1.invInertiaWorld.M31));
-                float num4 =
-                    (((num0 * body1.invInertiaWorld.M12) +
-                    (num1 * body1.invInertiaWorld.M22)) +
-                    (num2 * body1.invInertiaWorld.M32));
-                float num5 =
-                    (((num0 * body1.invInertiaWorld.M13) +
-                    (num1 * body1.invInertiaWorld.M23)) +
-                    (num2 * body1.invInertiaWorld.M33));
-
-                body1.angularVelocity.X -= num3;
-                body1.angularVelocity.Y -= num4;
-                body1.angularVelocity.Z -= num5;
-            }
-
-            if (!treatBody2AsStatic)
-            {
-
-                body2.linearVelocity.X += (impulse.X * body2.inverseMass);
-                body2.linearVelocity.Y += (impulse.Y * body2.inverseMass);
-                body2.linearVelocity.Z += (impulse.Z * body2.inverseMass);
-
-                float num0, num1, num2;
-                num0 = relativePos2.Y * impulse.Z - relativePos2.Z * impulse.Y;
-                num1 = relativePos2.Z * impulse.X - relativePos2.X * impulse.Z;
-                num2 = relativePos2.X * impulse.Y - relativePos2.Y * impulse.X;
-
-                float num3 =
-                    (((num0 * body2.invInertiaWorld.M11) +
-                    (num1 * body2.invInertiaWorld.M21)) +
-                    (num2 * body2.invInertiaWorld.M31));
-                float num4 =
-                    (((num0 * body2.invInertiaWorld.M12) +
-                    (num1 * body2.invInertiaWorld.M22)) +
-                    (num2 * body2.invInertiaWorld.M32));
-                float num5 =
-                    (((num0 * body2.invInertiaWorld.M13) +
-                    (num1 * body2.invInertiaWorld.M23)) +
-                    (num2 * body2.invInertiaWorld.M33));
-
-                body2.angularVelocity.X += num3;
-                body2.angularVelocity.Y += num4;
-                body2.angularVelocity.Z += num5;
-            }
-
-
-            #endregion
-        }
-
         public void ApplyImpulse(Vector3 impulse)
         {
             #region INLINE - HighFrequency
@@ -508,19 +440,19 @@ namespace BalatroPhysics.Dynamics
                 if (!body1IsMassPoint)
                 {
 
-                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(relativePos1, normal, out rantra);
                     rantra.X = (relativePos1.Y * normal.Z) - (relativePos1.Z * normal.Y);
                     rantra.Y = (relativePos1.Z * normal.X) - (relativePos1.X * normal.Z);
                     rantra.Z = (relativePos1.X * normal.Y) - (relativePos1.Y * normal.X);
 
-                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(rantra, body1.invInertiaWorld, out rantra);
                     float num0 = ((rantra.X * body1.invInertiaWorld.M11) + (rantra.Y * body1.invInertiaWorld.M21)) + (rantra.Z * body1.invInertiaWorld.M31);
                     float num1 = ((rantra.X * body1.invInertiaWorld.M12) + (rantra.Y * body1.invInertiaWorld.M22)) + (rantra.Z * body1.invInertiaWorld.M32);
                     float num2 = ((rantra.X * body1.invInertiaWorld.M13) + (rantra.Y * body1.invInertiaWorld.M23)) + (rantra.Z * body1.invInertiaWorld.M33);
 
                     rantra.X = num0; rantra.Y = num1; rantra.Z = num2;
 
-                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(rantra, relativePos1, out rantra);
                     num0 = (rantra.Y * relativePos1.Z) - (rantra.Z * relativePos1.Y);
                     num1 = (rantra.Z * relativePos1.X) - (rantra.X * relativePos1.Z);
                     num2 = (rantra.X * relativePos1.Y) - (rantra.Y * relativePos1.X);
@@ -537,19 +469,19 @@ namespace BalatroPhysics.Dynamics
                 if (!body2IsMassPoint)
                 {
 
-                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(relativePos1, normal, out rantra);
                     rbntrb.X = (relativePos2.Y * normal.Z) - (relativePos2.Z * normal.Y);
                     rbntrb.Y = (relativePos2.Z * normal.X) - (relativePos2.X * normal.Z);
                     rbntrb.Z = (relativePos2.X * normal.Y) - (relativePos2.Y * normal.X);
 
-                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(rantra, body1.invInertiaWorld, out rantra);
                     float num0 = ((rbntrb.X * body2.invInertiaWorld.M11) + (rbntrb.Y * body2.invInertiaWorld.M21)) + (rbntrb.Z * body2.invInertiaWorld.M31);
                     float num1 = ((rbntrb.X * body2.invInertiaWorld.M12) + (rbntrb.Y * body2.invInertiaWorld.M22)) + (rbntrb.Z * body2.invInertiaWorld.M32);
                     float num2 = ((rbntrb.X * body2.invInertiaWorld.M13) + (rbntrb.Y * body2.invInertiaWorld.M23)) + (rbntrb.Z * body2.invInertiaWorld.M33);
 
                     rbntrb.X = num0; rbntrb.Y = num1; rbntrb.Z = num2;
 
-                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(rantra, relativePos1, out rantra);
                     num0 = (rbntrb.Y * relativePos2.Z) - (rbntrb.Z * relativePos2.Y);
                     num1 = (rbntrb.Z * relativePos2.X) - (rbntrb.X * relativePos2.Z);
                     num2 = (rbntrb.X * relativePos2.Y) - (rbntrb.Y * relativePos2.X);
@@ -588,19 +520,19 @@ namespace BalatroPhysics.Dynamics
   
                 if (!body1IsMassPoint)
                 {
-                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(relativePos1, normal, out rantra);
                     rantra.X = (relativePos1.Y * tangent.Z) - (relativePos1.Z * tangent.Y);
                     rantra.Y = (relativePos1.Z * tangent.X) - (relativePos1.X * tangent.Z);
                     rantra.Z = (relativePos1.X * tangent.Y) - (relativePos1.Y * tangent.X);
 
-                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(rantra, body1.invInertiaWorld, out rantra);
                     float num0 = ((rantra.X * body1.invInertiaWorld.M11) + (rantra.Y * body1.invInertiaWorld.M21)) + (rantra.Z * body1.invInertiaWorld.M31);
                     float num1 = ((rantra.X * body1.invInertiaWorld.M12) + (rantra.Y * body1.invInertiaWorld.M22)) + (rantra.Z * body1.invInertiaWorld.M32);
                     float num2 = ((rantra.X * body1.invInertiaWorld.M13) + (rantra.Y * body1.invInertiaWorld.M23)) + (rantra.Z * body1.invInertiaWorld.M33);
 
                     rantra.X = num0; rantra.Y = num1; rantra.Z = num2;
 
-                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(rantra, relativePos1, out rantra);
                     num0 = (rantra.Y * relativePos1.Z) - (rantra.Z * relativePos1.Y);
                     num1 = (rantra.Z * relativePos1.X) - (rantra.X * relativePos1.Z);
                     num2 = (rantra.X * relativePos1.Y) - (rantra.Y * relativePos1.X);
@@ -617,19 +549,19 @@ namespace BalatroPhysics.Dynamics
 
                 if (!body2IsMassPoint)
                 {
-                    // Vector3.Cross(ref relativePos1, ref normal, out rantra);
+                    // Vector3.Cross(relativePos1, normal, out rantra);
                     rbntrb.X = (relativePos2.Y * tangent.Z) - (relativePos2.Z * tangent.Y);
                     rbntrb.Y = (relativePos2.Z * tangent.X) - (relativePos2.X * tangent.Z);
                     rbntrb.Z = (relativePos2.X * tangent.Y) - (relativePos2.Y * tangent.X);
 
-                    // JMath.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    // JMath.Transform(rantra, body1.invInertiaWorld, out rantra);
                     float num0 = ((rbntrb.X * body2.invInertiaWorld.M11) + (rbntrb.Y * body2.invInertiaWorld.M21)) + (rbntrb.Z * body2.invInertiaWorld.M31);
                     float num1 = ((rbntrb.X * body2.invInertiaWorld.M12) + (rbntrb.Y * body2.invInertiaWorld.M22)) + (rbntrb.Z * body2.invInertiaWorld.M32);
                     float num2 = ((rbntrb.X * body2.invInertiaWorld.M13) + (rbntrb.Y * body2.invInertiaWorld.M23)) + (rbntrb.Z * body2.invInertiaWorld.M33);
 
                     rbntrb.X = num0; rbntrb.Y = num1; rbntrb.Z = num2;
 
-                    //Vector3.Cross(ref rantra, ref relativePos1, out rantra);
+                    //Vector3.Cross(rantra, relativePos1, out rantra);
                     num0 = (rbntrb.Y * relativePos2.Z) - (rbntrb.Z * relativePos2.Y);
                     num1 = (rbntrb.Z * relativePos2.X) - (rbntrb.X * relativePos2.Z);
                     num2 = (rbntrb.X * relativePos2.Y) - (rbntrb.Y * relativePos2.X);
@@ -646,7 +578,7 @@ namespace BalatroPhysics.Dynamics
 
             speculativeVelocity = 0.0f;
 
-            float relNormalVel = normal.X * dvx + normal.Y * dvy + normal.Z * dvz; //Vector3.Dot(ref normal, ref dv);
+            float relNormalVel = normal.X * dvx + normal.Y * dvy + normal.Z * dvz; //Vector3.Dot(normal, dv);
 
             if (Penetration > settings.allowedPenetration)
             {
@@ -788,7 +720,7 @@ namespace BalatroPhysics.Dynamics
         /// <param name="point2">The collision point in worldspace</param>
         /// <param name="n">The normal pointing to body2.</param>
         /// <param name="penetration">The estimated penetration depth.</param>
-        public void Initialize(RigidBody body1, RigidBody body2, ref Vector3 point1, ref Vector3 point2, ref Vector3 n,
+        public void Initialize(RigidBody body1, RigidBody body2, Vector3 point1, Vector3 point2, Vector3 n,
             float penetration, bool newContact, ContactSettings settings)
         {
             this.body1 = body1;  this.body2 = body2;
@@ -799,8 +731,8 @@ namespace BalatroPhysics.Dynamics
 
             relativePos1 = p1 - body1.position;
             relativePos2 = p2 - body2.position;
-            JMath.Transform(ref relativePos1, ref body1.invOrientation, out realRelPos1);
-            JMath.Transform(ref relativePos2, ref body2.invOrientation, out realRelPos2);
+            JMath.Transform(relativePos1, body1.invOrientation, out realRelPos1);
+            JMath.Transform(relativePos2, body2.invOrientation, out realRelPos2);
 
             this.initialPen = penetration;
             this.penetration = penetration;

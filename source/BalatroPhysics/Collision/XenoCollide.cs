@@ -43,7 +43,7 @@ namespace BalatroPhysics.Collision
         /// </summary>
         /// <param name="direction">The direction.</param>
         /// <param name="result">The result.</param>
-        void SupportMapping(ref Vector3 direction, out Vector3 result);
+        void SupportMapping(Vector3 direction, out Vector3 result);
 
         /// <summary>
         /// The center of the SupportMap.
@@ -64,7 +64,7 @@ namespace BalatroPhysics.Collision
         private const int MaximumIterations = 34;
 
         private static void SupportMapTransformed(ISupportMappable support,
-            ref JMatrix orientation, ref Vector3 position, ref Vector3 direction, out Vector3 result)
+            JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
         {
             // THIS IS *THE* HIGH FREQUENCY CODE OF THE COLLLISION PART OF THE ENGINE
 
@@ -72,7 +72,7 @@ namespace BalatroPhysics.Collision
             result.Y = ((direction.X * orientation.M21) + (direction.Y * orientation.M22)) + (direction.Z * orientation.M23);
             result.Z = ((direction.X * orientation.M31) + (direction.Y * orientation.M32)) + (direction.Z * orientation.M33);
 
-            support.SupportMapping(ref result, out result);
+            support.SupportMapping(result, out result);
 
             float x = ((result.X * orientation.M11) + (result.Y * orientation.M21)) + (result.Z * orientation.M31);
             float y = ((result.X * orientation.M12) + (result.Y * orientation.M22)) + (result.Z * orientation.M32);
@@ -101,7 +101,6 @@ namespace BalatroPhysics.Collision
              out Vector3 point, out Vector3 normal, out float penetration)
         {
             // Used variables
-            Vector3 temp1, temp2;
             Vector3 v01, v02, v0;
             Vector3 v11, v12, v1;
             Vector3 v21, v22, v2;
@@ -117,12 +116,12 @@ namespace BalatroPhysics.Collision
 
             // Get the center of shape1 in world coordinates -> v01
             support1.SupportCenter(out v01);
-            JMath.Transform(ref v01, ref orientation1, out v01);
+            JMath.Transform(v01, orientation1, out v01);
             v01 += position1;
 
             // Get the center of shape2 in world coordinates -> v02
             support2.SupportCenter(out v02);
-            JMath.Transform(ref v02, ref orientation2, out v02);
+            JMath.Transform(v02, orientation2, out v02);
             v02 += position2;
 
             // v0 is the center of the minkowski difference
@@ -135,8 +134,8 @@ namespace BalatroPhysics.Collision
             mn = v0;
             normal = -v0;
 
-            SupportMapTransformed(support1, ref orientation1, ref position1, ref mn, out v11);
-            SupportMapTransformed(support2, ref orientation2, ref position2, ref normal, out v12);
+            SupportMapTransformed(support1, orientation1, position1, mn, out v11);
+            SupportMapTransformed(support2, orientation2, position2, normal, out v12);
             v1 = v12 - v11;
 
             if (Vector3.Dot(v1, normal) <= 0.0f) return false;
@@ -162,25 +161,23 @@ namespace BalatroPhysics.Collision
             }
 
             mn = -normal;
-            SupportMapTransformed(support1, ref orientation1, ref position1, ref mn, out v21);
-            SupportMapTransformed(support2, ref orientation2, ref position2, ref normal, out v22);
+            SupportMapTransformed(support1, orientation1, position1, mn, out v21);
+            SupportMapTransformed(support2, orientation2, position2, normal, out v22);
             v2 = v22 - v21;
 
             if (Vector3.Dot(v2, normal) <= 0.0f) return false;
 
             // Determine whether origin is on + or - side of plane (v1,v0,v2)
-            temp1 = v1 - v0;
-            temp2 = v2 - v0;
-            normal = Vector3.Cross(temp1, temp2);
+            normal = Vector3.Cross(v1 - v0, v2 - v0);
 
             float dist = Vector3.Dot(normal, v0);
 
             // If the origin is on the - side of the plane, reverse the direction of the plane
             if (dist > 0.0f)
             {
-                JMath.Swap(ref v1, ref v2);
-                JMath.Swap(ref v11, ref v21);
-                JMath.Swap(ref v12, ref v22);
+                JMath.Swap(v1, v2);
+                JMath.Swap(v11, v21);
+                JMath.Swap(v12, v22);
                 normal = -normal;
             }
 
@@ -199,8 +196,8 @@ namespace BalatroPhysics.Collision
                 // Obtain the support point in a direction perpendicular to the existing plane
                 // Note: This point is guaranteed to lie off the plane
                 mn = -normal;
-                SupportMapTransformed(support1, ref orientation1, ref position1, ref mn, out v31);
-                SupportMapTransformed(support2, ref orientation2, ref position2, ref normal, out v32);
+                SupportMapTransformed(support1, orientation1, position1, mn, out v31);
+                SupportMapTransformed(support2, orientation2, position2, normal, out v32);
                 v3 = v32 - v31;
 
                 if (Vector3.Dot(v3, normal) <= 0.0f)
@@ -209,28 +206,22 @@ namespace BalatroPhysics.Collision
                 }
 
                 // If origin is outside (v1,v0,v3), then eliminate v2 and loop
-                temp1 = Vector3.Cross(v1, v3);
-                if (Vector3.Dot(temp1, v0) < 0.0f)
+                if (Vector3.Dot(Vector3.Cross(v1, v3), v0) < 0.0f)
                 {
                     v2 = v3;
                     v21 = v31;
                     v22 = v32;
-                    temp1 = v1 - v0;
-                    temp2 = v3 - v0;
-                    normal = Vector3.Cross(temp1, temp2);
+                    normal = Vector3.Cross(v1 - v0, v3 - v0);
                     continue;
                 }
 
                 // If origin is outside (v3,v0,v2), then eliminate v1 and loop
-                temp1 = Vector3.Cross(v3, v2);
-                if (Vector3.Dot(temp1, v0) < 0.0f)
+                if (Vector3.Dot(Vector3.Cross(v3, v2), v0) < 0.0f)
                 {
                     v1 = v3;
                     v11 = v31;
                     v12 = v32;
-                    temp1 = v3 - v0;
-                    temp2 = v2 - v0;
-                    normal = Vector3.Cross(temp1, temp2);
+                    normal = Vector3.Cross(v3 - v0, v2 - v0);
                     continue;
                 }
 
@@ -241,9 +232,7 @@ namespace BalatroPhysics.Collision
                     phase2++;
 
                     // Compute normal of the wedge face
-                    temp1 = v2 - v1;
-                    temp2 = v3 - v1;
-                    normal = Vector3.Cross(temp1, temp2);
+                    normal = Vector3.Cross(v2 - v1, v3 - v1);
 
                     // Can this happen???  Can it be handled more cleanly?
                     if (normal.IsNearlyZero()) return true;
@@ -263,12 +252,11 @@ namespace BalatroPhysics.Collision
 
                     // Find the support point in the direction of the wedge face
                     mn = -normal;
-                    SupportMapTransformed(support1, ref orientation1, ref position1, ref mn, out v41);
-                    SupportMapTransformed(support2, ref orientation2, ref position2, ref normal, out v42);
+                    SupportMapTransformed(support1, orientation1, position1, mn, out v41);
+                    SupportMapTransformed(support2, orientation2, position2, normal, out v42);
                     v4 = v42 - v41;
 
-                    temp1 = v4 - v3;
-                    float delta = Vector3.Dot(temp1, normal);
+                    float delta = Vector3.Dot(v4 - v3, normal);
                     penetration = Vector3.Dot(v4, normal);
 
                     // If the boundary is thin enough or the origin is outside the support plane for the newly discovered vertex, then we can terminate
@@ -277,51 +265,26 @@ namespace BalatroPhysics.Collision
 
                         if (hit)
                         {
-                            temp1 = Vector3.Cross(v1, v2);
-                            float b0 = Vector3.Dot(temp1, v3);
-                            temp1 = Vector3.Cross(v3, v2);
-                            float b1 = Vector3.Dot(temp1, v0);
-                            temp1 = Vector3.Cross(v0, v1);
-                            float b2 = Vector3.Dot(temp1, v3);
-                            temp1 = Vector3.Cross(v2, v1);
-                            float b3 = Vector3.Dot(temp1, v0);
+                            float b0 = Vector3.Dot(Vector3.Cross(v1, v2), v3); 
+                            float b1 = Vector3.Dot(Vector3.Cross(v3, v2), v0);
+                            float b2 = Vector3.Dot(Vector3.Cross(v0, v1), v3);
+                            float b3 = Vector3.Dot(Vector3.Cross(v2, v1), v0);
 
                             float sum = b0 + b1 + b2 + b3;
 
                             if (sum <= 0)
                             {
                                 b0 = 0;
-                                temp1 = Vector3.Cross(v2, v3);
-                                b1 = Vector3.Dot(temp1, normal);
-                                temp1 = Vector3.Cross(v3, v1);
-                                b2 = Vector3.Dot(temp1, normal);
-                                temp1 = Vector3.Cross(v1, v2 );
-                                b3 = Vector3.Dot(temp1, normal);
+                                b1 = Vector3.Dot(Vector3.Cross(v2, v3), normal);
+                                b2 = Vector3.Dot(Vector3.Cross(v3, v1), normal);
+                                b3 = Vector3.Dot(Vector3.Cross(v1, v2), normal);
 
                                 sum = b1 + b2 + b3;
                             }
 
                             float inv = 1.0f / sum;
 
-                            point = v01 * b0;
-                            temp1 = v11 * b1;
-                            point += temp1;
-                            temp1 = v21 * b2;
-                            point += temp1;
-                            temp1 = v31 * b3;
-                            point += temp1;
-
-                            temp2 = v02 * b0;
-                            point += temp2;
-                            temp1 = v12 * b1;
-                            point += temp1;
-                            temp1 = v22 * b2;
-                            point += temp1;
-                            temp1 = v32 * b3;
-                            point += temp1;
-
-                            point *= inv * 0.5f;
-
+                            point = ((v01 * b0) + (v11 * b1) + (v21 * b2) + (v31 * b3) + (v02 * b0) + (v12 * b1) + (v22 * b2) + (v32 * b3)) * (inv * 0.5f);
                         }
 
                         // Compute the barycentric coordinates of the origin
@@ -329,22 +292,22 @@ namespace BalatroPhysics.Collision
                     }
 
                     //// Compute the tetrahedron dividing face (v4,v0,v1)
-                    //Vector3.Cross(ref v4, ref v1, out temp1);
-                    //float d1 = Vector3.Dot(ref temp1, ref v0);
+                    //Vector3.Cross(v4, v1, out temp1);
+                    //float d1 = Vector3.Dot(temp1, v0);
 
 
                     //// Compute the tetrahedron dividing face (v4,v0,v2)
-                    //Vector3.Cross(ref v4, ref v2, out temp1);
-                    //float d2 = Vector3.Dot(ref temp1, ref v0);
+                    //Vector3.Cross(v4, v2, out temp1);
+                    //float d2 = Vector3.Dot(temp1, v0);
 
 
                     // Compute the tetrahedron dividing face (v4,v0,v3)
-                    temp1 = Vector3.Cross(v4, v0);
-                    float dot = Vector3.Dot(temp1, v1);
+                    Vector3 cross = Vector3.Cross(v4, v0);
+                    float dot = Vector3.Dot(cross, v1);
 
                     if (dot >= 0.0f)
                     {
-                        dot = Vector3.Dot(temp1, v2);
+                        dot = Vector3.Dot(cross, v2);
 
                         if (dot >= 0.0f)
                         {
@@ -363,7 +326,7 @@ namespace BalatroPhysics.Collision
                     }
                     else
                     {
-                        dot = Vector3.Dot(temp1, v3);
+                        dot = Vector3.Dot(cross, v3);
 
                         if (dot >= 0.0f)
                         {

@@ -24,14 +24,14 @@ namespace BalatroPhysicsDemo
                 //jb2.Min = System.Numerics.Vector3.Zero;
                 //jb.Max = System.Numerics.Vector3.One * 2.0f;
 
-                //dt.CreateProxy(ref jb, 1);
-                //dt.CreateProxy(ref jb, 2);
+                //dt.CreateProxy(jb, 1);
+                //dt.CreateProxy(jb, 2);
 
                 //JBBox testBox;
                 //testBox.Min = System.Numerics.Vector3.Zero;
                 //testBox.Max = System.Numerics.Vector3.One *20.0f;
 
-                //dt.Query(bla, ref testBox);
+                //dt.Query(bla, testBox);
                 //dt.MoveProxy
 
 

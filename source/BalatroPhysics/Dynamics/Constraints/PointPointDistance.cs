@@ -66,8 +66,8 @@ namespace BalatroPhysics.Dynamics.Constraints
             localAnchor1 = anchor1 - body1.position;
             localAnchor2 = anchor2 - body2.position;
 
-            JMath.Transform(ref localAnchor1, ref body1.invOrientation, out localAnchor1);
-            JMath.Transform(ref localAnchor2, ref body2.invOrientation, out localAnchor2);
+            JMath.Transform(localAnchor1, body1.invOrientation, out localAnchor1);
+            JMath.Transform(localAnchor2, body2.invOrientation, out localAnchor2);
 
             distance = (anchor1 - anchor2).Length();
         }
@@ -119,8 +119,8 @@ namespace BalatroPhysics.Dynamics.Constraints
         /// <param name="timestep">The 5simulation timestep</param>
         public override void PrepareForIteration(float timestep)
         {
-            JMath.Transform(ref localAnchor1, ref body1.orientation, out r1);
-            JMath.Transform(ref localAnchor2, ref body2.orientation, out r2);
+            JMath.Transform(localAnchor1, body1.orientation, out r1);
+            JMath.Transform(localAnchor2, body2.orientation, out r2);
 
             Vector3 p1, p2, dp;
             p1 = body1.position + r1;

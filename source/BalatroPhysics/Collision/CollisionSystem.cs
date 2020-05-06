@@ -73,7 +73,7 @@ namespace BalatroPhysics.Collision
     /// <returns>If false is returned the collision information is dropped. The CollisionDetectedHandler
     /// is never called.</returns>
     public delegate bool PassedNarrowphaseHandler(RigidBody body1,RigidBody body2, 
-                    ref Vector3 point, ref Vector3 normal,float penetration);
+                    Vector3 point, Vector3 normal,float penetration);
 
     /// <summary>
     /// A delegate for raycasting.
@@ -238,12 +238,12 @@ namespace BalatroPhysics.Collision
 
                 if (result)
                 {
-                    int minIndexMy = FindNearestTrianglePoint(body1, my[i], ref point);
-                    int minIndexOther = FindNearestTrianglePoint(body2, other[i], ref point);
+                    int minIndexMy = FindNearestTrianglePoint(body1, my[i], point);
+                    int minIndexOther = FindNearestTrianglePoint(body2, other[i], point);
 
 
                     RaiseCollisionDetected(body1.VertexBodies[minIndexMy],
-                        body2.VertexBodies[minIndexOther], ref point, ref point, ref normal, penetration);
+                        body2.VertexBodies[minIndexOther], point, point, normal, penetration);
                 }
             }
 
@@ -270,15 +270,15 @@ namespace BalatroPhysics.Collision
                     out point, out normal, out penetration))
                 {
                     Vector3 point1, point2;
-                    FindSupportPoints(body1, body2, body1.Shape, body2.Shape, ref point, ref normal, out point1, out point2);
-                    RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
+                    FindSupportPoints(body1, body2, body1.Shape, body2.Shape, point, normal, out point1, out point2);
+                    RaiseCollisionDetected(body1, body2, point1, point2, normal, penetration);
                 }
                 else if (speculative)
                 {
                     Vector3 hit1, hit2;
 
-                    if (GJKCollide.ClosestPoints(body1.Shape, body2.Shape, ref body1.orientation, ref body2.orientation,
-                        ref body1.position, ref body2.position, out hit1, out hit2, out normal))
+                    if (GJKCollide.ClosestPoints(body1.Shape, body2.Shape, body1.orientation, body2.orientation,
+                        body1.position, body2.position, out hit1, out hit2, out normal))
                     {
                         Vector3 delta = hit2 - hit1;
 
@@ -288,7 +288,7 @@ namespace BalatroPhysics.Collision
 
                             if (penetration < 0.0f)
                             {
-                                RaiseCollisionDetected(body1, body2, ref hit1, ref hit2, ref normal, penetration);
+                                RaiseCollisionDetected(body1, body2, hit1, hit2, normal, penetration);
                             }
 
                         }
@@ -305,14 +305,14 @@ namespace BalatroPhysics.Collision
                 ms2 = ms2.RequestWorkingClone();
 
                 JBBox transformedBoundingBox = body2.boundingBox;
-                transformedBoundingBox.InverseTransform(ref body1.position, ref body1.orientation);
+                transformedBoundingBox.InverseTransform(body1.position, body1.orientation);
 
-                int ms1Length = ms1.Prepare(ref transformedBoundingBox);
+                int ms1Length = ms1.Prepare(transformedBoundingBox);
 
                 transformedBoundingBox = body1.boundingBox;
-                transformedBoundingBox.InverseTransform(ref body2.position, ref body2.orientation);
+                transformedBoundingBox.InverseTransform(body2.position, body2.orientation);
 
-                int ms2Length = ms2.Prepare(ref transformedBoundingBox);
+                int ms2Length = ms2.Prepare(transformedBoundingBox);
 
                 if (ms1Length == 0 || ms2Length == 0)
                 {
@@ -334,15 +334,15 @@ namespace BalatroPhysics.Collision
                             out point, out normal, out penetration))
                         {
                             Vector3 point1, point2;
-                            FindSupportPoints(body1, body2, ms1, ms2, ref point, ref normal, out point1, out point2);
-                            RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
+                            FindSupportPoints(body1, body2, ms1, ms2, point, normal, out point1, out point2);
+                            RaiseCollisionDetected(body1, body2, point1, point2, normal, penetration);
                         }
                         else if (speculative)
                         {
                             Vector3 hit1, hit2;
 
-                            if (GJKCollide.ClosestPoints(ms1, ms2, ref body1.orientation, ref body2.orientation,
-                                ref body1.position, ref body2.position, out hit1, out hit2, out normal))
+                            if (GJKCollide.ClosestPoints(ms1, ms2, body1.orientation, body2.orientation,
+                                body1.position, body2.position, out hit1, out hit2, out normal))
                             {
                                 Vector3 delta = hit2 - hit1;
 
@@ -352,7 +352,7 @@ namespace BalatroPhysics.Collision
 
                                     if (penetration < 0.0f)
                                     {
-                                        RaiseCollisionDetected(body1, body2, ref hit1, ref hit2, ref normal, penetration);
+                                        RaiseCollisionDetected(body1, body2, hit1, hit2, normal, penetration);
                                     }
                                 }
                             }
@@ -378,9 +378,9 @@ namespace BalatroPhysics.Collision
                 ms = ms.RequestWorkingClone();
 
                 JBBox transformedBoundingBox = b2.boundingBox;
-                transformedBoundingBox.InverseTransform(ref b1.position, ref b1.orientation);
+                transformedBoundingBox.InverseTransform(b1.position, b1.orientation);
 
-                int msLength = ms.Prepare(ref transformedBoundingBox);
+                int msLength = ms.Prepare(transformedBoundingBox);
 
                 if (msLength == 0)
                 {
@@ -397,27 +397,27 @@ namespace BalatroPhysics.Collision
                         out point, out normal, out penetration))
                     {
                         Vector3 point1, point2;
-                        FindSupportPoints(b1, b2, ms, b2.Shape, ref point, ref normal, out point1, out point2);
+                        FindSupportPoints(b1, b2, ms, b2.Shape, point, normal, out point1, out point2);
 
                         if (useTerrainNormal && ms is TerrainShape)
                         {
                             (ms as TerrainShape).CollisionNormal(out normal);
-                            JMath.Transform(ref normal, ref b1.orientation, out normal);
+                            JMath.Transform(normal, b1.orientation, out normal);
                         }
                         else if (useTriangleMeshNormal && ms is TriangleMeshShape)
                         {
                             (ms as TriangleMeshShape).CollisionNormal(out normal);
-                            JMath.Transform(ref normal, ref b1.orientation, out normal);
+                            JMath.Transform(normal, b1.orientation, out normal);
                         }
 
-                        RaiseCollisionDetected(b1, b2, ref point1, ref point2, ref normal, penetration);
+                        RaiseCollisionDetected(b1, b2, point1, point2, normal, penetration);
                     }
                     else if (speculative)
                     {
                         Vector3 hit1, hit2;
 
-                        if (GJKCollide.ClosestPoints(ms, b2.Shape, ref b1.orientation, ref b2.orientation,
-                            ref b1.position, ref b2.position, out hit1, out hit2, out normal))
+                        if (GJKCollide.ClosestPoints(ms, b2.Shape, b1.orientation, b2.orientation,
+                            b1.position, b2.position, out hit1, out hit2, out normal))
                         {
                             Vector3 delta = hit2 - hit1;
 
@@ -427,7 +427,7 @@ namespace BalatroPhysics.Collision
 
                                 if (penetration < 0.0f)
                                 {
-                                    RaiseCollisionDetected(b1, b2, ref hit1, ref hit2, ref normal, penetration);
+                                    RaiseCollisionDetected(b1, b2, hit1, hit2, normal, penetration);
                                 }
                             }
                         }
@@ -446,12 +446,12 @@ namespace BalatroPhysics.Collision
                 ms = ms.RequestWorkingClone();
 
                 JBBox transformedBoundingBox = softBody.BoundingBox;
-                transformedBoundingBox.InverseTransform(ref rigidBody.position, ref rigidBody.orientation);
+                transformedBoundingBox.InverseTransform(rigidBody.position, rigidBody.orientation);
 
-                int msLength = ms.Prepare(ref transformedBoundingBox);
+                int msLength = ms.Prepare(transformedBoundingBox);
 
                 List<int> detected = potentialTriangleLists.GetNew();
-                softBody.dynamicTree.Query(detected, ref rigidBody.boundingBox);
+                softBody.dynamicTree.Query(detected, rigidBody.boundingBox);
 
                 foreach (int i in detected)
                 {
@@ -470,10 +470,10 @@ namespace BalatroPhysics.Collision
 
                         if (result)
                         {
-                            int minIndex = FindNearestTrianglePoint(softBody, i, ref point);
+                            int minIndex = FindNearestTrianglePoint(softBody, i, point);
 
                             RaiseCollisionDetected(rigidBody,
-                                softBody.VertexBodies[minIndex], ref point, ref point, ref normal, penetration);
+                                softBody.VertexBodies[minIndex], point, point, normal, penetration);
                         }
                     }
 
@@ -485,7 +485,7 @@ namespace BalatroPhysics.Collision
             else
             {
                 List<int> detected = potentialTriangleLists.GetNew();
-                softBody.dynamicTree.Query(detected, ref rigidBody.boundingBox);
+                softBody.dynamicTree.Query(detected, rigidBody.boundingBox);
 
                 foreach (int i in detected)
                 {
@@ -500,10 +500,10 @@ namespace BalatroPhysics.Collision
 
                     if (result)
                     {
-                        int minIndex = FindNearestTrianglePoint(softBody, i, ref point);
+                        int minIndex = FindNearestTrianglePoint(softBody, i, point);
 
                         RaiseCollisionDetected(rigidBody,
-                            softBody.VertexBodies[minIndex], ref point, ref point, ref normal, penetration);
+                            softBody.VertexBodies[minIndex], point, point, normal, penetration);
                     }
                 }
 
@@ -512,7 +512,7 @@ namespace BalatroPhysics.Collision
             }
         }
 
-        public static int FindNearestTrianglePoint(SoftBody sb, int id, ref Vector3 point)
+        public static int FindNearestTrianglePoint(SoftBody sb, int id, Vector3 point)
         {
             SoftBody.Triangle triangle = sb.dynamicTree.GetUserData(id);
             Vector3 p;
@@ -543,13 +543,13 @@ namespace BalatroPhysics.Collision
 
 
         private void FindSupportPoints(RigidBody body1, RigidBody body2,
-            Shape shape1, Shape shape2, ref Vector3 point, ref Vector3 normal,
+            Shape shape1, Shape shape2, Vector3 point, Vector3 normal,
             out Vector3 point1, out Vector3 point2)
         {
             Vector3 mn = -normal;
 
-            Vector3 sA; SupportMapping(body1, shape1, ref mn, out sA);
-            Vector3 sB; SupportMapping(body2, shape2, ref normal, out sB);
+            Vector3 sA; SupportMapping(body1, shape1, mn, out sA);
+            Vector3 sB; SupportMapping(body2, shape2, normal, out sB);
 
             sA -= point;
             sB -= point;
@@ -564,11 +564,11 @@ namespace BalatroPhysics.Collision
             point2 = point + sB;
         }
 
-        private void SupportMapping(RigidBody body, Shape workingShape, ref Vector3 direction, out Vector3 result)
+        private void SupportMapping(RigidBody body, Shape workingShape, Vector3 direction, out Vector3 result)
         {
-            JMath.Transform(ref direction, ref body.invOrientation, out result);
-            workingShape.SupportMapping(ref result, out result);
-            JMath.Transform(ref result, ref body.orientation, out result);
+            JMath.Transform(direction, body.invOrientation, out result);
+            workingShape.SupportMapping(result, out result);
+            JMath.Transform(result, body.orientation, out result);
             result += body.position;
         }
 
@@ -643,8 +643,8 @@ namespace BalatroPhysics.Collision
         /// <param name="normal">The normal pointing to body1.</param>
         /// <param name="penetration">The penetration depth.</param>
         protected void RaiseCollisionDetected(RigidBody body1, RigidBody body2,
-                                            ref Vector3 point1, ref Vector3 point2,
-                                            ref Vector3 normal, float penetration)
+                                            Vector3 point1, Vector3 point2,
+                                            Vector3 normal, float penetration)
         {
             if (this.CollisionDetected != null)
                 this.CollisionDetected(body1, body2, point1, point2, normal, penetration);

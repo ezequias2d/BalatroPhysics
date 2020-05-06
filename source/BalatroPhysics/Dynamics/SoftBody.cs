@@ -265,9 +265,9 @@ namespace BalatroPhysics.Dynamics
             public void UpdateBoundingBox()
             {
                 boundingBox = JBBox.SmallBox;
-                boundingBox.AddPoint(ref owner.points[indices.I0].position);
-                boundingBox.AddPoint(ref owner.points[indices.I1].position);
-                boundingBox.AddPoint(ref owner.points[indices.I2].position);
+                boundingBox.AddPoint(owner.points[indices.I0].position);
+                boundingBox.AddPoint(owner.points[indices.I1].position);
+                boundingBox.AddPoint(owner.points[indices.I2].position);
 
                 boundingBox.Min -= new Vector3(owner.triangleExpansion);
                 boundingBox.Max += new Vector3(owner.triangleExpansion);
@@ -279,7 +279,7 @@ namespace BalatroPhysics.Dynamics
                     owner.points[indices.I2].position - owner.points[indices.I0].position).Length();
             }
 
-            public void SupportMapping(ref Vector3 direction, out Vector3 result)
+            public void SupportMapping(Vector3 direction, out Vector3 result)
             {
 
                 float min = Vector3.Dot(owner.points[indices.I0].position, direction);
@@ -566,7 +566,7 @@ namespace BalatroPhysics.Dynamics
             for (int i = 0; i < points.Count; i++)
             {
                 queryList.Clear();
-                this.dynamicTree.Query(queryList, ref points[i].boundingBox);
+                this.dynamicTree.Query(queryList, points[i].boundingBox);
 
                 for (int e = 0; e < queryList.Count; e++)
                 {
@@ -578,7 +578,7 @@ namespace BalatroPhysics.Dynamics
                             JMatrix.InternalIdentity, points[i].position, Vector3.Zero,
                             out point, out normal, out penetration))
                         {
-                            int nearest = CollisionSystem.FindNearestTrianglePoint(this, queryList[e], ref point);
+                            int nearest = CollisionSystem.FindNearestTrianglePoint(this, queryList[e], point);
 
                             collision(points[i], points[nearest], point, point, normal, penetration);
                      
@@ -616,7 +616,7 @@ namespace BalatroPhysics.Dynamics
                 t.boundingBox.AddPoint(points[t.indices.I1].position);
                 t.boundingBox.AddPoint(points[t.indices.I2].position);
 
-                t.dynamicTreeID = dynamicTree.AddProxy(ref t.boundingBox, t);
+                t.dynamicTreeID = dynamicTree.AddProxy(t.boundingBox, t);
             }
 
             HashSet<Edge> edges = GetEdges(indices);
@@ -688,7 +688,7 @@ namespace BalatroPhysics.Dynamics
 
                 linVel *= 1.0f / 3.0f;
 
-                dynamicTree.MoveProxy(t.dynamicTreeID, ref t.boundingBox, linVel * timestep);
+                dynamicTree.MoveProxy(t.dynamicTreeID, t.boundingBox, linVel * timestep);
 
                 Vector3 v1 = points[t.indices.I0].position;
                 Vector3 v2 = points[t.indices.I1].position;

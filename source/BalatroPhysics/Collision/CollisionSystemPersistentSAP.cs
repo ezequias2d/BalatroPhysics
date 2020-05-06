@@ -501,7 +501,7 @@ namespace BalatroPhysics.Collision
         {
             fraction = float.MaxValue; normal = Vector3.Zero;
 
-            if (!body.BoundingBox.RayIntersect(ref rayOrigin, ref rayDirection)) return false;
+            if (!body.BoundingBox.RayIntersect(rayOrigin, rayDirection)) return false;
 
             if (body.Shape is Multishape)
             {
@@ -511,30 +511,30 @@ namespace BalatroPhysics.Collision
                 bool multiShapeCollides = false;
 
                 Vector3 transformedOrigin = rayOrigin - body.position;
-                JMath.Transform(ref transformedOrigin, ref body.invOrientation, out transformedOrigin);
-                Vector3 transformedDirection; JMath.Transform(ref rayDirection, ref body.invOrientation, out transformedDirection);
+                JMath.Transform(transformedOrigin, body.invOrientation, out transformedOrigin);
+                Vector3 transformedDirection; JMath.Transform(rayDirection, body.invOrientation, out transformedDirection);
 
-                int msLength = ms.Prepare(ref transformedOrigin, ref transformedDirection);
+                int msLength = ms.Prepare(transformedOrigin, transformedDirection);
 
                 for (int i = 0; i < msLength; i++)
                 {
                     ms.SetCurrentShape(i);
 
-                    if (GJKCollide.Raycast(ms, ref body.orientation, ref body.invOrientation, ref body.position,
-                        ref rayOrigin, ref rayDirection, out tempFraction, out tempNormal))
+                    if (GJKCollide.Raycast(ms, body.orientation, body.invOrientation, body.position,
+                        rayOrigin, rayDirection, out tempFraction, out tempNormal))
                     {
                         if (tempFraction < fraction)
                         {
                             if (useTerrainNormal && ms is TerrainShape)
                             {
                                 (ms as TerrainShape).CollisionNormal(out tempNormal);
-                                JMath.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                JMath.Transform(tempNormal, body.orientation, out tempNormal);
                                 tempNormal = -tempNormal;
                             }
                             else if (useTriangleMeshNormal && ms is TriangleMeshShape)
                             {
                                 (ms as TriangleMeshShape).CollisionNormal(out tempNormal);
-                                JMath.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                JMath.Transform(tempNormal, body.orientation, out tempNormal);
                                 tempNormal = -tempNormal;
                             }
 
@@ -550,8 +550,8 @@ namespace BalatroPhysics.Collision
             }
             else
             {
-                return (GJKCollide.Raycast(body.Shape, ref body.orientation, ref body.invOrientation, ref body.position,
-                    ref rayOrigin, ref rayDirection, out fraction, out normal));
+                return (GJKCollide.Raycast(body.Shape, body.orientation, body.invOrientation, body.position,
+                    rayOrigin, rayDirection, out fraction, out normal));
             }
 
 
