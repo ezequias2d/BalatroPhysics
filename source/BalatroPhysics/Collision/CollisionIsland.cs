@@ -37,9 +37,9 @@ namespace BalatroPhysics.Collision
     /// </summary>
     public class CollisionIsland
     {
-        private HashSet<RigidBody> bodies = new HashSet<RigidBody>();
-        private HashSet<Arbiter> arbiter = new HashSet<Arbiter>();
-        private HashSet<Constraint> constraints = new HashSet<Constraint>();
+        private HashSet<RigidBody> bodies;
+        private HashSet<Arbiter> arbiter;
+        private HashSet<Constraint> constraints;
 
         /// <summary>
         /// Gets a read only list of <see cref="RigidBody"/> which are in contact with each other.
@@ -62,6 +62,9 @@ namespace BalatroPhysics.Collision
         /// </summary>
         public CollisionIsland()
         {
+            bodies = new HashSet<RigidBody>();
+            arbiter = new HashSet<Arbiter>();
+            constraints = new HashSet<Constraint>();
         }
 
         /// <summary>
