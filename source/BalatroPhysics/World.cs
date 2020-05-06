@@ -266,7 +266,7 @@ namespace BalatroPhysics
         /// Calling this method removes all cached objects from all
         /// stacks.
         /// </summary>
-        public void ResetResourcePools()
+        public void ClearPools()
         {
             IslandManager.Pool.Clear();
             Arbiter.Pool.Clear();
@@ -319,7 +319,7 @@ namespace BalatroPhysics
             // delete the arbiters
             arbiterMap.Clear();
 
-            ResetResourcePools();
+            ClearPools();
         }
 
         /// <summary>
