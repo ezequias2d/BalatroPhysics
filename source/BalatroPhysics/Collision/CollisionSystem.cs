@@ -112,7 +112,7 @@ namespace BalatroPhysics.Collision
             /// <summary>
             /// A resource pool of Pairs.
             /// </summary>
-            public static ResourcePool<BroadphasePair> Pool = new ResourcePool<BroadphasePair>();
+            public static IObjectPool<BroadphasePair> Pool = new ObjectPool<BroadphasePair>(() => new BroadphasePair());
         }
         #endregion
 
@@ -215,12 +215,12 @@ namespace BalatroPhysics.Collision
             }
         }
 
-        private ResourcePool<List<int>> potentialTriangleLists = new ResourcePool<List<int>>();
+        private IObjectPool<List<int>> potentialTriangleLists = new ObjectPool<List<int>>(() => new List<int>());
 
         private void DetectSoftSoft(SoftBody body1, SoftBody body2)
         {
-            List<int> my = potentialTriangleLists.GetNew();
-            List<int> other = potentialTriangleLists.GetNew();
+            List<int> my = potentialTriangleLists.Get();
+            List<int> other = potentialTriangleLists.Get();
 
             body1.dynamicTree.Query(other, my, body2.dynamicTree);
 
@@ -450,7 +450,7 @@ namespace BalatroPhysics.Collision
 
                 int msLength = ms.Prepare(transformedBoundingBox);
 
-                List<int> detected = potentialTriangleLists.GetNew();
+                List<int> detected = potentialTriangleLists.Get();
                 softBody.dynamicTree.Query(detected, rigidBody.boundingBox);
 
                 foreach (int i in detected)
@@ -484,7 +484,7 @@ namespace BalatroPhysics.Collision
             }
             else
             {
-                List<int> detected = potentialTriangleLists.GetNew();
+                List<int> detected = potentialTriangleLists.Get();
                 softBody.dynamicTree.Query(detected, rigidBody.boundingBox);
 
                 foreach (int i in detected)

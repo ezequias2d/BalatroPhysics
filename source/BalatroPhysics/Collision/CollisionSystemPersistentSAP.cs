@@ -304,7 +304,7 @@ namespace BalatroPhysics.Collision
                 {
                     if (multiThreaded)
                     {
-                        BroadphasePair pair = BroadphasePair.Pool.GetNew();
+                        BroadphasePair pair = BroadphasePair.Pool.Get();
                         if (swapOrder) { pair.Entity1 = key.Entity1; pair.Entity2 = key.Entity2; }
                         else { pair.Entity2 = key.Entity2; pair.Entity1 = key.Entity1; }
                         threadManager.AddTask(detectCallback, pair);

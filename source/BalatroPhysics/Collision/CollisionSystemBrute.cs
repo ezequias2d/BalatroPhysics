@@ -95,7 +95,7 @@ namespace BalatroPhysics.Collision
                         {
                             if (RaisePassedBroadphase(bodyList[i], bodyList[e]))
                             {
-                                BroadphasePair pair = BroadphasePair.Pool.GetNew();
+                                BroadphasePair pair = BroadphasePair.Pool.Get();
 
                                 if (swapOrder) { pair.Entity1 = bodyList[i]; pair.Entity2 = bodyList[e]; }
                                 else { pair.Entity2 = bodyList[e]; pair.Entity1 = bodyList[i]; }

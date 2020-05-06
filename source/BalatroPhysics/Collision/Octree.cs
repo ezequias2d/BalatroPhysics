@@ -138,7 +138,7 @@ namespace BalatroPhysics.Collision
             triBoxes = null;
             tris = null;
             nodes = null;
-            nodeStackPool.ResetResourcePool();
+            nodeStackPool.Clear();
         }
         #endregion
 
@@ -254,7 +254,7 @@ namespace BalatroPhysics.Collision
 
             // now convert to the tighter Node from BuildNodes
             nodes = new Node[buildNodes.Count];
-            nodeStackPool = new ArrayResourcePool<ushort>(buildNodes.Count);
+            nodeStackPool = new ObjectPool<ushort[]>(() => new ushort[nodes.Length]);
             //nodeStack = new UInt16[buildNodes.Count];
             for (int i = 0; i < nodes.Length; i++)
             {
@@ -362,7 +362,7 @@ namespace BalatroPhysics.Collision
             int curStackIndex = 0;
             int endStackIndex = 1;
 
-            UInt16[] nodeStack = nodeStackPool.GetNew();
+            UInt16[] nodeStack = nodeStackPool.Get();
 
             nodeStack[0] = 0;
 
@@ -397,7 +397,7 @@ namespace BalatroPhysics.Collision
         }
         #endregion
 
-        private ArrayResourcePool<UInt16> nodeStackPool;
+        private IObjectPool<UInt16[]> nodeStackPool;
 
         /// <summary>
         /// Returns all triangles which intersect the given axis aligned bounding box.
@@ -414,7 +414,7 @@ namespace BalatroPhysics.Collision
             int curStackIndex = 0;
             int endStackIndex = 1;
 
-            UInt16[] nodeStack = nodeStackPool.GetNew();
+            UInt16[] nodeStack = nodeStackPool.Get();
             nodeStack[0] = 0;
 
             int triCount = 0;

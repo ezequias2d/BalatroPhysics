@@ -20,7 +20,7 @@ namespace BalatroPhysics.Collision
     public class IslandManager : ReadOnlyCollection<CollisionIsland>
     {
 
-        public static ResourcePool<CollisionIsland> Pool = new ResourcePool<CollisionIsland>();
+        public static IObjectPool<CollisionIsland> Pool = new ObjectPool<CollisionIsland>(() => new CollisionIsland());
 
         private List<CollisionIsland> islands;
 
@@ -171,7 +171,7 @@ namespace BalatroPhysics.Collision
             {
                 if (body2.island == null)
                 {
-                    CollisionIsland newIsland = Pool.GetNew();
+                    CollisionIsland newIsland = Pool.Get();
                     newIsland.IslandManager = this;
 
                     body2.island = newIsland;
@@ -183,7 +183,7 @@ namespace BalatroPhysics.Collision
             {
                 if (body1.island == null)
                 {
-                    CollisionIsland newIsland = Pool.GetNew();
+                    CollisionIsland newIsland = Pool.Get();
                     newIsland.IslandManager = this;
 
                     body1.island = newIsland;
@@ -303,7 +303,7 @@ namespace BalatroPhysics.Collision
                 }
             }
 
-            CollisionIsland island = Pool.GetNew();
+            CollisionIsland island = Pool.Get();
             island.IslandManager = this;
 
             islands.Add(island);
@@ -431,7 +431,7 @@ namespace BalatroPhysics.Collision
             }
             else if (body0.island == null) // <- both are null
             {
-                CollisionIsland island = Pool.GetNew();
+                CollisionIsland island = Pool.Get();
                 island.IslandManager = this;
 
                 body0.island = body1.island = island;

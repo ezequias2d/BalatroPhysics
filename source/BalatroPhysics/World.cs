@@ -268,9 +268,9 @@ namespace BalatroPhysics
         /// </summary>
         public void ResetResourcePools()
         {
-            IslandManager.Pool.ResetResourcePool();
-            Arbiter.Pool.ResetResourcePool();
-            Contact.Pool.ResetResourcePool();
+            IslandManager.Pool.Clear();
+            Arbiter.Pool.Clear();
+            Contact.Pool.Clear();
         }
 
         /// <summary>
@@ -889,7 +889,7 @@ namespace BalatroPhysics
                 arbiterMap.LookUpArbiter(body1, body2, out arbiter);
                 if (arbiter == null)
                 {
-                    arbiter = Arbiter.Pool.GetNew();
+                    arbiter = Arbiter.Pool.Get();
                     arbiter.body1 = body1; arbiter.body2 = body2;
                     arbiterMap.Add(arbiter);
 

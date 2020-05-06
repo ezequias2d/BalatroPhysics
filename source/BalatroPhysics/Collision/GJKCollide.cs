@@ -37,7 +37,7 @@ namespace BalatroPhysics.Collision
     {
         private const int MaxIterations = 15;
 
-        private static ResourcePool<VoronoiSimplexSolver> simplexSolverPool = new ResourcePool<VoronoiSimplexSolver>();
+        private static IObjectPool<VoronoiSimplexSolver> simplexSolverPool = new ObjectPool<VoronoiSimplexSolver>(() => new VoronoiSimplexSolver());
 
         #region private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
         private static void SupportMapTransformed(ISupportMappable support, JMatrix orientation, Vector3 position, Vector3 direction, out Vector3 result)
@@ -94,7 +94,7 @@ namespace BalatroPhysics.Collision
 
             int maxIter = MaxIterations;
 
-            VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
+            VoronoiSimplexSolver simplexSolver = simplexSolverPool.Get();
 
             simplexSolver.Reset();
 
@@ -129,7 +129,7 @@ namespace BalatroPhysics.Collision
             out Vector3 p1, out Vector3 p2, out Vector3 normal)
         {
 
-            VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
+            VoronoiSimplexSolver simplexSolver = simplexSolverPool.Get();
             simplexSolver.Reset();
 
             p1 = p2 = Vector3.Zero;
@@ -190,7 +190,7 @@ namespace BalatroPhysics.Collision
     //out Vector3 p1, out Vector3 p2, out Vector3 normal)
     //    {
 
-    //        VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
+    //        VoronoiSimplexSolver simplexSolver = simplexSolverPool.Get();
     //        simplexSolver.Reset();
 
     //        float lambda = 0.0f;
@@ -305,7 +305,7 @@ namespace BalatroPhysics.Collision
         public static bool Raycast(ISupportMappable support, JMatrix orientation, JMatrix invOrientation,
             Vector3 position,Vector3 origin,Vector3 direction, out float fraction, out Vector3 normal)
         {
-            VoronoiSimplexSolver simplexSolver = simplexSolverPool.GetNew();
+            VoronoiSimplexSolver simplexSolver = simplexSolverPool.Get();
             simplexSolver.Reset();
 
             normal = Vector3.Zero;

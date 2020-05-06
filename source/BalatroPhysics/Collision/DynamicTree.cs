@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.Serialization;
 using BalatroPhysics.LinearMath;
 
 
@@ -259,7 +260,7 @@ namespace BalatroPhysics.Collision
 
         public void Query(Vector3 origin, Vector3 direction, List<int> collisions)
         {
-            Stack<int> stack = stackPool.GetNew();
+            Stack<int> stack = stackPool.Get();
 
             stack.Push(_root);
 
@@ -284,8 +285,8 @@ namespace BalatroPhysics.Collision
 
         public void Query(List<int> other, List<int> my, DynamicTree<T> tree)
         {
-            Stack<int> stack1 = stackPool.GetNew();
-            Stack<int> stack2 = stackPool.GetNew();
+            Stack<int> stack1 = stackPool.Get();
+            Stack<int> stack2 = stackPool.Get();
 
             stack1.Push(_root);
             stack2.Push(tree._root);
@@ -345,7 +346,7 @@ namespace BalatroPhysics.Collision
         }
 
 
-        private ResourcePool<Stack<int>> stackPool = new ResourcePool<Stack<int>>();
+        private IObjectPool<Stack<int>> stackPool = new ObjectPool<Stack<int>>(() => new Stack<int>());
 
         /// <summary>
         /// Query an AABB for overlapping proxies. The callback class
@@ -356,7 +357,7 @@ namespace BalatroPhysics.Collision
         public void Query(List<int> my, JBBox aabb)
         {
             //Stack<int> _stack = new Stack<int>(256);
-            Stack<int> _stack = stackPool.GetNew();
+            Stack<int> _stack = stackPool.Get();
 
             _stack.Push(_root);
 

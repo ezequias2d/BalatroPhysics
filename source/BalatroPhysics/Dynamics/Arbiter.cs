@@ -56,7 +56,7 @@ namespace BalatroPhysics.Dynamics
 
         /// <summary>
         /// </summary>
-        public static ResourcePool<Arbiter> Pool = new ResourcePool<Arbiter>();
+        public static IObjectPool<Arbiter> Pool = new ObjectPool<Arbiter>(() => new Arbiter());
 
         // internal values for faster access within the engine
         internal RigidBody body1, body2;
@@ -125,7 +125,7 @@ namespace BalatroPhysics.Dynamics
                 }
                 else
                 {
-                    Contact contact = Contact.Pool.GetNew();
+                    Contact contact = Contact.Pool.Get();
                     contact.Initialize(body1, body2, point1, point2, normal, penetration, true, contactSettings);
                     contactList.Add(contact);
                     return contact;

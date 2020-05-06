@@ -70,8 +70,7 @@ namespace BalatroPhysics.Dynamics
         /// <summary>
         /// A contact resource pool.
         /// </summary>
-        public static readonly ResourcePool<Contact> Pool =
-            new ResourcePool<Contact>();
+        public static readonly IObjectPool<Contact> Pool = new ObjectPool<Contact>(() => new Contact());
 
         private float lastTimeStep = float.PositiveInfinity;
 
